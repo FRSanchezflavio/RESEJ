@@ -29,7 +29,7 @@ class FileService {
         ruta_archivo: file.path,
         tipo_mime: file.mimetype,
         tamano_bytes: file.size,
-        subido_por: usuarioId
+        subido_por: usuarioId,
       };
 
       const archivo = await Archivo.create(archivoData);
@@ -44,7 +44,7 @@ class FileService {
       } catch (unlinkError) {
         logger.error(`Error al eliminar archivo: ${unlinkError.message}`);
       }
-      
+
       logger.error(`Error al guardar archivo: ${error.message}`);
       throw error;
     }
@@ -56,7 +56,7 @@ class FileService {
   static async getFile(id) {
     try {
       const archivo = await Archivo.findById(id);
-      
+
       if (!archivo) {
         throw new Error('Archivo no encontrado');
       }
@@ -82,7 +82,9 @@ class FileService {
     try {
       return await Archivo.findByRegistroId(registroId);
     } catch (error) {
-      logger.error(`Error al obtener archivos del registro ${registroId}: ${error.message}`);
+      logger.error(
+        `Error al obtener archivos del registro ${registroId}: ${error.message}`
+      );
       throw error;
     }
   }
@@ -93,7 +95,7 @@ class FileService {
   static async deleteFile(id) {
     try {
       const archivo = await Archivo.delete(id);
-      
+
       if (!archivo) {
         throw new Error('Archivo no encontrado');
       }
@@ -122,7 +124,9 @@ class FileService {
     try {
       return await Archivo.getEstadisticas();
     } catch (error) {
-      logger.error(`Error al obtener estadísticas de archivos: ${error.message}`);
+      logger.error(
+        `Error al obtener estadísticas de archivos: ${error.message}`
+      );
       throw error;
     }
   }
@@ -139,7 +143,7 @@ class FileService {
         if (file === '.gitkeep') continue;
 
         const archivo = await Archivo.findById({ nombre_archivo: file });
-        
+
         if (!archivo) {
           const filePath = path.join(UPLOAD_DIR, file);
           await fs.unlink(filePath);

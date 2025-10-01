@@ -1,5 +1,9 @@
 const AuthService = require('../services/authService');
-const { createSuccessResponse, createErrorResponse, getClientIp } = require('../utils/helpers');
+const {
+  createSuccessResponse,
+  createErrorResponse,
+  getClientIp,
+} = require('../utils/helpers');
 
 class AuthController {
   async login(req, res, next) {
@@ -20,7 +24,10 @@ class AuthController {
       const { refresh_token } = req.body;
       const ipAddress = getClientIp(req);
 
-      const result = await AuthService.refreshAccessToken(refresh_token, ipAddress);
+      const result = await AuthService.refreshAccessToken(
+        refresh_token,
+        ipAddress
+      );
 
       res.json(createSuccessResponse(result, 'Token refrescado exitosamente'));
     } catch (error) {

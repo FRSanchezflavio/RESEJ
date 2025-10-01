@@ -1,4 +1,5 @@
 # RE.SE.J - Registro de Secuestros Judiciales
+
 ## Backend API - Policía de Tucumán
 
 Sistema de gestión de registros de secuestros judiciales con autenticación JWT y autorización por roles.
@@ -80,11 +81,14 @@ cp .env.example .env
 ### 2. Configurar variables de entorno (.env)
 
 \`\`\`env
+
 # Server Configuration
+
 PORT=3000
 NODE_ENV=development
 
 # Database Configuration
+
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=resej_db
@@ -92,21 +96,25 @@ DB_USER=resej_user
 DB_PASSWORD=secure_password
 
 # JWT Configuration
+
 JWT_SECRET=your_super_secure_jwt_secret_key_change_this_in_production
 JWT_EXPIRES_IN=24h
 REFRESH_TOKEN_SECRET=your_super_secure_refresh_token_secret_change_this
 REFRESH_TOKEN_EXPIRES_IN=7d
 
 # File Upload Configuration
+
 UPLOAD_DIR=./uploads
 MAX_FILE_SIZE=5242880
 
 # Security Configuration
+
 BCRYPT_ROUNDS=12
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 
 # CORS Configuration
+
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 \`\`\`
 
@@ -129,6 +137,7 @@ npm run seed:run
 \`\`\`
 
 **Usuario Administrador por defecto**:
+
 - Usuario: `admin`
 - Contraseña: `Admin2025!`
 - ⚠️ **Cambiar la contraseña inmediatamente después del primer acceso**
@@ -178,28 +187,28 @@ POST /api/auth/login
 Content-Type: application/json
 
 {
-  "usuario": "admin",
-  "password": "Admin2025!"
+"usuario": "admin",
+"password": "Admin2025!"
 }
 \`\`\`
 
 **Respuesta**:
 \`\`\`json
 {
-  "success": true,
-  "data": {
-    "accessToken": "eyJhbGc...",
-    "refreshToken": "eyJhbGc...",
-    "usuario": {
-      "id": 1,
-      "usuario": "admin",
-      "nombre": "Administrador",
-      "apellido": "Sistema",
-      "nombreCompleto": "Administrador Sistema",
-      "rol": "administrador"
-    }
-  },
-  "message": "Login exitoso"
+"success": true,
+"data": {
+"accessToken": "eyJhbGc...",
+"refreshToken": "eyJhbGc...",
+"usuario": {
+"id": 1,
+"usuario": "admin",
+"nombre": "Administrador",
+"apellido": "Sistema",
+"nombreCompleto": "Administrador Sistema",
+"rol": "administrador"
+}
+},
+"message": "Login exitoso"
 }
 \`\`\`
 
@@ -210,7 +219,7 @@ POST /api/auth/refresh
 Content-Type: application/json
 
 {
-  "refresh_token": "eyJhbGc..."
+"refresh_token": "eyJhbGc..."
 }
 \`\`\`
 
@@ -221,7 +230,7 @@ POST /api/auth/logout
 Content-Type: application/json
 
 {
-  "refresh_token": "eyJhbGc..."
+"refresh_token": "eyJhbGc..."
 }
 \`\`\`
 
@@ -251,11 +260,11 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 
 {
-  "usuario": "juan.perez",
-  "password": "Password123!",
-  "nombre": "Juan",
-  "apellido": "Pérez",
-  "rol": "usuario_consulta"
+"usuario": "juan.perez",
+"password": "Password123!",
+"nombre": "Juan",
+"apellido": "Pérez",
+"rol": "usuario_consulta"
 }
 \`\`\`
 
@@ -267,8 +276,8 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 
 {
-  "nombre": "Juan Carlos",
-  "apellido": "Pérez González"
+"nombre": "Juan Carlos",
+"apellido": "Pérez González"
 }
 \`\`\`
 
@@ -280,7 +289,7 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 
 {
-  "new_password": "NewPassword123!"
+"new_password": "NewPassword123!"
 }
 \`\`\`
 
@@ -310,13 +319,13 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 
 {
-  "nombre": "Juan",
-  "apellido": "García",
-  "dni": "12345678",
-  "fecha_nacimiento": "1980-05-15",
-  "domicilio": "Av. Principal 123",
-  "telefono": "381-1234567",
-  "email": "juan.garcia@example.com"
+"nombre": "Juan",
+"apellido": "García",
+"dni": "12345678",
+"fecha_nacimiento": "1980-05-15",
+"domicilio": "Av. Principal 123",
+"telefono": "381-1234567",
+"email": "juan.garcia@example.com"
 }
 \`\`\`
 
@@ -355,20 +364,20 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 
 {
-  "persona_id": 1,
-  "fecha_ingreso": "2025-09-30",
-  "ufi": "UFI N° 1",
-  "numero_legajo": "123/2025",
-  "seccion_que_interviene": "División Robos",
-  "detalle_secuestro": "Elementos varios",
-  "numero_protocolo": "PROT-001/2025",
-  "cadena_custodia": "CC-001",
-  "nro_folio": "001",
-  "nro_libro_secuestro": "LIB-001",
-  "of_a_cargo": "Oficial Rodríguez",
-  "tramite": "En proceso",
-  "tipo_delito": "Robo",
-  "estado_causa": "abierta"
+"persona_id": 1,
+"fecha_ingreso": "2025-09-30",
+"ufi": "UFI N° 1",
+"numero_legajo": "123/2025",
+"seccion_que_interviene": "División Robos",
+"detalle_secuestro": "Elementos varios",
+"numero_protocolo": "PROT-001/2025",
+"cadena_custodia": "CC-001",
+"nro_folio": "001",
+"nro_libro_secuestro": "LIB-001",
+"of_a_cargo": "Oficial Rodríguez",
+"tramite": "En proceso",
+"tipo_delito": "Robo",
+"estado_causa": "abierta"
 }
 \`\`\`
 
@@ -443,24 +452,24 @@ Authorization: Bearer {accessToken}
 \`\`\`
 BACKEND/
 ├── src/
-│   ├── config/           # Configuraciones (DB, JWT, Multer)
-│   ├── controllers/      # Controladores de rutas
-│   ├── middleware/       # Middleware (Auth, Audit, Errors)
-│   ├── models/           # Modelos de datos
-│   ├── routes/           # Definición de rutas
-│   ├── services/         # Lógica de negocio
-│   ├── utils/            # Utilidades y helpers
-│   ├── migrations/       # Migraciones de BD
-│   ├── seeds/            # Seeds de datos iniciales
-│   └── app.js            # Configuración de Express
-├── uploads/              # Archivos subidos
-├── logs/                 # Logs de la aplicación
-├── .env                  # Variables de entorno
-├── .env.example          # Ejemplo de variables
-├── knexfile.js           # Configuración de Knex
-├── package.json          # Dependencias
-├── server.js             # Punto de entrada
-└── README.md             # Documentación
+│ ├── config/ # Configuraciones (DB, JWT, Multer)
+│ ├── controllers/ # Controladores de rutas
+│ ├── middleware/ # Middleware (Auth, Audit, Errors)
+│ ├── models/ # Modelos de datos
+│ ├── routes/ # Definición de rutas
+│ ├── services/ # Lógica de negocio
+│ ├── utils/ # Utilidades y helpers
+│ ├── migrations/ # Migraciones de BD
+│ ├── seeds/ # Seeds de datos iniciales
+│ └── app.js # Configuración de Express
+├── uploads/ # Archivos subidos
+├── logs/ # Logs de la aplicación
+├── .env # Variables de entorno
+├── .env.example # Ejemplo de variables
+├── knexfile.js # Configuración de Knex
+├── package.json # Dependencias
+├── server.js # Punto de entrada
+└── README.md # Documentación
 \`\`\`
 
 ---
@@ -470,29 +479,35 @@ BACKEND/
 ### Características de Seguridad Implementadas
 
 1. **Autenticación JWT**:
+
    - Access tokens de corta duración (24h)
    - Refresh tokens con revocación manual
    - Tokens almacenados en BD para control
 
 2. **Autorización por Roles**:
+
    - Middleware de verificación de roles
    - Permisos granulares por endpoint
 
 3. **Rate Limiting**:
+
    - Login: 5 intentos cada 15 minutos
    - General: 100 requests cada 15 minutos
    - Upload: 5 archivos por minuto
 
 4. **Validación de Archivos**:
+
    - Validación de Content-Type
    - Verificación de magic bytes
    - Límite de tamaño (5MB)
 
 5. **Encriptación**:
+
    - Bcrypt con 12 salt rounds
    - Contraseñas nunca expuestas
 
 6. **Headers HTTP Seguros**:
+
    - Helmet.js configurado
    - CORS restrictivo
 
@@ -517,7 +532,7 @@ await AuthService.cleanExpiredTokens();
 ### Backup de Base de Datos
 
 \`\`\`bash
-pg_dump -Fc resej_db > resej_backup_$(date +%Y%m%d).dump
+pg*dump -Fc resej_db > resej_backup*$(date +%Y%m%d).dump
 \`\`\`
 
 ### Restaurar Backup
@@ -554,6 +569,7 @@ npm run migrate:latest
 ## 📞 Contacto
 
 **Desarrolladores**:
+
 - Flavio Sanchez - P.T.P. - CARGO: 14059
 - Lucas Jonas Diaz - CARGO: 30313
 

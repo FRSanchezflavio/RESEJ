@@ -9,10 +9,10 @@ class UsuarioService {
   static async getAllUsuarios(filters) {
     try {
       const result = await Usuario.findAll(filters);
-      
+
       // Formatear usuarios
       result.usuarios = result.usuarios.map(user => formatUsuario(user));
-      
+
       return result;
     } catch (error) {
       logger.error(`Error al obtener usuarios: ${error.message}`);
@@ -26,7 +26,7 @@ class UsuarioService {
   static async getUsuarioById(id) {
     try {
       const usuario = await Usuario.findById(id);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
@@ -45,7 +45,7 @@ class UsuarioService {
     try {
       // Verificar si el usuario ya existe
       const existente = await Usuario.findByUsername(usuarioData.usuario);
-      
+
       if (existente) {
         throw new Error('El nombre de usuario ya está en uso');
       }
@@ -53,10 +53,12 @@ class UsuarioService {
       // Crear usuario
       const nuevoUsuario = await Usuario.create({
         ...usuarioData,
-        creado_por: creadoPor
+        creado_por: creadoPor,
       });
 
-      logger.info(`Usuario creado: ${nuevoUsuario.usuario} por usuario ID ${creadoPor}`);
+      logger.info(
+        `Usuario creado: ${nuevoUsuario.usuario} por usuario ID ${creadoPor}`
+      );
 
       return formatUsuario(nuevoUsuario);
     } catch (error) {
@@ -72,7 +74,7 @@ class UsuarioService {
     try {
       // Verificar que el usuario existe
       const usuario = await Usuario.findById(id);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
@@ -103,7 +105,7 @@ class UsuarioService {
   static async deactivateUsuario(id) {
     try {
       const usuario = await Usuario.deactivate(id);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
@@ -123,7 +125,7 @@ class UsuarioService {
   static async activateUsuario(id) {
     try {
       const usuario = await Usuario.activate(id);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
@@ -143,7 +145,7 @@ class UsuarioService {
   static async resetPassword(id, newPassword) {
     try {
       const usuario = await Usuario.resetPassword(id, newPassword);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
@@ -152,7 +154,9 @@ class UsuarioService {
 
       return formatUsuario(usuario);
     } catch (error) {
-      logger.error(`Error al resetear contraseña del usuario ${id}: ${error.message}`);
+      logger.error(
+        `Error al resetear contraseña del usuario ${id}: ${error.message}`
+      );
       throw error;
     }
   }
@@ -163,14 +167,16 @@ class UsuarioService {
   static async getAccessHistory(id, filters) {
     try {
       const usuario = await Usuario.findById(id);
-      
+
       if (!usuario) {
         throw new Error('Usuario no encontrado');
       }
 
       return await Usuario.getAccessHistory(id, filters);
     } catch (error) {
-      logger.error(`Error al obtener historial de usuario ${id}: ${error.message}`);
+      logger.error(
+        `Error al obtener historial de usuario ${id}: ${error.message}`
+      );
       throw error;
     }
   }

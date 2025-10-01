@@ -3,6 +3,7 @@
 ## Pasos para levantar el proyecto
 
 ### 1. Instalar dependencias
+
 \`\`\`bash
 npm install
 \`\`\`
@@ -22,6 +23,7 @@ GRANT ALL PRIVILEGES ON DATABASE resej_db TO resej_user;
 \`\`\`
 
 **Opción B: Desde pgAdmin**
+
 - Crear base de datos: `resej_db`
 - Crear usuario: `resej_user` con contraseña `resej_password_2025`
 - Dar permisos completos al usuario sobre la base de datos
@@ -50,6 +52,7 @@ npm run seed:run
 \`\`\`
 
 **Credenciales del administrador:**
+
 - Usuario: `admin`
 - Contraseña: `Admin2025!`
 
@@ -74,6 +77,7 @@ El servidor estará disponible en: **http://localhost:3000**
 ## ✅ Verificar que todo funciona
 
 ### 1. Health Check
+
 \`\`\`bash
 curl http://localhost:3000/health
 \`\`\`
@@ -81,9 +85,9 @@ curl http://localhost:3000/health
 Debe responder:
 \`\`\`json
 {
-  "status": "OK",
-  "timestamp": "2025-09-30T...",
-  "environment": "development"
+"status": "OK",
+"timestamp": "2025-09-30T...",
+"environment": "development"
 }
 \`\`\`
 
@@ -92,35 +96,36 @@ Debe responder:
 **Usando curl:**
 \`\`\`bash
 curl -X POST http://localhost:3000/api/auth/login \\
-  -H "Content-Type: application/json" \\
-  -d '{"usuario": "admin", "password": "Admin2025!"}'
+-H "Content-Type: application/json" \\
+-d '{"usuario": "admin", "password": "Admin2025!"}'
 \`\`\`
 
 **Usando Postman:**
+
 - Método: POST
 - URL: `http://localhost:3000/api/auth/login`
 - Body (raw JSON):
-\`\`\`json
-{
+  \`\`\`json
+  {
   "usuario": "admin",
   "password": "Admin2025!"
-}
-\`\`\`
+  }
+  \`\`\`
 
 Si funciona, recibirás:
 \`\`\`json
 {
-  "success": true,
-  "data": {
-    "accessToken": "eyJhbGc...",
-    "refreshToken": "eyJhbGc...",
-    "usuario": {
-      "id": 1,
-      "usuario": "admin",
-      "rol": "administrador",
-      ...
-    }
-  }
+"success": true,
+"data": {
+"accessToken": "eyJhbGc...",
+"refreshToken": "eyJhbGc...",
+"usuario": {
+"id": 1,
+"usuario": "admin",
+"rol": "administrador",
+...
+}
+}
 }
 \`\`\`
 
@@ -128,13 +133,13 @@ Si funciona, recibirás:
 
 ## 🔧 Comandos útiles
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Iniciar en modo desarrollo |
-| `npm start` | Iniciar en modo producción |
-| `npm run migrate:latest` | Ejecutar migraciones |
-| `npm run migrate:rollback` | Revertir última migración |
-| `npm run seed:run` | Ejecutar seeds |
+| Comando                    | Descripción                |
+| -------------------------- | -------------------------- |
+| `npm run dev`              | Iniciar en modo desarrollo |
+| `npm start`                | Iniciar en modo producción |
+| `npm run migrate:latest`   | Ejecutar migraciones       |
+| `npm run migrate:rollback` | Revertir última migración  |
+| `npm run seed:run`         | Ejecutar seeds             |
 
 ---
 
@@ -151,14 +156,17 @@ Si funciona, recibirás:
 ## ❌ Problemas comunes
 
 ### Error: "ECONNREFUSED" al conectar a PostgreSQL
+
 - Verificar que PostgreSQL esté corriendo
 - Verificar credenciales en `.env`
 - Verificar que la base de datos exista
 
 ### Error: "Cannot find module"
+
 - Ejecutar `npm install` nuevamente
 
 ### Error en migraciones
+
 - Verificar conexión a BD
 - Ejecutar `npm run migrate:rollback` y luego `npm run migrate:latest`
 
@@ -167,10 +175,12 @@ Si funciona, recibirás:
 ## 📞 Soporte
 
 Para problemas o consultas:
+
 - Revisar el archivo `README.md` completo
 - Consultar logs en la carpeta `logs/`
 - Contactar a los desarrolladores
 
 **Desarrolladores:**
+
 - Flavio Sanchez (14059)
 - Lucas Jonas Diaz (30313)

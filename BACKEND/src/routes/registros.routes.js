@@ -4,45 +4,49 @@ const registrosController = require('../controllers/registrosController');
 const { authenticateToken } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/authorize');
 const auditLogger = require('../middleware/auditLogger');
-const { createRegistroValidators, idParamValidator, searchValidators, handleValidationErrors } = require('../utils/validators');
+const {
+  createRegistroValidators,
+  idParamValidator,
+  searchValidators,
+  handleValidationErrors,
+} = require('../utils/validators');
 
 // Todas las rutas requieren autenticación
 router.use(authenticateToken);
 
 // GET /api/registros - Listar todos los registros
-router.get('/', 
-  registrosController.getAll
-);
+router.get('/', registrosController.getAll);
 
 // GET /api/registros/buscar - Búsqueda avanzada (todos los roles)
-router.get('/buscar', 
+router.get(
+  '/buscar',
   searchValidators,
   handleValidationErrors,
   registrosController.search
 );
 
 // GET /api/registros/estadisticas - Obtener estadísticas (Solo Admin)
-router.get('/estadisticas', 
-  requireAdmin,
-  registrosController.estadisticas
-);
+router.get('/estadisticas', requireAdmin, registrosController.estadisticas);
 
 // GET /api/registros/exportar - Exportar registros (Solo Admin)
-router.get('/exportar', 
+router.get(
+  '/exportar',
   requireAdmin,
   auditLogger('EXPORTAR_REGISTROS', 'registro'),
   registrosController.exportar
 );
 
 // GET /api/registros/:id - Obtener registro por ID
-router.get('/:id', 
+router.get(
+  '/:id',
   idParamValidator,
   handleValidationErrors,
   registrosController.getById
 );
 
 // POST /api/registros - Crear nuevo registro (Solo Admin)
-router.post('/', 
+router.post(
+  '/',
   requireAdmin,
   createRegistroValidators,
   handleValidationErrors,
@@ -51,7 +55,8 @@ router.post('/',
 );
 
 // PUT /api/registros/:id - Actualizar registro (Solo Admin)
-router.put('/:id', 
+router.put(
+  '/:id',
   requireAdmin,
   idParamValidator,
   handleValidationErrors,
@@ -60,7 +65,8 @@ router.put('/:id',
 );
 
 // DELETE /api/registros/:id - Eliminar registro (Solo Admin)
-router.delete('/:id', 
+router.delete(
+  '/:id',
   requireAdmin,
   idParamValidator,
   handleValidationErrors,

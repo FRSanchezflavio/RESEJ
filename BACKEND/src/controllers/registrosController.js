@@ -10,7 +10,7 @@ class RegistrosController {
         limit: parseInt(limit) || 10,
         estado_causa,
         fecha_desde,
-        fecha_hasta
+        fecha_hasta,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -29,7 +29,15 @@ class RegistrosController {
 
   async search(req, res, next) {
     try {
-      const { termino, criterio, page, limit, estado_causa, fecha_desde, fecha_hasta } = req.query;
+      const {
+        termino,
+        criterio,
+        page,
+        limit,
+        estado_causa,
+        fecha_desde,
+        fecha_hasta,
+      } = req.query;
       const result = await RegistroService.searchRegistros({
         termino,
         criterio: criterio || 'todos',
@@ -37,7 +45,7 @@ class RegistrosController {
         limit: parseInt(limit) || 10,
         estado_causa,
         fecha_desde,
-        fecha_hasta
+        fecha_hasta,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -47,8 +55,13 @@ class RegistrosController {
 
   async create(req, res, next) {
     try {
-      const registro = await RegistroService.createRegistro(req.body, req.user.id);
-      res.status(201).json(createSuccessResponse(registro, 'Registro creado exitosamente'));
+      const registro = await RegistroService.createRegistro(
+        req.body,
+        req.user.id
+      );
+      res
+        .status(201)
+        .json(createSuccessResponse(registro, 'Registro creado exitosamente'));
     } catch (error) {
       next(error);
     }
@@ -56,8 +69,13 @@ class RegistrosController {
 
   async update(req, res, next) {
     try {
-      const registro = await RegistroService.updateRegistro(req.params.id, req.body);
-      res.json(createSuccessResponse(registro, 'Registro actualizado exitosamente'));
+      const registro = await RegistroService.updateRegistro(
+        req.params.id,
+        req.body
+      );
+      res.json(
+        createSuccessResponse(registro, 'Registro actualizado exitosamente')
+      );
     } catch (error) {
       next(error);
     }
@@ -78,7 +96,7 @@ class RegistrosController {
       const registros = await RegistroService.exportRegistros({
         estado_causa,
         fecha_desde,
-        fecha_hasta
+        fecha_hasta,
       });
       res.json(createSuccessResponse(registros));
     } catch (error) {

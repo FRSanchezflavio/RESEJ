@@ -1,10 +1,10 @@
 const db = require('../config/database');
 const Usuario = require('../models/Usuario');
-const { 
-  generateAccessToken, 
-  generateRefreshToken, 
+const {
+  generateAccessToken,
+  generateRefreshToken,
   verifyRefreshToken,
-  getRefreshTokenExpiration 
+  getRefreshTokenExpiration,
 } = require('../config/jwt');
 const { comparePassword, formatUsuario } = require('../utils/helpers');
 const logger = require('../utils/logger');
@@ -19,7 +19,9 @@ class AuthService {
       const user = await Usuario.findByUsername(usuario);
 
       if (!user) {
-        logger.warn(`Intento de login fallido: usuario no encontrado - ${usuario}`);
+        logger.warn(
+          `Intento de login fallido: usuario no encontrado - ${usuario}`
+        );
         throw new Error('Credenciales inválidas');
       }
 
@@ -33,7 +35,9 @@ class AuthService {
       const passwordMatch = await comparePassword(password, user.password_hash);
 
       if (!passwordMatch) {
-        logger.warn(`Intento de login fallido: contraseña incorrecta - ${usuario}`);
+        logger.warn(
+          `Intento de login fallido: contraseña incorrecta - ${usuario}`
+        );
         throw new Error('Credenciales inválidas');
       }
 
@@ -42,7 +46,7 @@ class AuthService {
         userId: user.id,
         usuario: user.usuario,
         rol: user.rol,
-        nombreCompleto: `${user.nombre} ${user.apellido}`
+        nombreCompleto: `${user.nombre} ${user.apellido}`,
       };
 
       const accessToken = generateAccessToken(payload);
@@ -53,7 +57,7 @@ class AuthService {
         usuario_id: user.id,
         token: refreshToken,
         fecha_expiracion: getRefreshTokenExpiration(),
-        ip_address: ipAddress
+        ip_address: ipAddress,
       });
 
       // Actualizar último acceso
@@ -65,7 +69,7 @@ class AuthService {
         accion: 'LOGIN',
         recurso_tipo: 'autenticacion',
         detalles: JSON.stringify({ usuario: user.usuario }),
-        ip_address: ipAddress
+        ip_address: ipAddress,
       });
 
       logger.info(`Login exitoso: ${usuario} desde ${ipAddress}`);
@@ -73,7 +77,7 @@ class AuthService {
       return {
         accessToken,
         refreshToken,
-        usuario: formatUsuario(user)
+        usuario: formatUsuario(user),
       };
     } catch (error) {
       logger.error(`Error en login: ${error.message}`);
@@ -117,7 +121,7 @@ class AuthService {
         userId: user.id,
         usuario: user.usuario,
         rol: user.rol,
-        nombreCompleto: `${user.nombre} ${user.apellido}`
+        nombreCompleto: `${user.nombre} ${user.apellido}`,
       };
 
       const newAccessToken = generateAccessToken(payload);
@@ -126,7 +130,7 @@ class AuthService {
 
       return {
         accessToken: newAccessToken,
-        usuario: formatUsuario(user)
+        usuario: formatUsuario(user),
       };
     } catch (error) {
       logger.error(`Error al refrescar token: ${error.message}`);
@@ -170,7 +174,9 @@ class AuthService {
         .where({ usuario_id: usuarioId })
         .update({ revocado: true });
 
-      logger.info(`Todos los tokens del usuario ${usuarioId} han sido revocados`);
+      logger.info(
+        `Todos los tokens del usuario ${usuarioId} han sido revocados`
+      );
       return { message: 'Todas las sesiones cerradas exitosamente' };
     } catch (error) {
       logger.error(`Error al revocar tokens: ${error.message}`);

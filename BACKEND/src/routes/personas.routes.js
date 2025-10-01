@@ -4,30 +4,32 @@ const personasController = require('../controllers/personasController');
 const { authenticateToken } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/authorize');
 const auditLogger = require('../middleware/auditLogger');
-const { createPersonaValidators, idParamValidator, handleValidationErrors } = require('../utils/validators');
+const {
+  createPersonaValidators,
+  idParamValidator,
+  handleValidationErrors,
+} = require('../utils/validators');
 
 // Todas las rutas requieren autenticación
 router.use(authenticateToken);
 
 // GET /api/personas - Listar todas las personas
-router.get('/', 
-  personasController.getAll
-);
+router.get('/', personasController.getAll);
 
 // GET /api/personas/search - Buscar personas
-router.get('/search', 
-  personasController.search
-);
+router.get('/search', personasController.search);
 
 // GET /api/personas/:id - Obtener persona por ID
-router.get('/:id', 
+router.get(
+  '/:id',
   idParamValidator,
   handleValidationErrors,
   personasController.getById
 );
 
 // POST /api/personas - Crear nueva persona (Solo Admin)
-router.post('/', 
+router.post(
+  '/',
   requireAdmin,
   createPersonaValidators,
   handleValidationErrors,
@@ -36,7 +38,8 @@ router.post('/',
 );
 
 // PUT /api/personas/:id - Actualizar persona (Solo Admin)
-router.put('/:id', 
+router.put(
+  '/:id',
   requireAdmin,
   idParamValidator,
   handleValidationErrors,
@@ -45,7 +48,8 @@ router.put('/:id',
 );
 
 // DELETE /api/personas/:id - Eliminar persona (Solo Admin)
-router.delete('/:id', 
+router.delete(
+  '/:id',
   requireAdmin,
   idParamValidator,
   handleValidationErrors,

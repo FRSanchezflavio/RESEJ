@@ -7,7 +7,7 @@ class PersonasController {
       const { page, limit } = req.query;
       const result = await Persona.findAll({
         page: parseInt(page) || 1,
-        limit: parseInt(limit) || 10
+        limit: parseInt(limit) || 10,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -32,7 +32,7 @@ class PersonasController {
       const { termino, page, limit } = req.query;
       const result = await Persona.search(termino, {
         page: parseInt(page) || 1,
-        limit: parseInt(limit) || 10
+        limit: parseInt(limit) || 10,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -43,7 +43,9 @@ class PersonasController {
   async create(req, res, next) {
     try {
       const persona = await Persona.create(req.body);
-      res.status(201).json(createSuccessResponse(persona, 'Persona creada exitosamente'));
+      res
+        .status(201)
+        .json(createSuccessResponse(persona, 'Persona creada exitosamente'));
     } catch (error) {
       next(error);
     }
@@ -55,7 +57,9 @@ class PersonasController {
       if (!persona) {
         return res.status(404).json({ error: 'Persona no encontrada' });
       }
-      res.json(createSuccessResponse(persona, 'Persona actualizada exitosamente'));
+      res.json(
+        createSuccessResponse(persona, 'Persona actualizada exitosamente')
+      );
     } catch (error) {
       next(error);
     }
@@ -65,7 +69,11 @@ class PersonasController {
     try {
       const hasRegistros = await Persona.hasRegistros(req.params.id);
       if (hasRegistros) {
-        return res.status(400).json({ error: 'No se puede eliminar una persona con registros asociados' });
+        return res
+          .status(400)
+          .json({
+            error: 'No se puede eliminar una persona con registros asociados',
+          });
       }
       await Persona.delete(req.params.id);
       res.json(createSuccessResponse(null, 'Persona eliminada exitosamente'));

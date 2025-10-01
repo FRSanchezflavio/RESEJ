@@ -6,16 +6,26 @@ class ArchivosController {
   async upload(req, res, next) {
     try {
       if (!req.file) {
-        return res.status(400).json({ error: 'No se proporcionó ningún archivo' });
+        return res
+          .status(400)
+          .json({ error: 'No se proporcionó ningún archivo' });
       }
 
       const { registro_id } = req.body;
       if (!registro_id) {
-        return res.status(400).json({ error: 'El ID del registro es requerido' });
+        return res
+          .status(400)
+          .json({ error: 'El ID del registro es requerido' });
       }
 
-      const archivo = await FileService.saveFile(req.file, parseInt(registro_id), req.user.id);
-      res.status(201).json(createSuccessResponse(archivo, 'Archivo subido exitosamente'));
+      const archivo = await FileService.saveFile(
+        req.file,
+        parseInt(registro_id),
+        req.user.id
+      );
+      res
+        .status(201)
+        .json(createSuccessResponse(archivo, 'Archivo subido exitosamente'));
     } catch (error) {
       next(error);
     }
@@ -23,7 +33,9 @@ class ArchivosController {
 
   async getByRegistroId(req, res, next) {
     try {
-      const archivos = await FileService.getFilesByRegistroId(req.params.registroId);
+      const archivos = await FileService.getFilesByRegistroId(
+        req.params.registroId
+      );
       res.json(createSuccessResponse(archivos));
     } catch (error) {
       next(error);

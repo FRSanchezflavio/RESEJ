@@ -1,4 +1,5 @@
 # Guía de Despliegue en Producción
+
 ## RE.SE.J - Registro de Secuestros Judiciales
 
 ---
@@ -19,12 +20,14 @@
 ### 1.1. Actualizar Sistema Operativo
 
 **Windows Server:**
+
 ```powershell
 # Verificar actualizaciones de Windows
 Windows Update > Buscar actualizaciones
 ```
 
 **Linux:**
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
@@ -32,10 +35,12 @@ sudo apt update && sudo apt upgrade -y
 ### 1.2. Instalar Node.js
 
 **Windows:**
+
 - Descargar desde [nodejs.org](https://nodejs.org)
 - Instalar versión LTS (18.x)
 
 **Linux:**
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt install -y nodejs
@@ -45,10 +50,12 @@ node --version  # Verificar
 ### 1.3. Instalar PostgreSQL
 
 **Windows:**
+
 - Descargar desde [postgresql.org](https://www.postgresql.org/download/windows/)
 - Instalar PostgreSQL 14+
 
 **Linux:**
+
 ```bash
 sudo apt install postgresql postgresql-contrib -y
 sudo systemctl start postgresql
@@ -62,11 +69,13 @@ sudo systemctl enable postgresql
 ### 2.1. Acceder a PostgreSQL
 
 **Windows:**
+
 ```cmd
 psql -U postgres
 ```
 
 **Linux:**
+
 ```bash
 sudo -u postgres psql
 ```
@@ -79,6 +88,7 @@ sudo -u postgres psql
 ```
 
 **O manualmente:**
+
 ```sql
 -- Crear base de datos
 CREATE DATABASE resej_db ENCODING 'UTF8';
@@ -127,12 +137,14 @@ host    resej_db        resej_user      127.0.0.1/32            md5
 Reiniciar PostgreSQL:
 
 **Windows:**
+
 ```cmd
 net stop postgresql-x64-14
 net start postgresql-x64-14
 ```
 
 **Linux:**
+
 ```bash
 sudo systemctl restart postgresql
 ```
@@ -144,6 +156,7 @@ sudo systemctl restart postgresql
 ### 3.1. Crear Usuario para la Aplicación
 
 **Linux (recomendado):**
+
 ```bash
 sudo adduser --system --group --home /opt/resej resej
 sudo mkdir -p /opt/resej
@@ -153,6 +166,7 @@ sudo chown resej:resej /opt/resej
 ### 3.2. Clonar/Copiar Código
 
 **Desde Git:**
+
 ```bash
 cd /opt/resej
 git clone <repositorio> backend
@@ -160,6 +174,7 @@ cd backend
 ```
 
 **Desde archivo ZIP:**
+
 ```bash
 # Copiar archivo ZIP al servidor
 unzip backend.zip -d /opt/resej/backend
@@ -216,11 +231,13 @@ LOG_DIR=/opt/resej/logs
 **Generar secretos seguros:**
 
 **Linux/Mac:**
+
 ```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 **Windows PowerShell:**
+
 ```powershell
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
@@ -361,6 +378,7 @@ sudo ufw status
 ### 7.1. Instalar Nginx
 
 **Ubuntu:**
+
 ```bash
 sudo apt install nginx -y
 ```
@@ -391,18 +409,18 @@ server {
     location / {
         proxy_pass http://resej_backend;
         proxy_http_version 1.1;
-        
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection "";
-        
+
         # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
-        
+
         # Buffers
         proxy_buffering off;
         proxy_request_buffering off;
@@ -546,6 +564,7 @@ curl http://localhost:3000/health
 ```
 
 Respuesta esperada:
+
 ```json
 {
   "status": "ok",
@@ -661,6 +680,7 @@ tail -100 /opt/resej/backend/logs/error.log
 ## 📞 14. Contacto y Soporte
 
 Para problemas técnicos o consultas:
+
 - **Email**: soporte-ti@policia.tucuman.gob.ar
 - **Documentación**: Consultar README.md y API_EXAMPLES.md
 

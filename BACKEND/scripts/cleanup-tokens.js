@@ -18,7 +18,7 @@ async function cleanupExpiredTokens() {
       .delete();
 
     logger.info(`Tokens eliminados: ${result}`);
-    
+
     console.log(`✅ Limpieza completada. ${result} tokens eliminados.`);
     process.exit(0);
   } catch (error) {

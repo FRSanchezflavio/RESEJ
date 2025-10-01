@@ -5,10 +5,10 @@ class UsuariosController {
   async getAll(req, res, next) {
     try {
       const { page, limit, activo } = req.query;
-      const result = await UsuarioService.getAllUsuarios({ 
-        page: parseInt(page) || 1, 
+      const result = await UsuarioService.getAllUsuarios({
+        page: parseInt(page) || 1,
         limit: parseInt(limit) || 10,
-        activo: activo !== undefined ? activo === 'true' : null
+        activo: activo !== undefined ? activo === 'true' : null,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -28,7 +28,9 @@ class UsuariosController {
   async create(req, res, next) {
     try {
       const usuario = await UsuarioService.createUsuario(req.body, req.user.id);
-      res.status(201).json(createSuccessResponse(usuario, 'Usuario creado exitosamente'));
+      res
+        .status(201)
+        .json(createSuccessResponse(usuario, 'Usuario creado exitosamente'));
     } catch (error) {
       next(error);
     }
@@ -36,8 +38,13 @@ class UsuariosController {
 
   async update(req, res, next) {
     try {
-      const usuario = await UsuarioService.updateUsuario(req.params.id, req.body);
-      res.json(createSuccessResponse(usuario, 'Usuario actualizado exitosamente'));
+      const usuario = await UsuarioService.updateUsuario(
+        req.params.id,
+        req.body
+      );
+      res.json(
+        createSuccessResponse(usuario, 'Usuario actualizado exitosamente')
+      );
     } catch (error) {
       next(error);
     }
@@ -46,7 +53,9 @@ class UsuariosController {
   async deactivate(req, res, next) {
     try {
       const usuario = await UsuarioService.deactivateUsuario(req.params.id);
-      res.json(createSuccessResponse(usuario, 'Usuario desactivado exitosamente'));
+      res.json(
+        createSuccessResponse(usuario, 'Usuario desactivado exitosamente')
+      );
     } catch (error) {
       next(error);
     }
@@ -64,8 +73,13 @@ class UsuariosController {
   async resetPassword(req, res, next) {
     try {
       const { new_password } = req.body;
-      const usuario = await UsuarioService.resetPassword(req.params.id, new_password);
-      res.json(createSuccessResponse(usuario, 'Contraseña reseteada exitosamente'));
+      const usuario = await UsuarioService.resetPassword(
+        req.params.id,
+        new_password
+      );
+      res.json(
+        createSuccessResponse(usuario, 'Contraseña reseteada exitosamente')
+      );
     } catch (error) {
       next(error);
     }
@@ -76,7 +90,7 @@ class UsuariosController {
       const { page, limit } = req.query;
       const result = await UsuarioService.getAccessHistory(req.params.id, {
         page: parseInt(page) || 1,
-        limit: parseInt(limit) || 20
+        limit: parseInt(limit) || 20,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {

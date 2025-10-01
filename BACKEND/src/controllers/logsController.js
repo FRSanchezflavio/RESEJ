@@ -4,7 +4,15 @@ const { createSuccessResponse } = require('../utils/helpers');
 class LogsController {
   async getAll(req, res, next) {
     try {
-      const { page, limit, usuario_id, accion, recurso_tipo, fecha_desde, fecha_hasta } = req.query;
+      const {
+        page,
+        limit,
+        usuario_id,
+        accion,
+        recurso_tipo,
+        fecha_desde,
+        fecha_hasta,
+      } = req.query;
       const result = await Log.findAll({
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 50,
@@ -12,7 +20,7 @@ class LogsController {
         accion,
         recurso_tipo,
         fecha_desde,
-        fecha_hasta
+        fecha_hasta,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {
@@ -25,7 +33,7 @@ class LogsController {
       const { page, limit } = req.query;
       const result = await Log.findByUsuarioId(req.params.usuarioId, {
         page: parseInt(page) || 1,
-        limit: parseInt(limit) || 20
+        limit: parseInt(limit) || 20,
       });
       res.json(createSuccessResponse(result));
     } catch (error) {

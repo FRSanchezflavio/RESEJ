@@ -16,9 +16,8 @@ async function cleanupOrphanFiles() {
     logger.info('Iniciando limpieza de archivos huérfanos...');
 
     // Obtener lista de archivos en BD
-    const archivosDB = await db('archivos_adjuntos')
-      .select('nombre_archivo');
-    
+    const archivosDB = await db('archivos_adjuntos').select('nombre_archivo');
+
     const archivosDBSet = new Set(archivosDB.map(a => a.nombre_archivo));
 
     // Obtener lista de archivos en el sistema

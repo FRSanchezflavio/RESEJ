@@ -2,9 +2,9 @@ const bcrypt = require('bcrypt');
 
 /**
  * @param { import("knex").Knex } knex
- * @returns { Promise<void> } 
+ * @returns { Promise<void> }
  */
-exports.seed = async function(knex) {
+exports.seed = async function (knex) {
   // Verificar si ya existe el usuario admin
   const existingAdmin = await knex('usuarios')
     .where({ usuario: 'admin' })
@@ -28,8 +28,8 @@ exports.seed = async function(knex) {
       rol: 'administrador',
       activo: true,
       fecha_creacion: new Date(),
-      creado_por: null
-    }
+      creado_por: null,
+    },
   ]);
 
   console.log('✓ Usuario administrador creado exitosamente');

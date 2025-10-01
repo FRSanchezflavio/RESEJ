@@ -8,23 +8,15 @@ const { requireAdmin } = require('../middleware/authorize');
 router.use(authenticateToken, requireAdmin);
 
 // GET /api/logs - Listar todos los logs con filtros
-router.get('/', 
-  logsController.getAll
-);
+router.get('/', logsController.getAll);
 
 // GET /api/logs/acciones - Obtener lista de acciones
-router.get('/acciones', 
-  logsController.getAcciones
-);
+router.get('/acciones', logsController.getAcciones);
 
 // GET /api/logs/recursos-tipos - Obtener tipos de recursos
-router.get('/recursos-tipos', 
-  logsController.getRecursoTipos
-);
+router.get('/recursos-tipos', logsController.getRecursoTipos);
 
 // GET /api/logs/usuario/:usuarioId - Logs de un usuario específico
-router.get('/usuario/:usuarioId', 
-  logsController.getByUsuarioId
-);
+router.get('/usuario/:usuarioId', logsController.getByUsuarioId);
 
 module.exports = router;

@@ -21,7 +21,7 @@ class RegistroService {
   static async getRegistroById(id) {
     try {
       const registro = await Registro.findById(id);
-      
+
       if (!registro) {
         throw new Error('Registro no encontrado');
       }
@@ -52,7 +52,7 @@ class RegistroService {
     try {
       // Verificar que la persona existe
       const persona = await Persona.findById(registroData.persona_id);
-      
+
       if (!persona) {
         throw new Error('La persona especificada no existe');
       }
@@ -60,10 +60,12 @@ class RegistroService {
       // Crear registro
       const nuevoRegistro = await Registro.create({
         ...registroData,
-        usuario_carga: usuarioId
+        usuario_carga: usuarioId,
       });
 
-      logger.info(`Registro creado: ID ${nuevoRegistro.id} por usuario ID ${usuarioId}`);
+      logger.info(
+        `Registro creado: ID ${nuevoRegistro.id} por usuario ID ${usuarioId}`
+      );
 
       // Obtener registro completo con datos de persona
       return await Registro.findById(nuevoRegistro.id);
@@ -80,13 +82,16 @@ class RegistroService {
     try {
       // Verificar que el registro existe
       const registro = await Registro.findById(id);
-      
+
       if (!registro) {
         throw new Error('Registro no encontrado');
       }
 
       // Si se cambia la persona, verificar que existe
-      if (registroData.persona_id && registroData.persona_id !== registro.persona_id) {
+      if (
+        registroData.persona_id &&
+        registroData.persona_id !== registro.persona_id
+      ) {
         const persona = await Persona.findById(registroData.persona_id);
         if (!persona) {
           throw new Error('La persona especificada no existe');
@@ -112,7 +117,7 @@ class RegistroService {
   static async deleteRegistro(id) {
     try {
       const registro = await Registro.findById(id);
-      
+
       if (!registro) {
         throw new Error('Registro no encontrado');
       }
@@ -146,7 +151,11 @@ class RegistroService {
   static async exportRegistros(filters) {
     try {
       // Obtener todos los registros sin paginación
-      const { registros } = await Registro.findAll({ ...filters, limit: 10000, page: 1 });
+      const { registros } = await Registro.findAll({
+        ...filters,
+        limit: 10000,
+        page: 1,
+      });
 
       logger.info(`Registros exportados: ${registros.length} registros`);
 
