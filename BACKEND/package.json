@@ -13,7 +13,13 @@
     "seed:make": "knex seed:make",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["resej", "policia", "tucuman", "secuestros", "judiciales"],
+  "keywords": [
+    "resej",
+    "policia",
+    "tucuman",
+    "secuestros",
+    "judiciales"
+  ],
   "author": "Flavio Sanchez & Lucas Jonas Diaz",
   "license": "UNLICENSED",
   "description": "Backend para el sistema RE.SE.J - Registro de Secuestros Judiciales - Policía de Tucumán",
