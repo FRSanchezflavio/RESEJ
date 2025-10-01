@@ -47,4 +47,18 @@ module.exports = {
       directory: './src/seeds',
     },
   },
+  test: {
+    client: 'sqlite3',
+    connection: {
+      filename: ':memory:',
+    },
+    useNullAsDefault: true,
+    migrations: {
+      directory: './src/migrations',
+      tableName: 'knex_migrations_test',
+    },
+    seeds: {
+      directory: './src/seeds',
+    },
+  },
 };
