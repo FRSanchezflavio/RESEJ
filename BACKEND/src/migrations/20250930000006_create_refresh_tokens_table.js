@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function(knex) {
-  return knex.schema.createTable('refresh_tokens', function(table) {
+exports.up = function (knex) {
+  return knex.schema.createTable('refresh_tokens', function (table) {
     table.bigIncrements('id').primary();
     table.bigInteger('usuario_id').unsigned().notNullable();
     table.string('token', 500).notNullable().unique();
@@ -11,10 +11,14 @@ exports.up = function(knex) {
     table.timestamp('fecha_creacion', { useTz: true }).defaultTo(knex.fn.now());
     table.boolean('revocado').defaultTo(false);
     table.specificType('ip_address', 'inet');
-    
+
     // Foreign keys
-    table.foreign('usuario_id').references('id').inTable('usuarios').onDelete('CASCADE');
-    
+    table
+      .foreign('usuario_id')
+      .references('id')
+      .inTable('usuarios')
+      .onDelete('CASCADE');
+
     // Indexes
     table.index('usuario_id', 'idx_refresh_tokens_usuario');
     table.index('token', 'idx_refresh_tokens_token');
@@ -26,6 +30,6 @@ exports.up = function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
+exports.down = function (knex) {
   return knex.schema.dropTableIfExists('refresh_tokens');
 };
