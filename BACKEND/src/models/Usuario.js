@@ -6,18 +6,14 @@ class Usuario {
    * Buscar usuario por nombre de usuario
    */
   static async findByUsername(usuario) {
-    return await db('usuarios')
-      .where({ usuario })
-      .first();
+    return await db('usuarios').where({ usuario }).first();
   }
 
   /**
    * Buscar usuario por ID
    */
   static async findById(id) {
-    return await db('usuarios')
-      .where({ id })
-      .first();
+    return await db('usuarios').where({ id }).first();
   }
 
   /**
@@ -25,18 +21,25 @@ class Usuario {
    */
   static async findAll({ page = 1, limit = 10, activo = null }) {
     const offset = (page - 1) * limit;
-    
+
     let query = db('usuarios')
-      .select('id', 'usuario', 'nombre', 'apellido', 'rol', 'activo', 'fecha_creacion', 'ultimo_acceso')
+      .select(
+        'id',
+        'usuario',
+        'nombre',
+        'apellido',
+        'rol',
+        'activo',
+        'fecha_creacion',
+        'ultimo_acceso'
+      )
       .orderBy('fecha_creacion', 'desc');
 
     if (activo !== null) {
       query = query.where({ activo });
     }
 
-    const usuarios = await query
-      .limit(limit)
-      .offset(offset);
+    const usuarios = await query.limit(limit).offset(offset);
 
     const [{ total }] = await db('usuarios').count('* as total');
 
@@ -46,8 +49,8 @@ class Usuario {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -61,7 +64,7 @@ class Usuario {
     const [usuario] = await db('usuarios')
       .insert({
         ...rest,
-        password_hash
+        password_hash,
       })
       .returning('*');
 
@@ -116,9 +119,7 @@ class Usuario {
    * Actualizar último acceso
    */
   static async updateLastAccess(id) {
-    await db('usuarios')
-      .where({ id })
-      .update({ ultimo_acceso: db.fn.now() });
+    await db('usuarios').where({ id }).update({ ultimo_acceso: db.fn.now() });
   }
 
   /**
@@ -126,7 +127,7 @@ class Usuario {
    */
   static async resetPassword(id, newPassword) {
     const password_hash = await hashPassword(newPassword);
-    
+
     const [usuario] = await db('usuarios')
       .where({ id })
       .update({ password_hash })
@@ -157,8 +158,8 @@ class Usuario {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 }

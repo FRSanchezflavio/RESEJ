@@ -5,18 +5,14 @@ class Persona {
    * Buscar persona por ID
    */
   static async findById(id) {
-    return await db('personas_registradas')
-      .where({ id })
-      .first();
+    return await db('personas_registradas').where({ id }).first();
   }
 
   /**
    * Buscar persona por DNI
    */
   static async findByDni(dni) {
-    return await db('personas_registradas')
-      .where({ dni })
-      .first();
+    return await db('personas_registradas').where({ dni }).first();
   }
 
   /**
@@ -39,8 +35,8 @@ class Persona {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -70,8 +66,8 @@ class Persona {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -102,9 +98,7 @@ class Persona {
    * Eliminar persona
    */
   static async delete(id) {
-    return await db('personas_registradas')
-      .where({ id })
-      .del();
+    return await db('personas_registradas').where({ id }).del();
   }
 
   /**

@@ -10,8 +10,12 @@ class Registro {
       .leftJoin('usuarios as u', 'r.usuario_carga', 'u.id')
       .select(
         'r.*',
-        db.raw("json_build_object('id', p.id, 'nombre', p.nombre, 'apellido', p.apellido, 'dni', p.dni, 'domicilio', p.domicilio, 'telefono', p.telefono, 'email', p.email) as persona"),
-        db.raw("json_build_object('id', u.id, 'usuario', u.usuario, 'nombre', u.nombre, 'apellido', u.apellido) as usuario_carga_info")
+        db.raw(
+          "json_build_object('id', p.id, 'nombre', p.nombre, 'apellido', p.apellido, 'dni', p.dni, 'domicilio', p.domicilio, 'telefono', p.telefono, 'email', p.email) as persona"
+        ),
+        db.raw(
+          "json_build_object('id', u.id, 'usuario', u.usuario, 'nombre', u.nombre, 'apellido', u.apellido) as usuario_carga_info"
+        )
       )
       .where('r.id', id)
       .first();
@@ -26,7 +30,7 @@ class Registro {
       limit = 10,
       estado_causa = null,
       fecha_desde = null,
-      fecha_hasta = null
+      fecha_hasta = null,
     } = filters;
 
     const offset = (page - 1) * limit;
@@ -53,15 +57,16 @@ class Registro {
       query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
     }
 
-    const registros = await query
-      .limit(limit)
-      .offset(offset);
+    const registros = await query.limit(limit).offset(offset);
 
     // Count total con los mismos filtros
     let countQuery = db('registros_secuestros');
-    if (estado_causa) countQuery = countQuery.where('estado_causa', estado_causa);
-    if (fecha_desde) countQuery = countQuery.where('fecha_ingreso', '>=', fecha_desde);
-    if (fecha_hasta) countQuery = countQuery.where('fecha_ingreso', '<=', fecha_hasta);
+    if (estado_causa)
+      countQuery = countQuery.where('estado_causa', estado_causa);
+    if (fecha_desde)
+      countQuery = countQuery.where('fecha_ingreso', '>=', fecha_desde);
+    if (fecha_hasta)
+      countQuery = countQuery.where('fecha_ingreso', '<=', fecha_hasta);
 
     const [{ total }] = await countQuery.count('* as total');
 
@@ -71,8 +76,8 @@ class Registro {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -87,7 +92,7 @@ class Registro {
       limit = 10,
       estado_causa = null,
       fecha_desde = null,
-      fecha_hasta = null
+      fecha_hasta = null,
     } = filters;
 
     const offset = (page - 1) * limit;
@@ -104,17 +109,17 @@ class Registro {
     // Aplicar búsqueda por término según criterio
     if (termino) {
       if (criterio === 'todos' || criterio === 'persona') {
-        query = query.where(function() {
+        query = query.where(function () {
           this.where('p.nombre', 'ilike', `%${termino}%`)
             .orWhere('p.apellido', 'ilike', `%${termino}%`)
             .orWhere('p.dni', 'ilike', `%${termino}%`);
         });
       }
-      
+
       if (criterio === 'todos' || criterio === 'legajo') {
         query = query.orWhere('r.numero_legajo', 'ilike', `%${termino}%`);
       }
-      
+
       if (criterio === 'todos' || criterio === 'ufi') {
         query = query.orWhere('r.ufi', 'ilike', `%${termino}%`);
       }
@@ -137,9 +142,7 @@ class Registro {
       query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
     }
 
-    const registros = await query
-      .limit(limit)
-      .offset(offset);
+    const registros = await query.limit(limit).offset(offset);
 
     // Count total (simplificado para evitar complejidad)
     const [{ total }] = await db('registros_secuestros').count('* as total');
@@ -150,8 +153,8 @@ class Registro {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
@@ -182,16 +185,16 @@ class Registro {
    * Eliminar registro
    */
   static async delete(id) {
-    return await db('registros_secuestros')
-      .where({ id })
-      .del();
+    return await db('registros_secuestros').where({ id }).del();
   }
 
   /**
    * Obtener estadísticas de registros
    */
   static async getEstadisticas() {
-    const [totalRegistros] = await db('registros_secuestros').count('* as total');
+    const [totalRegistros] = await db('registros_secuestros').count(
+      '* as total'
+    );
     const [registrosPorEstado] = await db('registros_secuestros')
       .select('estado_causa')
       .count('* as cantidad')
@@ -199,7 +202,7 @@ class Registro {
 
     return {
       total: parseInt(totalRegistros.total),
-      porEstado: registrosPorEstado
+      porEstado: registrosPorEstado,
     };
   }
 }

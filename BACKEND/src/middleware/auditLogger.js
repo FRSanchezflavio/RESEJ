@@ -12,7 +12,7 @@ const auditLogger = (accion, recursoTipo = null) => {
     // Capturar el método original de res.json para interceptar la respuesta
     const originalJson = res.json.bind(res);
 
-    res.json = function(body) {
+    res.json = function (body) {
       // Registrar en auditoría solo si la operación fue exitosa (2xx)
       if (res.statusCode >= 200 && res.statusCode < 300) {
         // No esperar a que termine el registro para continuar
@@ -29,14 +29,18 @@ const auditLogger = (accion, recursoTipo = null) => {
                 params: req.params,
                 query: req.query,
                 // No registrar passwords u otra info sensible
-                body: sanitizeBody(req.body)
+                body: sanitizeBody(req.body),
               }),
-              ip_address: getClientIp(req)
+              ip_address: getClientIp(req),
             };
 
             await db('logs_auditoria').insert(logEntry);
-            
-            logger.info(`Auditoría registrada: ${accion} por usuario ${req.user?.usuario || 'desconocido'}`);
+
+            logger.info(
+              `Auditoría registrada: ${accion} por usuario ${
+                req.user?.usuario || 'desconocido'
+              }`
+            );
           } catch (error) {
             logger.error(`Error al registrar auditoría: ${error.message}`);
             // No interrumpir el flujo de la aplicación por error en auditoría
@@ -57,18 +61,23 @@ const auditLogger = (accion, recursoTipo = null) => {
  * @param {Object} body - Body de la request
  * @returns {Object} Body sanitizado
  */
-const sanitizeBody = (body) => {
+const sanitizeBody = body => {
   if (!body) return {};
-  
+
   const sanitized = { ...body };
-  const sensitiveFields = ['password', 'password_hash', 'token', 'refresh_token'];
-  
+  const sensitiveFields = [
+    'password',
+    'password_hash',
+    'token',
+    'refresh_token',
+  ];
+
   sensitiveFields.forEach(field => {
     if (sanitized[field]) {
       sanitized[field] = '[REDACTED]';
     }
   });
-  
+
   return sanitized;
 };
 

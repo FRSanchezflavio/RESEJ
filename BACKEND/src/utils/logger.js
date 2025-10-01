@@ -23,29 +23,31 @@ const logger = winston.createLogger({
   defaultMeta: { service: 'resej-backend' },
   transports: [
     // Logs de error en archivo separado
-    new winston.transports.File({ 
-      filename: path.join(logsDir, 'error.log'), 
+    new winston.transports.File({
+      filename: path.join(logsDir, 'error.log'),
       level: 'error',
       maxsize: 5242880, // 5MB
-      maxFiles: 5
+      maxFiles: 5,
     }),
     // Todos los logs en archivo combined
-    new winston.transports.File({ 
+    new winston.transports.File({
       filename: path.join(logsDir, 'combined.log'),
       maxsize: 5242880, // 5MB
-      maxFiles: 5
-    })
-  ]
+      maxFiles: 5,
+    }),
+  ],
 });
 
 // Si no estamos en producción, también log a consola
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    )
-  }));
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    })
+  );
 }
 
 module.exports = logger;

@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
     cb(null, uniqueName);
-  }
+  },
 });
 
 // Filtro de archivos permitidos
@@ -30,13 +30,18 @@ const fileFilter = (req, file, cb) => {
     'application/pdf',
     'image/jpeg',
     'image/jpg',
-    'image/png'
+    'image/png',
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Tipo de archivo no permitido. Solo se permiten PDF, JPEG y PNG.'), false);
+    cb(
+      new Error(
+        'Tipo de archivo no permitido. Solo se permiten PDF, JPEG y PNG.'
+      ),
+      false
+    );
   }
 };
 
@@ -45,12 +50,12 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: MAX_FILE_SIZE // Límite de tamaño
-  }
+    fileSize: MAX_FILE_SIZE, // Límite de tamaño
+  },
 });
 
 module.exports = {
   upload,
   UPLOAD_DIR,
-  MAX_FILE_SIZE
+  MAX_FILE_SIZE,
 };

@@ -5,9 +5,7 @@ class Archivo {
    * Buscar archivo por ID
    */
   static async findById(id) {
-    return await db('archivos_adjuntos')
-      .where({ id })
-      .first();
+    return await db('archivos_adjuntos').where({ id }).first();
   }
 
   /**
@@ -37,9 +35,7 @@ class Archivo {
     const archivo = await this.findById(id);
     if (!archivo) return null;
 
-    await db('archivos_adjuntos')
-      .where({ id })
-      .del();
+    await db('archivos_adjuntos').where({ id }).del();
 
     return archivo;
   }
@@ -49,11 +45,13 @@ class Archivo {
    */
   static async getEstadisticas() {
     const [{ total }] = await db('archivos_adjuntos').count('* as total');
-    const [{ tamano_total }] = await db('archivos_adjuntos').sum('tamano_bytes as tamano_total');
+    const [{ tamano_total }] = await db('archivos_adjuntos').sum(
+      'tamano_bytes as tamano_total'
+    );
 
     return {
       total: parseInt(total),
-      tamanoTotal: parseInt(tamano_total) || 0
+      tamanoTotal: parseInt(tamano_total) || 0,
     };
   }
 

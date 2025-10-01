@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_super_secure_jwt_secret_key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your_super_secure_refresh_token_secret';
+const REFRESH_TOKEN_SECRET =
+  process.env.REFRESH_TOKEN_SECRET || 'your_super_secure_refresh_token_secret';
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
 
 /**
@@ -10,7 +11,7 @@ const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || '7d';
  * @param {Object} payload - Datos del usuario { userId, usuario, rol, nombreCompleto }
  * @returns {string} Token JWT
  */
-const generateAccessToken = (payload) => {
+const generateAccessToken = payload => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
@@ -19,8 +20,10 @@ const generateAccessToken = (payload) => {
  * @param {Object} payload - Datos del usuario { userId }
  * @returns {string} Refresh token
  */
-const generateRefreshToken = (payload) => {
-  return jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+const generateRefreshToken = payload => {
+  return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+  });
 };
 
 /**
@@ -28,7 +31,7 @@ const generateRefreshToken = (payload) => {
  * @param {string} token - Token a verificar
  * @returns {Object} Payload decodificado
  */
-const verifyAccessToken = (token) => {
+const verifyAccessToken = token => {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {
@@ -41,7 +44,7 @@ const verifyAccessToken = (token) => {
  * @param {string} token - Token a verificar
  * @returns {Object} Payload decodificado
  */
-const verifyRefreshToken = (token) => {
+const verifyRefreshToken = token => {
   try {
     return jwt.verify(token, REFRESH_TOKEN_SECRET);
   } catch (error) {
@@ -69,5 +72,5 @@ module.exports = {
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
-  getRefreshTokenExpiration
+  getRefreshTokenExpiration,
 };

@@ -8,16 +8,23 @@ const logger = require('../utils/logger');
 const requireAdmin = (req, res, next) => {
   if (!req.user) {
     logger.error('requireAdmin llamado sin usuario autenticado');
-    return res.status(401).json(
-      createErrorResponse('Usuario no autenticado', 401)
-    );
+    return res
+      .status(401)
+      .json(createErrorResponse('Usuario no autenticado', 401));
   }
 
   if (req.user.rol !== 'administrador') {
-    logger.warn(`Acceso denegado a ${req.user.usuario} (${req.user.rol}) - requiere admin`);
-    return res.status(403).json(
-      createErrorResponse('Acceso denegado. Requiere permisos de administrador.', 403)
+    logger.warn(
+      `Acceso denegado a ${req.user.usuario} (${req.user.rol}) - requiere admin`
     );
+    return res
+      .status(403)
+      .json(
+        createErrorResponse(
+          'Acceso denegado. Requiere permisos de administrador.',
+          403
+        )
+      );
   }
 
   logger.info(`Acceso de administrador concedido: ${req.user.usuario}`);
@@ -31,9 +38,9 @@ const requireAdmin = (req, res, next) => {
  */
 const requireActiveUser = (req, res, next) => {
   if (!req.user) {
-    return res.status(401).json(
-      createErrorResponse('Usuario no autenticado', 401)
-    );
+    return res
+      .status(401)
+      .json(createErrorResponse('Usuario no autenticado', 401));
   }
 
   // La verificación de activo se hace en el login
@@ -43,5 +50,5 @@ const requireActiveUser = (req, res, next) => {
 
 module.exports = {
   requireAdmin,
-  requireActiveUser
+  requireActiveUser,
 };

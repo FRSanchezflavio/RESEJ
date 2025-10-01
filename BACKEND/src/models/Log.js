@@ -5,9 +5,7 @@ class Log {
    * Crear nuevo log de auditoría
    */
   static async create(logData) {
-    const [log] = await db('logs_auditoria')
-      .insert(logData)
-      .returning('*');
+    const [log] = await db('logs_auditoria').insert(logData).returning('*');
 
     return log;
   }
@@ -23,7 +21,7 @@ class Log {
       accion = null,
       recurso_tipo = null,
       fecha_desde = null,
-      fecha_hasta = null
+      fecha_hasta = null,
     } = filters;
 
     const offset = (page - 1) * limit;
@@ -32,7 +30,9 @@ class Log {
       .leftJoin('usuarios as u', 'l.usuario_id', 'u.id')
       .select(
         'l.*',
-        db.raw("json_build_object('id', u.id, 'usuario', u.usuario, 'nombre', u.nombre, 'apellido', u.apellido) as usuario_info")
+        db.raw(
+          "json_build_object('id', u.id, 'usuario', u.usuario, 'nombre', u.nombre, 'apellido', u.apellido) as usuario_info"
+        )
       )
       .orderBy('l.fecha_hora', 'desc');
 
@@ -57,17 +57,18 @@ class Log {
       query = query.where('l.fecha_hora', '<=', fecha_hasta);
     }
 
-    const logs = await query
-      .limit(limit)
-      .offset(offset);
+    const logs = await query.limit(limit).offset(offset);
 
     // Count total con los mismos filtros
     let countQuery = db('logs_auditoria');
     if (usuario_id) countQuery = countQuery.where('usuario_id', usuario_id);
     if (accion) countQuery = countQuery.where('accion', accion);
-    if (recurso_tipo) countQuery = countQuery.where('recurso_tipo', recurso_tipo);
-    if (fecha_desde) countQuery = countQuery.where('fecha_hora', '>=', fecha_desde);
-    if (fecha_hasta) countQuery = countQuery.where('fecha_hora', '<=', fecha_hasta);
+    if (recurso_tipo)
+      countQuery = countQuery.where('recurso_tipo', recurso_tipo);
+    if (fecha_desde)
+      countQuery = countQuery.where('fecha_hora', '>=', fecha_desde);
+    if (fecha_hasta)
+      countQuery = countQuery.where('fecha_hora', '<=', fecha_hasta);
 
     const [{ total }] = await countQuery.count('* as total');
 
@@ -77,8 +78,8 @@ class Log {
         page,
         limit,
         total: parseInt(total),
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   }
 
