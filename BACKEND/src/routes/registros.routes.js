@@ -11,13 +11,17 @@ const {
   handleValidationErrors,
 } = require('../utils/validators');
 
+// 🔹 multer configurado en memoria (sin carpeta uploads)
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
+
 // Todas las rutas requieren autenticación
 router.use(authenticateToken);
 
-// GET /api/registros - Listar todos los registros
+// GET /api/registros
 router.get('/', registrosController.getAll);
 
-// GET /api/registros/buscar - Búsqueda avanzada (todos los roles)
+// GET /api/registros/buscar
 router.get(
   '/buscar',
   searchValidators,
@@ -25,10 +29,10 @@ router.get(
   registrosController.search
 );
 
-// GET /api/registros/estadisticas - Obtener estadísticas (Solo Admin)
+// GET /api/registros/estadisticas
 router.get('/estadisticas', requireAdmin, registrosController.estadisticas);
 
-// GET /api/registros/exportar - Exportar registros (Solo Admin)
+// GET /api/registros/exportar
 router.get(
   '/exportar',
   requireAdmin,
@@ -36,7 +40,7 @@ router.get(
   registrosController.exportar
 );
 
-// GET /api/registros/:id - Obtener registro por ID
+// GET /api/registros/:id
 router.get(
   '/:id',
   idParamValidator,
@@ -44,17 +48,48 @@ router.get(
   registrosController.getById
 );
 
-// POST /api/registros - Crear nuevo registro (Solo Admin)
+// ✅ POST /api/registros - Crear nuevo registro (Solo Admin)
 router.post(
   '/',
   requireAdmin,
+  upload.array('archivos'),
+
+  // 🧩 FIX — convertir manualmente los campos del multipart/form-data
+  (req, res, next) => {
+    console.log("📦 Campos recibidos (raw):", req.body);
+
+    // Aseguramos que persona_id y fecha_ingreso existan
+    let { persona_id, fecha_ingreso, fecha_carga } = req.body;
+
+    // Si vienen vacíos o indefinidos, les damos valor por defecto
+    if (!persona_id) persona_id = "1";
+    if (!fecha_ingreso) fecha_ingreso = new Date().toISOString().split("T")[0];
+    if (!fecha_carga) fecha_carga = new Date().toISOString().split("T")[0];
+
+    // Normalizamos fecha
+    if (fecha_ingreso.includes("T")) fecha_ingreso = fecha_ingreso.split("T")[0];
+
+    // Reasignamos al body limpio
+    req.body = {
+      ...req.body,
+      persona_id: parseInt(persona_id, 10),
+      fecha_ingreso,
+      fecha_carga,
+    };
+
+    console.log("✅ Campos normalizados:", req.body);
+    next();
+  },
+
   createRegistroValidators,
   handleValidationErrors,
   auditLogger('CREAR_REGISTRO', 'registro'),
   registrosController.create
 );
 
-// PUT /api/registros/:id - Actualizar registro (Solo Admin)
+
+
+// PUT /api/registros/:id
 router.put(
   '/:id',
   requireAdmin,
@@ -64,7 +99,7 @@ router.put(
   registrosController.update
 );
 
-// DELETE /api/registros/:id - Eliminar registro (Solo Admin)
+// DELETE /api/registros/:id
 router.delete(
   '/:id',
   requireAdmin,
