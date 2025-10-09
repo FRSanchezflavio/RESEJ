@@ -54,7 +54,9 @@ class RegistroService {
       const persona = await Persona.findById(registroData.persona_id);
 
       if (!persona) {
-        throw new Error('La persona especificada no existe');
+        const error = new Error('La persona especificada no existe');
+        error.statusCode = 404;
+        throw error;
       }
 
       // Crear registro
@@ -94,7 +96,9 @@ class RegistroService {
       ) {
         const persona = await Persona.findById(registroData.persona_id);
         if (!persona) {
-          throw new Error('La persona especificada no existe');
+          const error = new Error('La persona especificada no existe');
+          error.statusCode = 404;
+          throw error;
         }
       }
 

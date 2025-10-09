@@ -162,8 +162,34 @@ class Registro {
    * Crear nuevo registro
    */
   static async create(registroData) {
+    // Mapear correctamente los campos del formulario
+    const dataToInsert = {
+      persona_id: registroData.persona_id,
+      fecha_ingreso: registroData.fecha_ingreso,
+      ufi: registroData.ufi || null,
+      numero_legajo: registroData.numero_legajo || null,
+      seccion_que_interviene: registroData.seccion_que_interviene,
+      detalle_secuestro: registroData.detalle_secuestro,
+      numero_protocolo: registroData.numero_protocolo || null,
+      cadena_custodia: registroData.cadena_custodia || null,
+      nro_folio: registroData.nro_folio || null,
+      nro_libro_secuestro: registroData.nro_libro_secuestro || null,
+      of_a_cargo: registroData.of_a_cargo || null,
+      observaciones: registroData.observaciones || null,
+      usuario_carga: registroData.usuario_carga || null,
+      // Campos heredados opcionales
+      tipo_delito: registroData.tipo_delito || null,
+      fecha_delito: registroData.fecha_delito || null,
+      lugar_delito: registroData.lugar_delito || null,
+      descripcion: registroData.descripcion || null,
+      estado_causa: registroData.estado_causa || 'en_proceso',
+      numero_causa: registroData.numero_causa || null,
+      juzgado: registroData.juzgado || null,
+      tramite: registroData.tramite || null,
+    };
+
     const [registro] = await db('registros_secuestros')
-      .insert(registroData)
+      .insert(dataToInsert)
       .returning('*');
 
     return registro;
