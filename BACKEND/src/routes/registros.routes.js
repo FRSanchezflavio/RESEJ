@@ -56,7 +56,7 @@ router.post(
 
   // 🧩 Normalizar campos del multipart/form-data
   (req, res, next) => {
-    console.log("📦 Campos recibidos (raw):", req.body);
+    console.log('📦 Campos recibidos (raw):', req.body);
 
     // Convertir persona_id a número
     if (req.body.persona_id) {
@@ -64,12 +64,12 @@ router.post(
     }
 
     // Normalizar fechas (remover parte de tiempo si existe)
-    if (req.body.fecha_ingreso && req.body.fecha_ingreso.includes("T")) {
-      req.body.fecha_ingreso = req.body.fecha_ingreso.split("T")[0];
+    if (req.body.fecha_ingreso && req.body.fecha_ingreso.includes('T')) {
+      req.body.fecha_ingreso = req.body.fecha_ingreso.split('T')[0];
     }
-    
-    if (req.body.fecha_carga && req.body.fecha_carga.includes("T")) {
-      req.body.fecha_carga = req.body.fecha_carga.split("T")[0];
+
+    if (req.body.fecha_carga && req.body.fecha_carga.includes('T')) {
+      req.body.fecha_carga = req.body.fecha_carga.split('T')[0];
     }
 
     // Convertir strings vacíos a null para campos opcionales
@@ -79,7 +79,7 @@ router.post(
       }
     });
 
-    console.log("✅ Campos normalizados:", req.body);
+    console.log('✅ Campos normalizados:', req.body);
     next();
   },
 
@@ -88,8 +88,6 @@ router.post(
   auditLogger('CREAR_REGISTRO', 'registro'),
   registrosController.create
 );
-
-
 
 // PUT /api/registros/:id
 router.put(

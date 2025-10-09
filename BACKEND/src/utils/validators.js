@@ -107,11 +107,11 @@ const createRegistroValidators = [
     .withMessage('El ID de persona es requerido')
     .isInt({ min: 1 })
     .withMessage('ID de persona inválido'),
-  
+
   body('fecha_ingreso')
     .notEmpty()
     .withMessage('La fecha de ingreso es requerida')
-    .custom((value) => {
+    .custom(value => {
       const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
       if (!isoRegex.test(value)) {
         throw new Error('Formato de fecha inválido (use AAAA-MM-DD)');
@@ -122,11 +122,13 @@ const createRegistroValidators = [
   // Campos opcionales - permitir todos los campos del formulario
   body('fecha_carga')
     .optional()
-    .custom((value) => {
+    .custom(value => {
       if (value && value !== '') {
         const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!isoRegex.test(value)) {
-          throw new Error('Formato de fecha de carga inválido (use AAAA-MM-DD)');
+          throw new Error(
+            'Formato de fecha de carga inválido (use AAAA-MM-DD)'
+          );
         }
       }
       return true;
@@ -137,57 +139,53 @@ const createRegistroValidators = [
     .trim()
     .isLength({ max: 100 })
     .withMessage('UFI no puede exceder 100 caracteres'),
-  
+
   body('numero_legajo')
     .optional()
     .trim()
     .isLength({ max: 100 })
     .withMessage('Número de legajo no puede exceder 100 caracteres'),
-  
+
   body('seccion_que_interviene')
     .optional()
     .trim()
     .isLength({ max: 200 })
     .withMessage('Sección que interviene no puede exceder 200 caracteres'),
-  
-  body('detalle_secuestro')
-    .optional()
-    .trim(),
-  
+
+  body('detalle_secuestro').optional().trim(),
+
   body('numero_protocolo')
     .optional()
     .trim()
     .isLength({ max: 100 })
     .withMessage('Número de protocolo no puede exceder 100 caracteres'),
-  
+
   body('cadena_custodia')
     .optional()
     .trim()
     .isLength({ max: 100 })
     .withMessage('Cadena de custodia no puede exceder 100 caracteres'),
-  
+
   body('nro_folio')
     .optional()
     .trim()
     .isLength({ max: 50 })
     .withMessage('Número de folio no puede exceder 50 caracteres'),
-  
+
   body('nro_libro_secuestro')
     .optional()
     .trim()
     .isLength({ max: 50 })
     .withMessage('Número de libro de secuestro no puede exceder 50 caracteres'),
-  
+
   body('of_a_cargo')
     .optional()
     .trim()
     .isLength({ max: 200 })
     .withMessage('Oficial a cargo no puede exceder 200 caracteres'),
-  
-  body('observaciones')
-    .optional()
-    .trim(),
-  
+
+  body('observaciones').optional().trim(),
+
   body('estado_causa')
     .optional()
     .isIn(['abierta', 'cerrada', 'en_proceso'])

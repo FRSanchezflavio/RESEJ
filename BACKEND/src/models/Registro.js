@@ -185,7 +185,7 @@ class Registro {
       estado_causa: registroData.estado_causa || 'en_proceso',
       numero_causa: registroData.numero_causa || null,
       juzgado: registroData.juzgado || null,
-      tramite: registroData.tramite || null
+      tramite: registroData.tramite || null,
     };
 
     const [registro] = await db('registros_secuestros')

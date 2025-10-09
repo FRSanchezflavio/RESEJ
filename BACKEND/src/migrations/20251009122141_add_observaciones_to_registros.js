@@ -2,8 +2,8 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function(knex) {
-  return knex.schema.table('registros_secuestros', function(table) {
+exports.up = function (knex) {
+  return knex.schema.table('registros_secuestros', function (table) {
     table.text('observaciones').nullable();
   });
 };
@@ -12,8 +12,8 @@ exports.up = function(knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function(knex) {
-  return knex.schema.table('registros_secuestros', function(table) {
+exports.down = function (knex) {
+  return knex.schema.table('registros_secuestros', function (table) {
     table.dropColumn('observaciones');
   });
 };
