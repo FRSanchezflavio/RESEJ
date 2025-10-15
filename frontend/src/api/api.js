@@ -19,9 +19,18 @@ export async function loginRequest(usuario, password) {
 }
 
 export async function fetchRegistros(params = {}) {
-  // backend puede aceptar query params; params ejemplo: { page:1, limit:10, q:'term' }
+  // Si hay término de búsqueda, usar la ruta /registros/buscar
+  if (params.termino) {
+    return api.get('/registros/buscar', { params });
+  }
+  // Si no hay término, traer todos los registros
   return api.get('/registros', { params });
 }
+
+export async function fetchArchivosByRegistroId(registroId) {
+  return await api.get(`/archivos/registro/${registroId}`);
+}
+
 
 export async function uploadRegistro(formData) {
   return api.post('/registros', formData, {
@@ -37,8 +46,9 @@ export async function createPersona(payload) {
   return api.post('/personas', payload);
 }
 
-export async function fetchUsers() {
-  return api.get('/usuarios');
+export async function fetchUsers(params = {}) {
+  // params ejemplo: { page: 1, limit: 20, activo: true }
+  return api.get('/usuarios', { params });
 }
 
 export async function createUser(payload) {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, Form, Button, Row, Col, Alert, Spinner } from "react-bootstrap";
-import { uploadRegistro } from "../../api/api";
+import api, { uploadRegistro } from "../../api/api";
 
 const initialRegistroState = {
   persona_id: '',
@@ -15,7 +15,7 @@ const initialRegistroState = {
   nro_folio: '',
   nro_libro_secuestro: '',
   of_a_cargo: '',
-  observaciones: '',
+  observaciones: '', // reemplaza a estado_secuestro
 };
 
 export default function UploadForm() {
@@ -46,50 +46,56 @@ export default function UploadForm() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setSubmitting(true);
+    setMsg('');
 
     if (!form.persona_id || isNaN(Number(form.persona_id))) {
       setMsgType('danger');
       setMsg('Debes ingresar un ID de persona válido (número).');
+      setSubmitting(false);
       return;
     }
 
-    const fd = new FormData();
-    const fechaIngresoISO = form.fecha_ingreso
-      ? new Date(form.fecha_ingreso).toISOString().split('T')[0]
-      : '';
-    const fechaCargaISO = form.fecha_carga
-      ? new Date(form.fecha_carga).toISOString().split('T')[0]
-      : '';
-
-    Object.entries({
-      ...form,
-      fecha_ingreso: fechaIngresoISO,
-      fecha_carga: fechaCargaISO,
-      persona_id: Number(form.persona_id),
-    }).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        fd.append(key, value);
-      }
-    });
-
-    if (files) {
-      Array.from(files).forEach(file => fd.append('archivos', file));
-    }
-
-    setSubmitting(true);
-    setMsg('');
-
     try {
-      await uploadRegistro(fd);
+      const fdRegistro = new FormData();
+      const fechaIngresoISO = form.fecha_ingreso
+        ? new Date(form.fecha_ingreso).toISOString().split('T')[0]
+        : '';
+      const fechaCargaISO = form.fecha_carga
+        ? new Date(form.fecha_carga).toISOString().split('T')[0]
+        : '';
+
+      Object.entries({
+        ...form,
+        fecha_ingreso: fechaIngresoISO,
+        fecha_carga: fechaCargaISO,
+        persona_id: Number(form.persona_id),
+      }).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          fdRegistro.append(key, value);
+        }
+      });
+
+      const resRegistro = await uploadRegistro(fdRegistro);
+      const registroId = resRegistro.data.data.id;
+
+      if (files && files.length > 0) {
+        const fdArchivos = new FormData();
+        Array.from(files).forEach(file => fdArchivos.append('archivo', file));
+        fdArchivos.append('registro_id', registroId);
+
+        await api.post('/archivos/upload', fdArchivos, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+
       setMsgType('success');
-      setMsg('✅ Registro cargado correctamente.');
+      setMsg('✅ Registro y archivos cargados correctamente.');
       resetRegistroForm();
     } catch (error) {
-      console.error('Error al subir registro', error);
-      const errorMsg =
-        error?.response?.data?.error || error?.message || 'Error inesperado';
+      console.error(error);
       setMsgType('danger');
-      setMsg(`❌ Error al subir: ${errorMsg}`);
+      setMsg(`❌ Error al subir: ${error?.response?.data?.error || error.message}`);
     } finally {
       setSubmitting(false);
     }
@@ -157,7 +163,7 @@ export default function UploadForm() {
             name="ufi"
             value={form.ufi}
             onChange={handleRegistroChange}
-            placeholder="Ej: UFI"
+            placeholder="Ej: UFI N°3"
           />
         </Form.Group>
 
@@ -180,11 +186,13 @@ export default function UploadForm() {
             required
           >
             <option value="">Seleccione...</option>
-            <option value="Criminalística">Criminalística</option>
-            <option value="Robos y Hurtos">Robos y Hurtos</option>
-            <option value="Narcotráfico">Narcotráfico</option>
-            <option value="Delitos Complejos">Delitos Complejos</option>
-            <option value="Otros">Otros</option>
+            <option value="Seccion delitos generales y especiales">Sección delitos generales y especiales</option>
+            <option value="Seccion analisis informatica forense">Sección análisis informática forense</option>
+            <option value="Seccion analisis de informacion delictual">Sección análisis de información delictual</option>
+            <option value="Seccion delitos economicos">Sección delitos económicos</option>
+            <option value="Seccion desarrollo informatico">Sección desarrollo informático</option>
+            <option value="Seccion delitos contra la niñez y adolescencia">Sección delitos contra la niñez y adolescencia</option>
+            <option value="Seccion laboratorio y analisis digital">Sección laboratorio y análisis digital</option>
           </Form.Select>
         </Form.Group>
 
@@ -257,15 +265,22 @@ export default function UploadForm() {
           />
         </Form.Group>
 
-        <Form.Group className="mb-2">
-          <Form.Label>Observaciones</Form.Label>
-          <Form.Control
-            as="textarea"
+        {/* Campo select para estado actual → se guarda en observaciones */}
+        <Form.Group className="mb-3">
+          <Form.Label>Estado actual del secuestro *</Form.Label>
+          <Form.Select
             name="observaciones"
-            rows={2}
             value={form.observaciones}
             onChange={handleRegistroChange}
-          />
+            required
+          >
+            <option value="">Seleccione estado...</option>
+            <option value="En depósito">En depósito</option>
+            <option value="Devuelto">Devuelto</option>
+            <option value="Destruido">Destruido</option>
+            <option value="Peritado">Peritado</option>
+            <option value="Remitido a UFI">Remitido a UFI</option>
+          </Form.Select>
         </Form.Group>
 
         <Form.Group className="mb-3">
