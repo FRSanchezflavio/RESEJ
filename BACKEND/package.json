@@ -13,7 +13,7 @@
     "seed:make": "knex seed:make",
     "cleanup:tokens": "node scripts/cleanup-tokens.js",
     "cleanup:files": "node scripts/cleanup-files.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "keywords": [
     "resej",
@@ -44,6 +44,7 @@
   "devDependencies": {
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
-    "supertest": "^7.1.4"
+    "supertest": "^7.1.4",
+    "sqlite3": "^5.1.6"
   }
 }

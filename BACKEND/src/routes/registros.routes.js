@@ -54,30 +54,32 @@ router.post(
   requireAdmin,
   upload.array('archivos'),
 
-  // 🧩 FIX — convertir manualmente los campos del multipart/form-data
+  // 🧩 Normalizar campos del multipart/form-data
   (req, res, next) => {
-    console.log("📦 Campos recibidos (raw):", req.body);
+    console.log('📦 Campos recibidos (raw):', req.body);
 
-    // Aseguramos que persona_id y fecha_ingreso existan
-    let { persona_id, fecha_ingreso, fecha_carga } = req.body;
+    // Convertir persona_id a número
+    if (req.body.persona_id) {
+      req.body.persona_id = parseInt(req.body.persona_id, 10);
+    }
 
-    // Si vienen vacíos o indefinidos, les damos valor por defecto
-    if (!persona_id) persona_id = "1";
-    if (!fecha_ingreso) fecha_ingreso = new Date().toISOString().split("T")[0];
-    if (!fecha_carga) fecha_carga = new Date().toISOString().split("T")[0];
+    // Normalizar fechas (remover parte de tiempo si existe)
+    if (req.body.fecha_ingreso && req.body.fecha_ingreso.includes('T')) {
+      req.body.fecha_ingreso = req.body.fecha_ingreso.split('T')[0];
+    }
 
-    // Normalizamos fecha
-    if (fecha_ingreso.includes("T")) fecha_ingreso = fecha_ingreso.split("T")[0];
+    if (req.body.fecha_carga && req.body.fecha_carga.includes('T')) {
+      req.body.fecha_carga = req.body.fecha_carga.split('T')[0];
+    }
 
-    // Reasignamos al body limpio
-    req.body = {
-      ...req.body,
-      persona_id: parseInt(persona_id, 10),
-      fecha_ingreso,
-      fecha_carga,
-    };
+    // Convertir strings vacíos a null para campos opcionales
+    Object.keys(req.body).forEach(key => {
+      if (req.body[key] === '') {
+        req.body[key] = null;
+      }
+    });
 
-    console.log("✅ Campos normalizados:", req.body);
+    console.log('✅ Campos normalizados:', req.body);
     next();
   },
 
@@ -86,8 +88,6 @@ router.post(
   auditLogger('CREAR_REGISTRO', 'registro'),
   registrosController.create
 );
-
-
 
 // PUT /api/registros/:id
 router.put(

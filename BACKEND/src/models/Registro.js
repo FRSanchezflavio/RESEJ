@@ -25,48 +25,29 @@ class Registro {
    * Obtener todos los registros con paginación y filtros
    */
   static async findAll(filters = {}) {
-    const {
-      page = 1,
-      limit = 10,
-      estado_causa = null,
-      fecha_desde = null,
-      fecha_hasta = null,
-    } = filters;
-
+    const { page = 1, limit = 10, estado_causa = null, fecha_desde = null, fecha_hasta = null } = filters;
     const offset = (page - 1) * limit;
 
     let query = db('registros_secuestros as r')
       .leftJoin('personas_registradas as p', 'r.persona_id', 'p.id')
       .select(
         'r.*',
-        db.raw("concat(p.nombre, ' ', p.apellido) as persona_nombre_completo"),
+        db.raw("json_build_object('nombre', p.nombre, 'apellido', p.apellido) as persona_info"),
         'p.dni as persona_dni'
       )
       .orderBy('r.fecha_carga', 'desc');
 
-    // Aplicar filtros
-    if (estado_causa) {
-      query = query.where('r.estado_causa', estado_causa);
-    }
-
-    if (fecha_desde) {
-      query = query.where('r.fecha_ingreso', '>=', fecha_desde);
-    }
-
-    if (fecha_hasta) {
-      query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
-    }
+    if (estado_causa) query = query.where('r.estado_causa', estado_causa);
+    if (fecha_desde) query = query.where('r.fecha_ingreso', '>=', fecha_desde);
+    if (fecha_hasta) query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
 
     const registros = await query.limit(limit).offset(offset);
 
     // Count total con los mismos filtros
     let countQuery = db('registros_secuestros');
-    if (estado_causa)
-      countQuery = countQuery.where('estado_causa', estado_causa);
-    if (fecha_desde)
-      countQuery = countQuery.where('fecha_ingreso', '>=', fecha_desde);
-    if (fecha_hasta)
-      countQuery = countQuery.where('fecha_ingreso', '<=', fecha_hasta);
+    if (estado_causa) countQuery = countQuery.where('estado_causa', estado_causa);
+    if (fecha_desde) countQuery = countQuery.where('fecha_ingreso', '>=', fecha_desde);
+    if (fecha_hasta) countQuery = countQuery.where('fecha_ingreso', '<=', fecha_hasta);
 
     const [{ total }] = await countQuery.count('* as total');
 
@@ -85,28 +66,18 @@ class Registro {
    * Buscar registros por múltiples criterios
    */
   static async search(filters = {}) {
-    const {
-      termino = null,
-      criterio = 'todos',
-      page = 1,
-      limit = 10,
-      estado_causa = null,
-      fecha_desde = null,
-      fecha_hasta = null,
-    } = filters;
-
+    const { termino = null, criterio = 'todos', page = 1, limit = 10, estado_causa = null, fecha_desde = null, fecha_hasta = null } = filters;
     const offset = (page - 1) * limit;
 
     let query = db('registros_secuestros as r')
       .leftJoin('personas_registradas as p', 'r.persona_id', 'p.id')
       .select(
         'r.*',
-        db.raw("concat(p.nombre, ' ', p.apellido) as persona_nombre_completo"),
+        db.raw("json_build_object('nombre', p.nombre, 'apellido', p.apellido) as persona_info"),
         'p.dni as persona_dni'
       )
       .orderBy('r.fecha_carga', 'desc');
 
-    // Aplicar búsqueda por término según criterio
     if (termino) {
       if (criterio === 'todos' || criterio === 'persona') {
         query = query.where(function () {
@@ -129,22 +100,11 @@ class Registro {
       }
     }
 
-    // Filtros adicionales
-    if (estado_causa) {
-      query = query.where('r.estado_causa', estado_causa);
-    }
-
-    if (fecha_desde) {
-      query = query.where('r.fecha_ingreso', '>=', fecha_desde);
-    }
-
-    if (fecha_hasta) {
-      query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
-    }
+    if (estado_causa) query = query.where('r.estado_causa', estado_causa);
+    if (fecha_desde) query = query.where('r.fecha_ingreso', '>=', fecha_desde);
+    if (fecha_hasta) query = query.where('r.fecha_ingreso', '<=', fecha_hasta);
 
     const registros = await query.limit(limit).offset(offset);
-
-    // Count total (simplificado para evitar complejidad)
     const [{ total }] = await db('registros_secuestros').count('* as total');
 
     return {
@@ -162,8 +122,26 @@ class Registro {
    * Crear nuevo registro
    */
   static async create(registroData) {
+    const dataToInsert = {
+      persona_id: registroData.persona_id,
+      fecha_ingreso: registroData.fecha_ingreso,
+      fecha_carga: registroData.fecha_carga || null,
+      ufi: registroData.ufi || null,
+      numero_legajo: registroData.numero_legajo || null,
+      seccion_que_interviene: registroData.seccion_que_interviene,
+      detalle_secuestro: registroData.detalle_secuestro,
+      numero_protocolo: registroData.numero_protocolo || null,
+      cadena_custodia: registroData.cadena_custodia || null,
+      nro_folio: registroData.nro_folio || null,
+      nro_libro_secuestro: registroData.nro_libro_secuestro || null,
+      of_a_cargo: registroData.of_a_cargo || null,
+      observaciones: registroData.observaciones || null,
+      usuario_carga: registroData.usuario_carga || null,
+      estado_causa: registroData.estado_causa || 'abierta',
+    };
+
     const [registro] = await db('registros_secuestros')
-      .insert(registroData)
+      .insert(dataToInsert)
       .returning('*');
 
     return registro;
@@ -173,9 +151,14 @@ class Registro {
    * Actualizar registro
    */
   static async update(id, registroData) {
+    // 🔹 Asegurarse de no enviar campos calculados (concat, persona_nombre_completo)
+    const safeData = { ...registroData };
+    delete safeData.persona_nombre_completo;
+    delete safeData.persona_info;
+
     const [registro] = await db('registros_secuestros')
       .where({ id })
-      .update(registroData)
+      .update(safeData)
       .returning('*');
 
     return registro;
@@ -192,10 +175,8 @@ class Registro {
    * Obtener estadísticas de registros
    */
   static async getEstadisticas() {
-    const [totalRegistros] = await db('registros_secuestros').count(
-      '* as total'
-    );
-    const [registrosPorEstado] = await db('registros_secuestros')
+    const [totalRegistros] = await db('registros_secuestros').count('* as total');
+    const registrosPorEstado = await db('registros_secuestros')
       .select('estado_causa')
       .count('* as cantidad')
       .groupBy('estado_causa');
