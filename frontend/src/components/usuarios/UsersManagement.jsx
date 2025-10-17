@@ -20,10 +20,14 @@ export default function UsersManagement() {
   async function load() {
     try {
       const res = await fetchUsers();
-      // asegura que users sea siempre array
-      let data = res?.data?.data || res?.data || [];
-      if (!Array.isArray(data)) data = [];
-      setUsers(data);
+      console.log('Respuesta de usuarios:', res.data);
+
+      // La API devuelve { success: true, data: { usuarios: [...], pagination: {...} } }
+      let usuarios = res?.data?.data?.usuarios || res?.data?.usuarios || [];
+      if (!Array.isArray(usuarios)) usuarios = [];
+
+      console.log('Usuarios cargados:', usuarios);
+      setUsers(usuarios);
     } catch (err) {
       console.error('Error cargando usuarios:', err);
       setUsers([]); // fallback
