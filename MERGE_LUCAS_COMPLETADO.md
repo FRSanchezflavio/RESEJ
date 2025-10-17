@@ -12,26 +12,29 @@
 ## 📈 Cambios Traídos de lucas
 
 ### **Backend - Cambios Principales**
-| Archivo | Cambios |
-|---------|---------|
-| `BACKEND/package.json` | ✅ Dependencias actualizadas (5 cambios) |
-| `BACKEND/knexfile.js` | ✅ 14 líneas de configuración |
-| `BACKEND/src/models/Registro.js` | ✅ 99 líneas - Mejoras en modelo |
-| `BACKEND/src/routes/registros.routes.js` | ✅ 51 líneas - Normalización de rutas |
-| `BACKEND/src/utils/validators.js` | ✅ 69 líneas - Validadores mejorados |
-| `BACKEND/src/services/registroService.js` | ✅ 8 líneas - Lógica de servicios |
-| `BACKEND/test/app.test.js` | ✅ 20 líneas - Tests agregados |
+
+| Archivo                                   | Cambios                                  |
+| ----------------------------------------- | ---------------------------------------- |
+| `BACKEND/package.json`                    | ✅ Dependencias actualizadas (5 cambios) |
+| `BACKEND/knexfile.js`                     | ✅ 14 líneas de configuración            |
+| `BACKEND/src/models/Registro.js`          | ✅ 99 líneas - Mejoras en modelo         |
+| `BACKEND/src/routes/registros.routes.js`  | ✅ 51 líneas - Normalización de rutas    |
+| `BACKEND/src/utils/validators.js`         | ✅ 69 líneas - Validadores mejorados     |
+| `BACKEND/src/services/registroService.js` | ✅ 8 líneas - Lógica de servicios        |
+| `BACKEND/test/app.test.js`                | ✅ 20 líneas - Tests agregados           |
 
 ### **Frontend - Cambios Principales**
-| Archivo | Cambios |
-|---------|---------|
-| `frontend/package.json` | ✅ Dependencias (+1) |
-| `frontend/src/api/api.js` | ✅ 58 líneas - API interceptors |
-| `frontend/src/components/registros/Registros.jsx` | ✅ 440 líneas - UI completa |
-| `frontend/src/components/registros/UploadForm.jsx` | ✅ 313 líneas - Formulario mejorado |
-| `frontend/src/components/usuarios/UsersManagement.jsx` | ✅ 69 líneas - Gestión de usuarios |
+
+| Archivo                                                | Cambios                             |
+| ------------------------------------------------------ | ----------------------------------- |
+| `frontend/package.json`                                | ✅ Dependencias (+1)                |
+| `frontend/src/api/api.js`                              | ✅ 58 líneas - API interceptors     |
+| `frontend/src/components/registros/Registros.jsx`      | ✅ 440 líneas - UI completa         |
+| `frontend/src/components/registros/UploadForm.jsx`     | ✅ 313 líneas - Formulario mejorado |
+| `frontend/src/components/usuarios/UsersManagement.jsx` | ✅ 69 líneas - Gestión de usuarios  |
 
 ### **Documentación**
+
 - ✅ `PRUEBAS_CARGA_REGISTROS.md` - Guía de pruebas
 - ✅ `BACKEND/test-upload-registro.sh` - Script de pruebas
 
@@ -53,12 +56,14 @@ Commits adelante de origin/flavio: 12
 ## 📁 Archivos Nuevos/Modificados
 
 **Nuevos archivos**: 10
+
 - ✅ Migraciones de base de datos
 - ✅ Tests de carga
 - ✅ Documentación de pruebas
 - ✅ Backup de componentes
 
 **Archivos modificados**: 19
+
 - ✅ Configuraciones
 - ✅ Modelos
 - ✅ Rutas
@@ -69,18 +74,21 @@ Commits adelante de origin/flavio: 12
 ## 🚀 Próximos Pasos
 
 ### 1. **Actualizar dependencias del Backend**
+
 ```bash
 cd BACKEND
 npm install
 ```
 
 ### 2. **Ejecutar migraciones nuevas**
+
 ```bash
 npm run migrate:latest
 npm run seed:run
 ```
 
 ### 3. **Ejecutar tests**
+
 ```bash
 npm test
 # o el script de pruebas
@@ -88,6 +96,7 @@ bash test-upload-registro.sh
 ```
 
 ### 4. **Reiniciar servidores**
+
 ```bash
 # Terminal 1: Backend
 cd BACKEND && npm start
@@ -97,6 +106,7 @@ cd frontend && npm run dev
 ```
 
 ### 5. **Hacer push a origin**
+
 ```bash
 git push origin flavio
 ```
@@ -125,11 +135,10 @@ git push origin flavio
 
 ## 🎯 Estado Actual del Sistema
 
-| Componente | Estado | Notas |
-|-----------|--------|-------|
-| **Backend** | ✅ Listo | Requiere `npm install` |
-| **Frontend** | ✅ Listo | Requiere `npm install` |
-| **Base de Datos** | ✅ Configurada | Nuevas migraciones |
-| **Tests** | ✅ Agregados | Ver `PRUEBAS_CARGA_REGISTROS.md` |
-| **Documentación** | ✅ Mejorada | Guías de pruebas |
-
+| Componente        | Estado         | Notas                            |
+| ----------------- | -------------- | -------------------------------- |
+| **Backend**       | ✅ Listo       | Requiere `npm install`           |
+| **Frontend**      | ✅ Listo       | Requiere `npm install`           |
+| **Base de Datos** | ✅ Configurada | Nuevas migraciones               |
+| **Tests**         | ✅ Agregados   | Ver `PRUEBAS_CARGA_REGISTROS.md` |
+| **Documentación** | ✅ Mejorada    | Guías de pruebas                 |
