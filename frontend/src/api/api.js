@@ -41,6 +41,10 @@ export async function fetchRegistros(params = {}) {
   return api.get('/registros', { params });
 }
 
+export async function fetchArchivosByRegistroId(registroId) {
+  return api.get(`/registros/${registroId}/archivos`);
+}
+
 export async function uploadRegistro(formData) {
   return api.post('/registros', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

@@ -17,28 +17,33 @@ const logsRoutes = require('./routes/logs.routes');
 const app = express();
 
 // Configuración de CORS
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000', 'http://localhost:5173, http://localhost:5174'];
-
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir requests sin origin (como Postman, mobile apps, etc.)
-    if (!origin) return callback(null, true);
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',      // Vite (desarrollo)
+      'http://127.0.0.1:5173',
+      'http://localhost:5174',
+      process.env.FRONTEND_URL      // URL de producción desde .env
+    ].filter(Boolean);
 
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('No permitido por CORS'));
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
 };
+
+app.use(cors(corsOptions));
 
 // Middlewares globales
 app.use(helmet()); // Seguridad headers HTTP
-app.use(cors(corsOptions)); // CORS
 app.use(express.json()); // Parser JSON
 app.use(express.urlencoded({ extended: true })); // Parser URL-encoded
 
