@@ -21,10 +21,10 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:3000',
-      'http://localhost:5173',      // Vite (desarrollo)
+      'http://localhost:5173', // Vite (desarrollo)
       'http://127.0.0.1:5173',
       'http://localhost:5174',
-      process.env.FRONTEND_URL      // URL de producción desde .env
+      process.env.FRONTEND_URL, // URL de producción desde .env
     ].filter(Boolean);
 
     // Permitir requests sin origin (como mobile apps o curl)
@@ -37,7 +37,7 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
