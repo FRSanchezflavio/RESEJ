@@ -12,6 +12,7 @@ export default function UsersManagement() {
     password: "",
     rol: "usuario_consulta",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     load();
@@ -19,31 +20,38 @@ export default function UsersManagement() {
 
   async function load() {
     try {
-      const res = await fetchUsers();
-      // asegura que users sea siempre array
-      let data = res?.data?.data || res?.data || [];
-      if (!Array.isArray(data)) data = [];
+      const res = await fetchUsers({ page: 1, limit: 20, activo: null });
+      // ❗ aquí extraemos correctamente el array de usuarios
+      const data = res?.data?.data?.usuarios || [];
+      console.log("Usuarios cargados:", data);
       setUsers(data);
     } catch (err) {
       console.error("Error cargando usuarios:", err);
-      setUsers([]); // fallback
+      setUsers([]);
     }
   }
 
   const handleCreate = async () => {
+    const { usuario, nombre, apellido, password, rol } = form;
+
+    if (!usuario || !nombre || !apellido || !password || !rol) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
+
     try {
-      await createUser(form);
+      setLoading(true);
+      // ID del admin que crea el usuario
+      const creadoPor = 1;
+      await createUser({ ...form, creado_por: creadoPor });
       setShow(false);
-      setForm({
-        usuario: "",
-        nombre: "",
-        apellido: "",
-        password: "",
-        rol: "usuario_consulta",
-      });
-      load();
+      setForm({ usuario: "", nombre: "", apellido: "", password: "", rol: "usuario_consulta" });
+      await load();
     } catch (err) {
       console.error("Error creando usuario:", err);
+      alert(err?.response?.data?.message || "Error creando usuario");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,9 +59,7 @@ export default function UsersManagement() {
     <Card className="p-3 shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h6>👥 Gestión de Usuarios</h6>
-        <Button size="sm" onClick={() => setShow(true)}>
-          Crear Nuevo Usuario
-        </Button>
+        <Button size="sm" onClick={() => setShow(true)}>Crear Nuevo Usuario</Button>
       </div>
 
       <Table size="sm" striped bordered hover>
@@ -68,18 +74,14 @@ export default function UsersManagement() {
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan="4" className="text-center">
-                No hay usuarios registrados
-              </td>
+              <td colSpan="4" className="text-center">No hay usuarios registrados</td>
             </tr>
           ) : (
-            users.map((u) => (
+            users.map(u => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.usuario}</td>
-                <td>
-                  {u.nombre} {u.apellido}
-                </td>
+                <td>{u.nombre} {u.apellido}</td>
                 <td>{u.rol}</td>
               </tr>
             ))
@@ -87,7 +89,6 @@ export default function UsersManagement() {
         </tbody>
       </Table>
 
-      {/* Modal para crear usuario */}
       <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Crear Usuario</Modal.Title>
@@ -98,21 +99,21 @@ export default function UsersManagement() {
               <Form.Label>Usuario</Form.Label>
               <Form.Control
                 value={form.usuario}
-                onChange={(e) => setForm({ ...form, usuario: e.target.value })}
+                onChange={e => setForm({ ...form, usuario: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
                 value={form.nombre}
-                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                onChange={e => setForm({ ...form, nombre: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Apellido</Form.Label>
               <Form.Control
                 value={form.apellido}
-                onChange={(e) => setForm({ ...form, apellido: e.target.value })}
+                onChange={e => setForm({ ...form, apellido: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -120,16 +121,14 @@ export default function UsersManagement() {
               <Form.Control
                 type="password"
                 value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
+                onChange={e => setForm({ ...form, password: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Rol</Form.Label>
               <Form.Select
                 value={form.rol}
-                onChange={(e) => setForm({ ...form, rol: e.target.value })}
+                onChange={e => setForm({ ...form, rol: e.target.value })}
               >
                 <option value="usuario_consulta">Usuario Consulta</option>
                 <option value="administrador">Administrador</option>
@@ -138,10 +137,8 @@ export default function UsersManagement() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShow(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleCreate}>Crear</Button>
+          <Button variant="secondary" onClick={() => setShow(false)}>Cancelar</Button>
+          <Button onClick={handleCreate} disabled={loading}>{loading ? "Creando..." : "Crear"}</Button>
         </Modal.Footer>
       </Modal>
     </Card>
