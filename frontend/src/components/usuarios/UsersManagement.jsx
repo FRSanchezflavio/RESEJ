@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Card, Table, Button, Modal, Form } from "react-bootstrap";
-import { fetchUsers, createUser } from "../../api/api";
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Button, Modal, Form } from 'react-bootstrap';
+import { fetchUsers, createUser } from '../../api/api';
 
 export default function UsersManagement() {
   const [users, setUsers] = useState([]);
   const [show, setShow] = useState(false);
   const [form, setForm] = useState({
-    usuario: "",
-    nombre: "",
-    apellido: "",
-    password: "",
-    rol: "usuario_consulta",
+    usuario: '',
+    nombre: '',
+    apellido: '',
+    password: '',
+    rol: 'usuario_consulta',
   });
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     load();
@@ -20,38 +19,63 @@ export default function UsersManagement() {
 
   async function load() {
     try {
-      const res = await fetchUsers({ page: 1, limit: 20, activo: null });
-      // ❗ aquí extraemos correctamente el array de usuarios
-      const data = res?.data?.data?.usuarios || [];
-      console.log("Usuarios cargados:", data);
+      const res = await fetchUsers();
+      // asegura que users sea siempre array
+      let data = res?.data?.data || res?.data || [];
+      if (!Array.isArray(data)) data = [];
       setUsers(data);
     } catch (err) {
-      console.error("Error cargando usuarios:", err);
-      setUsers([]);
+      console.error('Error cargando usuarios:', err);
+      setUsers([]); // fallback
     }
   }
 
   const handleCreate = async () => {
-    const { usuario, nombre, apellido, password, rol } = form;
+    // Validación básica del lado del cliente
+    if (!form.usuario || !form.nombre || !form.apellido || !form.password) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
 
-    if (!usuario || !nombre || !apellido || !password || !rol) {
-      alert("Todos los campos son obligatorios");
+    // Validar contraseña
+    if (form.password.length < 8) {
+      alert('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+    if (!/[A-Z]/.test(form.password)) {
+      alert('La contraseña debe contener al menos una mayúscula');
+      return;
+    }
+    if (!/[a-z]/.test(form.password)) {
+      alert('La contraseña debe contener al menos una minúscula');
+      return;
+    }
+    if (!/\d/.test(form.password)) {
+      alert('La contraseña debe contener al menos un número');
       return;
     }
 
     try {
-      setLoading(true);
-      // ID del admin que crea el usuario
-      const creadoPor = 1;
-      await createUser({ ...form, creado_por: creadoPor });
+      const response = await createUser(form);
+      console.log('Usuario creado:', response.data);
       setShow(false);
-      setForm({ usuario: "", nombre: "", apellido: "", password: "", rol: "usuario_consulta" });
-      await load();
+      setForm({
+        usuario: '',
+        nombre: '',
+        apellido: '',
+        password: '',
+        rol: 'usuario_consulta',
+      });
+      load();
+      alert('Usuario creado exitosamente');
     } catch (err) {
-      console.error("Error creando usuario:", err);
-      alert(err?.response?.data?.message || "Error creando usuario");
-    } finally {
-      setLoading(false);
+      console.error('Error completo:', err);
+      const errorMsg =
+        err.response?.data?.detalles?.[0]?.msg ||
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message;
+      alert(`Error: ${errorMsg}`);
     }
   };
 
@@ -59,7 +83,9 @@ export default function UsersManagement() {
     <Card className="p-3 shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h6>👥 Gestión de Usuarios</h6>
-        <Button size="sm" onClick={() => setShow(true)}>Crear Nuevo Usuario</Button>
+        <Button size="sm" onClick={() => setShow(true)}>
+          Crear Nuevo Usuario
+        </Button>
       </div>
 
       <Table size="sm" striped bordered hover>
@@ -74,14 +100,18 @@ export default function UsersManagement() {
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan="4" className="text-center">No hay usuarios registrados</td>
+              <td colSpan="4" className="text-center">
+                No hay usuarios registrados
+              </td>
             </tr>
           ) : (
             users.map(u => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.usuario}</td>
-                <td>{u.nombre} {u.apellido}</td>
+                <td>
+                  {u.nombre} {u.apellido}
+                </td>
                 <td>{u.rol}</td>
               </tr>
             ))
@@ -89,6 +119,7 @@ export default function UsersManagement() {
         </tbody>
       </Table>
 
+      {/* Modal para crear usuario */}
       <Modal show={show} onHide={() => setShow(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Crear Usuario</Modal.Title>
@@ -123,6 +154,47 @@ export default function UsersManagement() {
                 value={form.password}
                 onChange={e => setForm({ ...form, password: e.target.value })}
               />
+              <small className="text-muted d-block mt-1">
+                Requisitos: mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1
+                número
+              </small>
+              {form.password && (
+                <div className="mt-2 small">
+                  <div
+                    className={
+                      form.password.length >= 8 ? 'text-success' : 'text-danger'
+                    }
+                  >
+                    ✓ Mínimo 8 caracteres{' '}
+                    {form.password.length >= 8 ? '✓' : '✗'}
+                  </div>
+                  <div
+                    className={
+                      /[A-Z]/.test(form.password)
+                        ? 'text-success'
+                        : 'text-danger'
+                    }
+                  >
+                    ✓ Mayúscula {/[A-Z]/.test(form.password) ? '✓' : '✗'}
+                  </div>
+                  <div
+                    className={
+                      /[a-z]/.test(form.password)
+                        ? 'text-success'
+                        : 'text-danger'
+                    }
+                  >
+                    ✓ Minúscula {/[a-z]/.test(form.password) ? '✓' : '✗'}
+                  </div>
+                  <div
+                    className={
+                      /\d/.test(form.password) ? 'text-success' : 'text-danger'
+                    }
+                  >
+                    ✓ Número {/\d/.test(form.password) ? '✓' : '✗'}
+                  </div>
+                </div>
+              )}
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Rol</Form.Label>
@@ -137,8 +209,10 @@ export default function UsersManagement() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShow(false)}>Cancelar</Button>
-          <Button onClick={handleCreate} disabled={loading}>{loading ? "Creando..." : "Crear"}</Button>
+          <Button variant="secondary" onClick={() => setShow(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={handleCreate}>Crear</Button>
         </Modal.Footer>
       </Modal>
     </Card>
