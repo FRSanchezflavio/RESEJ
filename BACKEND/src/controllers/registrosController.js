@@ -17,10 +17,10 @@ class RegistrosController {
         fecha_desde,
         fecha_hasta,
       });
-      
+
       console.log('✅ Registros obtenidos:', result.registros.length);
       console.log('📊 Resultado completo:', result);
-      
+
       res.json(createSuccessResponse(result));
     } catch (error) {
       console.error('❌ Error en getAll:', error);

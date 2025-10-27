@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
+import {
+  Alert,
+  Container,
+  Row,
+  Col,
+  Card,
+  Badge,
+  Button,
+} from 'react-bootstrap';
 
 const DiagnosticoApp = () => {
   const [diagnostico, setDiagnostico] = useState({
-    backend: { status: '⏳', mensaje: 'Verificando...', url: 'http://localhost:3000' },
-    api_registros: { status: '⏳', mensaje: 'Verificando...', url: 'http://localhost:3000/api/registros' },
-    api_enlaces: { status: '⏳', mensaje: 'Verificando...', url: 'http://localhost:3000/api/enlaces-compartidos' },
+    backend: {
+      status: '⏳',
+      mensaje: 'Verificando...',
+      url: 'http://localhost:3000',
+    },
+    api_registros: {
+      status: '⏳',
+      mensaje: 'Verificando...',
+      url: 'http://localhost:3000/api/registros',
+    },
+    api_enlaces: {
+      status: '⏳',
+      mensaje: 'Verificando...',
+      url: 'http://localhost:3000/api/enlaces-compartidos',
+    },
     token: { status: '⏳', mensaje: 'Verificando...', existe: false },
     localStorage: { status: '⏳', mensaje: 'Verificando...' },
   });
@@ -47,7 +67,7 @@ const DiagnosticoApp = () => {
         method: 'GET',
         timeout: 5000,
       });
-      
+
       if (respuestaBackend.ok) {
         nuevosDatos.backend = {
           status: '✅',
@@ -71,14 +91,17 @@ const DiagnosticoApp = () => {
 
     // 4. Verificar API de registros
     try {
-      const respuestaRegistros = await fetch('http://localhost:3000/api/registros', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token || 'sin-token'}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 5000,
-      });
+      const respuestaRegistros = await fetch(
+        'http://localhost:3000/api/registros',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token || 'sin-token'}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 5000,
+        }
+      );
 
       if (respuestaRegistros.ok) {
         const data = await respuestaRegistros.json();
@@ -91,7 +114,9 @@ const DiagnosticoApp = () => {
         const errorData = await respuestaRegistros.json();
         nuevosDatos.api_registros = {
           status: '⚠️',
-          mensaje: `Status ${respuestaRegistros.status}: ${errorData.message || 'error'}`,
+          mensaje: `Status ${respuestaRegistros.status}: ${
+            errorData.message || 'error'
+          }`,
           url: 'http://localhost:3000/api/registros',
         };
       }
@@ -105,14 +130,17 @@ const DiagnosticoApp = () => {
 
     // 5. Verificar API de enlaces
     try {
-      const respuestaEnlaces = await fetch('http://localhost:3000/api/enlaces-compartidos', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token || 'sin-token'}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 5000,
-      });
+      const respuestaEnlaces = await fetch(
+        'http://localhost:3000/api/enlaces-compartidos',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token || 'sin-token'}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 5000,
+        }
+      );
 
       if (respuestaEnlaces.ok) {
         const data = await respuestaEnlaces.json();
@@ -125,7 +153,9 @@ const DiagnosticoApp = () => {
         const errorData = await respuestaEnlaces.json();
         nuevosDatos.api_enlaces = {
           status: '⚠️',
-          mensaje: `Status ${respuestaEnlaces.status}: ${errorData.message || 'error'}`,
+          mensaje: `Status ${respuestaEnlaces.status}: ${
+            errorData.message || 'error'
+          }`,
           url: 'http://localhost:3000/api/enlaces-compartidos',
         };
       }
@@ -160,7 +190,9 @@ const DiagnosticoApp = () => {
       <Row className="mb-4">
         <Col>
           <h1>🔍 Diagnóstico de la Aplicación</h1>
-          <p className="text-muted">Verifica el estado de todos los componentes</p>
+          <p className="text-muted">
+            Verifica el estado de todos los componentes
+          </p>
         </Col>
       </Row>
 
@@ -175,7 +207,10 @@ const DiagnosticoApp = () => {
 
       <Row className="mb-4">
         <Col md={6}>
-          <ItemDiagnostico titulo="localStorage" datos={diagnostico.localStorage} />
+          <ItemDiagnostico
+            titulo="localStorage"
+            datos={diagnostico.localStorage}
+          />
         </Col>
       </Row>
 
@@ -187,23 +222,36 @@ const DiagnosticoApp = () => {
 
       <Row>
         <Col md={6}>
-          <ItemDiagnostico titulo="GET /api/registros" datos={diagnostico.api_registros} />
+          <ItemDiagnostico
+            titulo="GET /api/registros"
+            datos={diagnostico.api_registros}
+          />
         </Col>
         <Col md={6}>
-          <ItemDiagnostico titulo="GET /api/enlaces-compartidos" datos={diagnostico.api_enlaces} />
+          <ItemDiagnostico
+            titulo="GET /api/enlaces-compartidos"
+            datos={diagnostico.api_enlaces}
+          />
         </Col>
       </Row>
 
       <Row className="mt-4">
         <Col>
-          <Button variant="primary" onClick={ejecutarDiagnostico} className="me-2">
+          <Button
+            variant="primary"
+            onClick={ejecutarDiagnostico}
+            className="me-2"
+          >
             🔄 Recargar
           </Button>
-          <Button variant="secondary" onClick={() => {
-            console.clear();
-            console.log('=== INFORMACIÓN DEL DIAGNOSTICO ===');
-            console.log(diagnostico);
-          }}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              console.clear();
+              console.log('=== INFORMACIÓN DEL DIAGNOSTICO ===');
+              console.log(diagnostico);
+            }}
+          >
             📋 Mostrar en consola
           </Button>
         </Col>
@@ -214,9 +262,17 @@ const DiagnosticoApp = () => {
           <Alert variant="info">
             <strong>💡 Sugerencias:</strong>
             <ul className="mb-0 mt-2">
-              <li>Si Backend API muestra ❌: Ejecuta <code>npm run dev</code> en la carpeta BACKEND</li>
-              <li>Si Token muestra ❌: Inicia sesión primero en la aplicación</li>
-              <li>Si los endpoints muestran ⚠️: Revisa la consola del navegador (F12)</li>
+              <li>
+                Si Backend API muestra ❌: Ejecuta <code>npm run dev</code> en
+                la carpeta BACKEND
+              </li>
+              <li>
+                Si Token muestra ❌: Inicia sesión primero en la aplicación
+              </li>
+              <li>
+                Si los endpoints muestran ⚠️: Revisa la consola del navegador
+                (F12)
+              </li>
             </ul>
           </Alert>
         </Col>

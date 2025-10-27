@@ -26,7 +26,10 @@ export const enlacesApi = {
       console.log('Respuesta de crearEnlace:', response.data);
       return response.data.data;
     } catch (error) {
-      console.error('Error en crearEnlace:', error.response?.data || error.message);
+      console.error(
+        'Error en crearEnlace:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -40,7 +43,10 @@ export const enlacesApi = {
       console.log('Respuesta de listarEnlaces:', response.data);
       return response.data.data || [];
     } catch (error) {
-      console.error('Error en listarEnlaces:', error.response?.data || error.message);
+      console.error(
+        'Error en listarEnlaces:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -51,7 +57,10 @@ export const enlacesApi = {
       const response = await client.get(`/enlaces-compartidos/${token}`);
       return response.data.data;
     } catch (error) {
-      console.error('Error en obtenerEnlace:', error.response?.data || error.message);
+      console.error(
+        'Error en obtenerEnlace:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -61,16 +70,18 @@ export const enlacesApi = {
     try {
       let response;
       if (password) {
-        response = await client.post(
-          `/enlaces-compartidos/publico/${token}`,
-          { contrasena: password }
-        );
+        response = await client.post(`/enlaces-compartidos/publico/${token}`, {
+          contrasena: password,
+        });
       } else {
         response = await client.get(`/enlaces-compartidos/publico/${token}`);
       }
       return response.data.data;
     } catch (error) {
-      console.error('Error en obtenerEnlacePublico:', error.response?.data || error.message);
+      console.error(
+        'Error en obtenerEnlacePublico:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -81,7 +92,10 @@ export const enlacesApi = {
       const response = await client.put(`/enlaces-compartidos/${token}`, datos);
       return response.data.data;
     } catch (error) {
-      console.error('Error en actualizarEnlace:', error.response?.data || error.message);
+      console.error(
+        'Error en actualizarEnlace:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -92,7 +106,10 @@ export const enlacesApi = {
       await client.delete(`/enlaces-compartidos/${token}`);
       return true;
     } catch (error) {
-      console.error('Error en eliminarEnlace:', error.response?.data || error.message);
+      console.error(
+        'Error en eliminarEnlace:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -106,7 +123,10 @@ export const enlacesApi = {
       );
       return response.data.data;
     } catch (error) {
-      console.error('Error en revocarEnlace:', error.response?.data || error.message);
+      console.error(
+        'Error en revocarEnlace:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -119,7 +139,10 @@ export const enlacesApi = {
       );
       return response.data.data;
     } catch (error) {
-      console.error('Error en obtenerEstadisticas:', error.response?.data || error.message);
+      console.error(
+        'Error en obtenerEstadisticas:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -127,12 +150,18 @@ export const enlacesApi = {
   // Obtener accesos de un enlace
   obtenerAccesos: async (token, page = 1, limit = 20) => {
     try {
-      const response = await client.get(`/enlaces-compartidos/${token}/accesos`, {
-        params: { page, limit },
-      });
+      const response = await client.get(
+        `/enlaces-compartidos/${token}/accesos`,
+        {
+          params: { page, limit },
+        }
+      );
       return response.data.data;
     } catch (error) {
-      console.error('Error en obtenerAccesos:', error.response?.data || error.message);
+      console.error(
+        'Error en obtenerAccesos:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -149,7 +178,10 @@ export const enlacesApi = {
       );
       return response.data;
     } catch (error) {
-      console.error('Error en exportarAccesos:', error.response?.data || error.message);
+      console.error(
+        'Error en exportarAccesos:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },
@@ -170,10 +202,15 @@ export const enlacesApi = {
   // Obtener análitica de un enlace
   obtenerAnalytics: async token => {
     try {
-      const response = await client.get(`/enlaces-compartidos/${token}/analytics`);
+      const response = await client.get(
+        `/enlaces-compartidos/${token}/analytics`
+      );
       return response.data.data;
     } catch (error) {
-      console.error('Error en obtenerAnalytics:', error.response?.data || error.message);
+      console.error(
+        'Error en obtenerAnalytics:',
+        error.response?.data || error.message
+      );
       throw error;
     }
   },

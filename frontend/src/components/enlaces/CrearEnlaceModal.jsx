@@ -13,7 +13,8 @@ import { enlacesApi } from '../../services/enlacesApi';
 import './CrearEnlaceModal.css';
 
 // Obtener URL base del frontend desde variable de entorno
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || window.location.origin;
+const FRONTEND_URL =
+  import.meta.env.VITE_FRONTEND_URL || window.location.origin;
 
 // ✅ CAMBIO: Mantener onSuccess en los parámetros para que el padre pueda recargar
 const CrearEnlaceModal = ({ show, onHide, onSuccess }) => {
@@ -44,11 +45,11 @@ const CrearEnlaceModal = ({ show, onHide, onSuccess }) => {
   const cargarRegistros = async () => {
     try {
       console.log('=== Iniciando cargarRegistros ===');
-      
+
       // Obtener token del localStorage
       const token = localStorage.getItem('token');
       console.log('Token disponible:', !!token);
-      
+
       if (!token) {
         console.error('No hay token disponible');
         setRegistros([]);
@@ -57,7 +58,7 @@ const CrearEnlaceModal = ({ show, onHide, onSuccess }) => {
 
       // Hacer petición a la API de registros
       console.log('Realizando fetch a http://localhost:3000/api/registros');
-      
+
       const response = await fetch('http://localhost:3000/api/registros', {
         method: 'GET',
         headers: {
@@ -67,7 +68,7 @@ const CrearEnlaceModal = ({ show, onHide, onSuccess }) => {
       });
 
       console.log('Response status:', response.status, response.statusText);
-      
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error(`Error ${response.status}:`, errorData);
@@ -171,7 +172,10 @@ const CrearEnlaceModal = ({ show, onHide, onSuccess }) => {
       }
     } catch (err) {
       console.error('Error creando enlace:', err);
-      const mensajeError = err.response?.data?.message || err.message || 'Error al crear el enlace';
+      const mensajeError =
+        err.response?.data?.message ||
+        err.message ||
+        'Error al crear el enlace';
       setError(mensajeError);
     } finally {
       setLoading(false);

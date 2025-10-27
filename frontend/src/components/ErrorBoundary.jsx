@@ -17,19 +17,23 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ 
-          padding: '20px', 
-          border: '2px solid red', 
-          borderRadius: '5px',
-          backgroundColor: '#fee',
-          margin: '10px'
-        }}>
+        <div
+          style={{
+            padding: '20px',
+            border: '2px solid red',
+            borderRadius: '5px',
+            backgroundColor: '#fee',
+            margin: '10px',
+          }}
+        >
           <h4 style={{ color: 'red' }}>Hubo un error</h4>
-          <p><strong>{this.state.error?.message}</strong></p>
+          <p>
+            <strong>{this.state.error?.message}</strong>
+          </p>
           <details style={{ whiteSpace: 'pre-wrap', fontSize: '12px' }}>
             {this.state.error?.toString()}
           </details>
-          <button 
+          <button
             onClick={() => this.setState({ hasError: false, error: null })}
             style={{ marginTop: '10px', padding: '10px 20px' }}
           >
