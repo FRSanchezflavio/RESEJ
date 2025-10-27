@@ -4,6 +4,11 @@ const { createSuccessResponse } = require('../utils/helpers');
 class RegistrosController {
   async getAll(req, res, next) {
     try {
+      console.log('🔍 [registrosController.getAll] Iniciado');
+      console.log('📝 Usuario ID:', req.user?.id);
+      console.log('📝 Usuario rol:', req.user?.rol);
+      console.log('📝 Query params:', req.query);
+
       const { page, limit, estado_causa, fecha_desde, fecha_hasta } = req.query;
       const result = await RegistroService.getAllRegistros({
         page: parseInt(page) || 1,
@@ -12,8 +17,13 @@ class RegistrosController {
         fecha_desde,
         fecha_hasta,
       });
+      
+      console.log('✅ Registros obtenidos:', result.registros.length);
+      console.log('📊 Resultado completo:', result);
+      
       res.json(createSuccessResponse(result));
     } catch (error) {
+      console.error('❌ Error en getAll:', error);
       next(error);
     }
   }

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Container, Card, Row, Col, Button } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Share2 } from "lucide-react";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -15,23 +16,30 @@ export default function Dashboard() {
         <Col>
           <Card className="mb-3 p-3">
             <h5>Accesos rÃ¡pidos</h5>
-            <div className="d-flex gap-2 mt-3">
+            <div className="d-flex gap-2 mt-3 flex-wrap">
               <Button variant="outline-dark" onClick={() => navigate("/registros")}>
-                ğŸ” Buscar Registros
+                í´ Buscar Registros
+              </Button>
+              <Button 
+                variant="outline-primary" 
+                onClick={() => navigate("/enlaces")}
+                className="d-flex align-items-center gap-2"
+              >
+                <Share2 size={18} /> Enlaces Compartidos
               </Button>
               {isAdmin ? (
                 <>
                   <Button variant="dark" onClick={() => navigate("/cargar")}>
-                    ğŸ“„ Cargar Registros
+                    í³„ Cargar Registros
                   </Button>
                   <Button variant="outline-dark" onClick={() => navigate("/usuarios")}>
-                    ğŸ‘¥ Gestionar Usuarios
+                    í±¥ Gestionar Usuarios
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button variant="secondary" disabled>ğŸ“„ Cargar Registros</Button>
-                  <Button variant="secondary" disabled>ğŸ‘¥ Gestionar Usuarios</Button>
+                  <Button variant="secondary" disabled>í³„ Cargar Registros</Button>
+                  <Button variant="secondary" disabled>í±¥ Gestionar Usuarios</Button>
                 </>
               )}
             </div>

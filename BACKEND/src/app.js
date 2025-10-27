@@ -13,6 +13,7 @@ const personasRoutes = require('./routes/personas.routes');
 const registrosRoutes = require('./routes/registros.routes');
 const archivosRoutes = require('./routes/archivos.routes');
 const logsRoutes = require('./routes/logs.routes');
+const enlacesRoutes = require('./routes/enlacesCompartidos.routes');
 
 const app = express();
 
@@ -24,13 +25,19 @@ const corsOptions = {
       'http://localhost:5173', // Vite (desarrollo)
       'http://127.0.0.1:5173',
       'http://localhost:5174',
+      'http://localhost:5175', // Puerto actual
+      'http://192.168.1.23:5175', // IP local
+      'http://192.168.1.23:5174',
+      'http://192.168.1.23:5173',
       process.env.FRONTEND_URL, // URL de producción desde .env
+      process.env.CORS_ORIGIN, // Origen adicional desde .env
     ].filter(Boolean);
 
     // Permitir requests sin origin (como mobile apps o curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('❌ Origen bloqueado por CORS:', origin);
       callback(new Error('No permitido por CORS'));
     }
   },
@@ -76,6 +83,7 @@ app.use('/api/personas', personasRoutes);
 app.use('/api/registros', registrosRoutes);
 app.use('/api/archivos', archivosRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/enlaces-compartidos', enlacesRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
