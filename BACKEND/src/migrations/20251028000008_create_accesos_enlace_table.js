@@ -8,20 +8,13 @@ exports.up = async function up(knex) {
 
   await knex.schema.createTable('accesos_enlace', table => {
     table.bigIncrements('id').primary();
-    table
-      .bigInteger('enlace_id')
-      .unsigned()
-      .notNullable();
+    table.bigInteger('enlace_id').unsigned().notNullable();
     table
       .timestamp('fecha_acceso', { useTz: true })
       .notNullable()
       .defaultTo(knex.fn.now());
-    table
-      .string('ip_address', 64)
-      .nullable();
-    table
-      .text('user_agent')
-      .nullable();
+    table.string('ip_address', 64).nullable();
+    table.text('user_agent').nullable();
     table
       .string('resultado', 32)
       .notNullable()

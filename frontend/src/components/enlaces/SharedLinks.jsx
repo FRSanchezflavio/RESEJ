@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Badge,
@@ -10,38 +10,37 @@ import {
   Row,
   Spinner,
   Table,
-} from "react-bootstrap";
-import { useSearchParams } from "react-router-dom";
+} from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
 import {
   createSharedLink,
   fetchSharedLinks,
   revokeSharedLink,
-} from "../../api/api";
+} from '../../api/api';
 
 const EMPTY_FORM = {
-  registro_id: "",
-  descripcion: "",
-  duracion_horas: "24",
-  max_accesos: "",
+  registro_id: '',
+  descripcion: '',
+  duracion_horas: '24',
+  max_accesos: '',
   requiere_contrasena: false,
-  contrasena: "",
-  tipo: "registro",
+  contrasena: '',
+  tipo: 'registro',
 };
 
 const limitedStatus = enlace => {
-  if (enlace.revocado) return { variant: "secondary", label: "Revocado" };
+  if (enlace.revocado) return { variant: 'secondary', label: 'Revocado' };
   if (enlace.fecha_expiracion) {
     const expired = new Date(enlace.fecha_expiracion) <= new Date();
-    if (expired) return { variant: "danger", label: "Expirado" };
+    if (expired) return { variant: 'danger', label: 'Expirado' };
   }
   if (enlace.max_accesos && enlace.accesos >= enlace.max_accesos) {
-    return { variant: "warning", label: "Límite alcanzado" };
+    return { variant: 'warning', label: 'Límite alcanzado' };
   }
-  return { variant: "success", label: "Vigente" };
+  return { variant: 'success', label: 'Vigente' };
 };
 
-const formatDate = value =>
-  value ? new Date(value).toLocaleString() : "-";
+const formatDate = value => (value ? new Date(value).toLocaleString() : '-');
 
 export default function SharedLinks() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,10 +67,10 @@ export default function SharedLinks() {
         setLinks(payload.enlaces ?? []);
         setPagination(payload.pagination ?? { page: 1, totalPages: 1 });
       } catch (err) {
-        console.error("Error cargando enlaces", err);
+        console.error('Error cargando enlaces', err);
         setError(
           err?.response?.data?.error ||
-            "No se pudieron obtener los enlaces compartidos"
+            'No se pudieron obtener los enlaces compartidos'
         );
         setLinks([]);
       } finally {
@@ -82,13 +81,13 @@ export default function SharedLinks() {
   );
 
   useEffect(() => {
-    const registroPrefill = searchParams.get("registro");
+    const registroPrefill = searchParams.get('registro');
     if (registroPrefill) {
       setForm(prev => ({ ...prev, registro_id: registroPrefill }));
       setCreationResult(null);
       setShowModal(true);
       const updated = new URLSearchParams(searchParams);
-      updated.delete("registro");
+      updated.delete('registro');
       setSearchParams(updated, { replace: true });
     }
   }, [searchParams, setSearchParams]);
@@ -99,22 +98,22 @@ export default function SharedLinks() {
 
   const handleChange = event => {
     const { name, value, type, checked } = event.target;
-    if (name === "requiere_contrasena") {
+    if (name === 'requiere_contrasena') {
       setForm(prev => ({
         ...prev,
         requiere_contrasena: checked,
-        contrasena: checked ? prev.contrasena : "",
+        contrasena: checked ? prev.contrasena : '',
       }));
       return;
     }
     setForm(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
   const resetForm = useCallback(() => {
-  setForm({ ...EMPTY_FORM });
+    setForm({ ...EMPTY_FORM });
     setCreationResult(null);
   }, []);
 
@@ -137,11 +136,10 @@ export default function SharedLinks() {
       setCreationResult(data);
       await fetchData({ page: pagination.page });
     } catch (err) {
-      console.error("Error creando enlace", err);
+      console.error('Error creando enlace', err);
       setCreationResult({
         error:
-          err?.response?.data?.error ||
-          "No se pudo crear el enlace compartido",
+          err?.response?.data?.error || 'No se pudo crear el enlace compartido',
       });
     } finally {
       setCreating(false);
@@ -154,14 +152,15 @@ export default function SharedLinks() {
   };
 
   const handleRevoke = async token => {
-    if (!window.confirm("¿Está seguro de revocar este enlace?")) return;
+    if (!window.confirm('¿Está seguro de revocar este enlace?')) return;
     try {
       await revokeSharedLink(token);
       await fetchData({ page: pagination.page });
     } catch (err) {
-      console.error("Error revocando enlace", err);
+      console.error('Error revocando enlace', err);
       alert(
-        err?.response?.data?.error || "No se pudo revocar el enlace seleccionado"
+        err?.response?.data?.error ||
+          'No se pudo revocar el enlace seleccionado'
       );
     }
   };
@@ -284,7 +283,9 @@ export default function SharedLinks() {
           <Spinner animation="border" />
         </div>
       ) : links.length === 0 ? (
-        <p className="mb-0">No se encontraron enlaces para los criterios seleccionados.</p>
+        <p className="mb-0">
+          No se encontraron enlaces para los criterios seleccionados.
+        </p>
       ) : (
         <Table striped bordered hover responsive size="sm">
           <thead>
@@ -313,12 +314,14 @@ export default function SharedLinks() {
                       onFocus={event => event.target.select()}
                     />
                   </td>
-                  <td>{link.descripcion || "-"}</td>
-                  <td>{link.registro_id ?? "-"}</td>
+                  <td>{link.descripcion || '-'}</td>
+                  <td>{link.registro_id ?? '-'}</td>
                   <td>
                     <Badge bg={status.variant}>{status.label}</Badge>
                   </td>
-                  <td>{`${link.accesos || 0}${link.max_accesos ? `/${link.max_accesos}` : ""}`}</td>
+                  <td>{`${link.accesos || 0}${
+                    link.max_accesos ? `/${link.max_accesos}` : ''
+                  }`}</td>
                   <td>{formatDate(link.fecha_expiracion)}</td>
                   <td>{formatDate(link.fecha_creacion)}</td>
                   <td className="d-flex flex-column gap-2">
@@ -362,9 +365,7 @@ export default function SharedLinks() {
           <Button
             variant="outline-secondary"
             size="sm"
-            disabled={
-              pagination.page >= pagination.totalPages || loading
-            }
+            disabled={pagination.page >= pagination.totalPages || loading}
             onClick={() => fetchData({ page: pagination.page + 1 })}
           >
             Siguiente
@@ -453,7 +454,7 @@ export default function SharedLinks() {
               Cancelar
             </Button>
             <Button type="submit" disabled={creating}>
-              {creating ? <Spinner animation="border" size="sm" /> : "Generar"}
+              {creating ? <Spinner animation="border" size="sm" /> : 'Generar'}
             </Button>
           </Modal.Footer>
         </Form>

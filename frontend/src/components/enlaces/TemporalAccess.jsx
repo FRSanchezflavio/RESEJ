@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
   Badge,
@@ -9,29 +9,28 @@ import {
   Form,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { accessSharedLinkPublic } from "../../api/api";
+} from 'react-bootstrap';
+import { accessSharedLinkPublic } from '../../api/api';
 
 const initialState = {
-  token: "",
-  contrasena: "",
+  token: '',
+  contrasena: '',
 };
 
 const statusFor = enlace => {
-  if (!enlace) return { variant: "secondary", label: "Sin datos" };
-  if (enlace.revocado) return { variant: "secondary", label: "Revocado" };
+  if (!enlace) return { variant: 'secondary', label: 'Sin datos' };
+  if (enlace.revocado) return { variant: 'secondary', label: 'Revocado' };
   if (enlace.fecha_expiracion) {
     const expired = new Date(enlace.fecha_expiracion) <= new Date();
-    if (expired) return { variant: "danger", label: "Expirado" };
+    if (expired) return { variant: 'danger', label: 'Expirado' };
   }
   if (enlace.max_accesos && enlace.accesos >= enlace.max_accesos) {
-    return { variant: "warning", label: "Límite alcanzado" };
+    return { variant: 'warning', label: 'Límite alcanzado' };
   }
-  return { variant: "success", label: "Vigente" };
+  return { variant: 'success', label: 'Vigente' };
 };
 
-const formatDate = value =>
-  value ? new Date(value).toLocaleString() : "-";
+const formatDate = value => (value ? new Date(value).toLocaleString() : '-');
 
 export default function TemporalAccess() {
   const [form, setForm] = useState({ ...initialState });
@@ -52,35 +51,35 @@ export default function TemporalAccess() {
     setEnlace(null);
   };
 
-  const requestAccess = useCallback(
-    async ({ token, contrasena }) => {
-      setLoading(true);
-      setError(null);
-      setRequiresPassword(false);
-      try {
-        const payload = contrasena ? { contrasena } : {};
-        const response = await accessSharedLinkPublic(token, payload);
-        const data = response.data?.data ?? {};
-        setEnlace(data);
-      } catch (err) {
-        const responsePayload = err?.response?.data ?? {};
-        const status = err?.response?.status;
-        const needsPassword = responsePayload.necesitaContrasena || status === 401;
-        if (needsPassword) {
-          setRequiresPassword(true);
-          if (responsePayload.error) {
-            setError(responsePayload.error);
-          }
-        } else {
-          setError(responsePayload.error || "No se pudo acceder al enlace solicitado");
+  const requestAccess = useCallback(async ({ token, contrasena }) => {
+    setLoading(true);
+    setError(null);
+    setRequiresPassword(false);
+    try {
+      const payload = contrasena ? { contrasena } : {};
+      const response = await accessSharedLinkPublic(token, payload);
+      const data = response.data?.data ?? {};
+      setEnlace(data);
+    } catch (err) {
+      const responsePayload = err?.response?.data ?? {};
+      const status = err?.response?.status;
+      const needsPassword =
+        responsePayload.necesitaContrasena || status === 401;
+      if (needsPassword) {
+        setRequiresPassword(true);
+        if (responsePayload.error) {
+          setError(responsePayload.error);
         }
-        setEnlace(null);
-      } finally {
-        setLoading(false);
+      } else {
+        setError(
+          responsePayload.error || 'No se pudo acceder al enlace solicitado'
+        );
       }
-    },
-    []
-  );
+      setEnlace(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -102,7 +101,11 @@ export default function TemporalAccess() {
                   Consulte registros habilitados ingresando el token entregado.
                 </p>
               </div>
-              <Button variant="outline-secondary" size="sm" onClick={handleReset}>
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={handleReset}
+              >
                 Limpiar
               </Button>
             </div>
@@ -123,7 +126,11 @@ export default function TemporalAccess() {
                 </Col>
                 <Col md={4} className="d-flex align-items-end">
                   <Button type="submit" className="w-100" disabled={loading}>
-                    {loading ? <Spinner animation="border" size="sm" /> : "Consultar"}
+                    {loading ? (
+                      <Spinner animation="border" size="sm" />
+                    ) : (
+                      'Consultar'
+                    )}
                   </Button>
                 </Col>
               </Row>
@@ -144,7 +151,7 @@ export default function TemporalAccess() {
             </Form>
 
             {error && (
-              <Alert variant={requiresPassword ? "warning" : "danger"}>
+              <Alert variant={requiresPassword ? 'warning' : 'danger'}>
                 {error}
               </Alert>
             )}
@@ -165,11 +172,13 @@ export default function TemporalAccess() {
                 <Row className="mb-3">
                   <Col md={6}>
                     <small className="text-muted">Registro relacionado</small>
-                    <div className="fw-semibold">{enlace.registro_id ?? "-"}</div>
+                    <div className="fw-semibold">
+                      {enlace.registro_id ?? '-'}
+                    </div>
                   </Col>
                   <Col md={6}>
                     <small className="text-muted">Descripción</small>
-                    <div>{enlace.descripcion || "Sin descripción"}</div>
+                    <div>{enlace.descripcion || 'Sin descripción'}</div>
                   </Col>
                 </Row>
                 <Row className="mb-3">
@@ -187,7 +196,7 @@ export default function TemporalAccess() {
                     <small className="text-muted">Accesos</small>
                     <div>
                       {enlace.accesos || 0}
-                      {enlace.max_accesos ? ` / ${enlace.max_accesos}` : ""}
+                      {enlace.max_accesos ? ` / ${enlace.max_accesos}` : ''}
                     </div>
                   </Col>
                   <Col md={6}>
@@ -202,7 +211,8 @@ export default function TemporalAccess() {
               </div>
             ) : (
               <Alert variant="secondary">
-                Ingrese un token válido para visualizar la información disponible.
+                Ingrese un token válido para visualizar la información
+                disponible.
               </Alert>
             )}
           </Card>

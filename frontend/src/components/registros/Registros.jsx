@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Card, Form, Button, Table } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { fetchRegistros } from "../../api/api";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useContext, useEffect, useState } from 'react';
+import { Card, Form, Button, Table } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { fetchRegistros } from '../../api/api';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function Registros() {
   const [registros, setRegistros] = useState([]);
-  const [term, setTerm] = useState("");
+  const [term, setTerm] = useState('');
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const canShare = ["administrador", "usuario_consulta"].includes(user?.rol);
+  const canShare = ['administrador', 'usuario_consulta'].includes(user?.rol);
 
   async function load(params = {}) {
     try {
@@ -23,9 +23,11 @@ export default function Registros() {
     }
   }
 
-  useEffect(() => { load({}); }, []);
+  useEffect(() => {
+    load({});
+  }, []);
 
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     load({ q: term });
   };
@@ -34,9 +36,23 @@ export default function Registros() {
     <Card className="p-3">
       <h5>Buscar registro</h5>
       <Form onSubmit={handleSearch} className="d-flex gap-2 mb-3">
-        <Form.Control placeholder="Ingrese término de búsqueda" value={term} onChange={(e)=>setTerm(e.target.value)} />
-        <Button type="submit" variant="dark">BUSCAR</Button>
-        <Button variant="outline-secondary" onClick={()=>{ setTerm(""); load({}); }}>MOSTRAR TODAS</Button>
+        <Form.Control
+          placeholder="Ingrese término de búsqueda"
+          value={term}
+          onChange={e => setTerm(e.target.value)}
+        />
+        <Button type="submit" variant="dark">
+          BUSCAR
+        </Button>
+        <Button
+          variant="outline-secondary"
+          onClick={() => {
+            setTerm('');
+            load({});
+          }}
+        >
+          MOSTRAR TODAS
+        </Button>
       </Form>
 
       {registros.length === 0 ? (
@@ -57,7 +73,9 @@ export default function Registros() {
               <tr key={r.id}>
                 <td>{r.id}</td>
                 <td>{r.numero_causa}</td>
-                <td>{r.fecha_delito ? new Date(r.fecha_delito).getFullYear() : ''}</td>
+                <td>
+                  {r.fecha_delito ? new Date(r.fecha_delito).getFullYear() : ''}
+                </td>
                 <td>{r.detalle_secuestro || r.descripcion || '-'}</td>
                 <td>
                   {canShare ? (

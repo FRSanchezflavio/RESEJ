@@ -1,13 +1,16 @@
-import React, { useContext } from "react";
-import { Navbar, Container, Nav, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useContext } from 'react';
+import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
-export default function AppNavbar({ isLimitedUser = false, isTemporalUser = false }) {
+export default function AppNavbar({
+  isLimitedUser = false,
+  isTemporalUser = false,
+}) {
   const { user, logout } = useContext(AuthContext);
   const role = user?.rol;
-  const isAdmin = role === "administrador";
-  const isConsulta = role === "usuario_consulta";
+  const isAdmin = role === 'administrador';
+  const isConsulta = role === 'usuario_consulta';
   const showDashboard = !isLimitedUser && (isAdmin || isConsulta);
   const showSharedLinks = !isLimitedUser && (isAdmin || isConsulta);
 
@@ -15,11 +18,11 @@ export default function AppNavbar({ isLimitedUser = false, isTemporalUser = fals
     <Navbar
       bg="light"
       expand="lg"
-      style={{ borderBottom: "1px solid #e9ecef" }}
+      style={{ borderBottom: '1px solid #e9ecef' }}
       className="mb-3"
     >
       <Container>
-        <Navbar.Brand style={{ color: "#546e7a", fontWeight: 600 }}>
+        <Navbar.Brand style={{ color: '#546e7a', fontWeight: 600 }}>
           REGISTRO DE SECUESTROS JUDICIALES
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="main-navbar" />

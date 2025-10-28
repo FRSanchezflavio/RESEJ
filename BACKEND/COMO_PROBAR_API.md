@@ -152,19 +152,19 @@ http://localhost:4000/health
 
 ### Con Autenticación (Requieren Token)
 
-| Método | Endpoint            | Descripción                    |
-| ------ | ------------------- | ------------------------------ |
-| GET    | `/api/auth/me`      | Perfil del usuario actual      |
-| POST   | `/api/auth/refresh` | Renovar token                  |
-| POST   | `/api/auth/logout`  | Cerrar sesión                  |
-| GET    | `/api/usuarios`     | Listar usuarios (admin)        |
-| GET    | `/api/personas`     | Listar personas registradas    |
-| GET    | `/api/registros`    | Listar registros de secuestros |
-| POST   | `/api/registros`    | Crear nuevo registro (admin)   |
-| GET    | `/api/enlaces-compartidos` | Listar enlaces compartidos (consulta/admin) |
-| POST   | `/api/enlaces-compartidos` | Crear enlace compartido (consulta/admin) |
-| POST   | `/api/enlaces-compartidos/:token/revocar` | Revocar un enlace existente |
-| POST   | `/api/public/enlaces/:token/acceso` | Acceder a un enlace público con IP registrada |
+| Método | Endpoint                                  | Descripción                                   |
+| ------ | ----------------------------------------- | --------------------------------------------- |
+| GET    | `/api/auth/me`                            | Perfil del usuario actual                     |
+| POST   | `/api/auth/refresh`                       | Renovar token                                 |
+| POST   | `/api/auth/logout`                        | Cerrar sesión                                 |
+| GET    | `/api/usuarios`                           | Listar usuarios (admin)                       |
+| GET    | `/api/personas`                           | Listar personas registradas                   |
+| GET    | `/api/registros`                          | Listar registros de secuestros                |
+| POST   | `/api/registros`                          | Crear nuevo registro (admin)                  |
+| GET    | `/api/enlaces-compartidos`                | Listar enlaces compartidos (consulta/admin)   |
+| POST   | `/api/enlaces-compartidos`                | Crear enlace compartido (consulta/admin)      |
+| POST   | `/api/enlaces-compartidos/:token/revocar` | Revocar un enlace existente                   |
+| POST   | `/api/public/enlaces/:token/acceso`       | Acceder a un enlace público con IP registrada |
 
 #### Ejemplos rápidos para enlaces compartidos
 

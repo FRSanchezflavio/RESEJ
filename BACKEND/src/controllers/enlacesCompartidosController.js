@@ -1,14 +1,14 @@
-const { createSuccessResponse, createErrorResponse, getClientIp } = require('../utils/helpers');
+const {
+  createSuccessResponse,
+  createErrorResponse,
+  getClientIp,
+} = require('../utils/helpers');
 const enlaceCompartidoService = require('../services/enlaceCompartidoService');
 const logger = require('../utils/logger');
 
 const sanitizeEnlace = enlace => {
   if (!enlace) return null;
-  const {
-    contrasena_hash,
-    usuario_temporal_password_hash,
-    ...resto
-  } = enlace;
+  const { contrasena_hash, usuario_temporal_password_hash, ...resto } = enlace;
   return resto;
 };
 
@@ -24,16 +24,17 @@ const create = async (req, res, next) => {
       tipo,
     } = req.body;
 
-    const { enlace, credencialesTemporales } = await enlaceCompartidoService.createEnlace({
-      registroId: registro_id,
-      usuarioCreadorId: req.user?.id,
-      descripcion,
-      duracionHoras: duracion_horas,
-      maxAccesos: max_accesos,
-      requiereContrasena: requiere_contrasena,
-      contrasena,
-      tipo,
-    });
+    const { enlace, credencialesTemporales } =
+      await enlaceCompartidoService.createEnlace({
+        registroId: registro_id,
+        usuarioCreadorId: req.user?.id,
+        descripcion,
+        duracionHoras: duracion_horas,
+        maxAccesos: max_accesos,
+        requiereContrasena: requiere_contrasena,
+        contrasena,
+        tipo,
+      });
 
     return res.status(201).json(
       createSuccessResponse({
@@ -77,7 +78,9 @@ const getByToken = async (req, res, next) => {
     const enlace = await enlaceCompartidoService.getEnlacePrivado(token);
 
     if (!enlace) {
-      return res.status(404).json(createErrorResponse('Enlace no encontrado', 404));
+      return res
+        .status(404)
+        .json(createErrorResponse('Enlace no encontrado', 404));
     }
 
     return res.json(createSuccessResponse(sanitizeEnlace(enlace)));
@@ -93,7 +96,9 @@ const revoke = async (req, res, next) => {
     const enlace = await enlaceCompartidoService.revokeEnlace(token);
 
     if (!enlace) {
-      return res.status(404).json(createErrorResponse('Enlace no encontrado', 404));
+      return res
+        .status(404)
+        .json(createErrorResponse('Enlace no encontrado', 404));
     }
 
     return res.json(
@@ -115,11 +120,14 @@ const accessPublico = async (req, res, next) => {
     const ip = getClientIp(req);
     const userAgent = req.headers['user-agent'];
 
-    const resultado = await enlaceCompartidoService.validatePublicAccess(token, {
-      contrasena,
-      ip,
-      userAgent,
-    });
+    const resultado = await enlaceCompartidoService.validatePublicAccess(
+      token,
+      {
+        contrasena,
+        ip,
+        userAgent,
+      }
+    );
 
     if (resultado.error) {
       const payload = createErrorResponse(resultado.error, resultado.status);

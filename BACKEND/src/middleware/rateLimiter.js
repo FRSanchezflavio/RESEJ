@@ -71,8 +71,7 @@ const uploadLimiter = rateLimit({
 });
 
 const sharedLinkAccessLimiter = rateLimit({
-  windowMs:
-    parseInt(process.env.SHARED_LINK_WINDOW_MS) || 5 * 60 * 1000, // 5 minutos
+  windowMs: parseInt(process.env.SHARED_LINK_WINDOW_MS) || 5 * 60 * 1000, // 5 minutos
   max: parseInt(process.env.SHARED_LINK_MAX_REQUESTS) || 20,
   message: createErrorResponse(
     'Demasiados intentos de acceso. Por favor intente más tarde',

@@ -48,7 +48,9 @@ async function registerAccess(enlace, { resultado, ip, userAgent, detalle }) {
       detalle: detalle || null,
     });
   } catch (error) {
-    logger.error(`Error registrando acceso de enlace ${enlace.token}: ${error.message}`);
+    logger.error(
+      `Error registrando acceso de enlace ${enlace.token}: ${error.message}`
+    );
   }
 }
 

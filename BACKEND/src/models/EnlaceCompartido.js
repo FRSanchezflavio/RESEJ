@@ -2,7 +2,9 @@ const db = require('../config/database');
 
 class EnlaceCompartido {
   static async create(data) {
-    const [enlace] = await db('enlaces_compartidos').insert(data).returning('*');
+    const [enlace] = await db('enlaces_compartidos')
+      .insert(data)
+      .returning('*');
     return enlace;
   }
 
@@ -14,10 +16,18 @@ class EnlaceCompartido {
     return db('enlaces_compartidos').where({ id }).first();
   }
 
-  static async findAll({ page = 1, limit = 10, usuarioId = null, includeRevoked = true } = {}) {
+  static async findAll({
+    page = 1,
+    limit = 10,
+    usuarioId = null,
+    includeRevoked = true,
+  } = {}) {
     const offset = (page - 1) * limit;
 
-    const baseQuery = db('enlaces_compartidos').orderBy('fecha_creacion', 'desc');
+    const baseQuery = db('enlaces_compartidos').orderBy(
+      'fecha_creacion',
+      'desc'
+    );
 
     if (!includeRevoked) {
       baseQuery.where({ revocado: false });

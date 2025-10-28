@@ -29,10 +29,7 @@ exports.up = async function up(knex) {
       .defaultTo('registro')
       .comment('registro | persona | mixto (flexible por si se amplía)');
     table.text('descripcion').nullable();
-    table
-      .boolean('requiere_contrasena')
-      .notNullable()
-      .defaultTo(false);
+    table.boolean('requiere_contrasena').notNullable().defaultTo(false);
     table
       .string('contrasena_hash', 255)
       .nullable()
@@ -60,19 +57,10 @@ exports.up = async function up(knex) {
       .unsigned()
       .nullable()
       .comment('Cantidad máxima de accesos permitidos (null = ilimitado)');
-    table
-      .integer('accesos')
-      .unsigned()
-      .notNullable()
-      .defaultTo(0);
-    table
-      .boolean('revocado')
-      .notNullable()
-      .defaultTo(false);
+    table.integer('accesos').unsigned().notNullable().defaultTo(0);
+    table.boolean('revocado').notNullable().defaultTo(false);
     table.timestamp('fecha_revocado', { useTz: true }).nullable();
-    table
-      .timestamp('ultimo_acceso', { useTz: true })
-      .nullable();
+    table.timestamp('ultimo_acceso', { useTz: true }).nullable();
 
     table
       .foreign('registro_id')

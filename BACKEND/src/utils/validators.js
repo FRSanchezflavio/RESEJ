@@ -108,8 +108,9 @@ const createRegistroValidators = [
     .withMessage('ID de persona inválido'),
   // fecha_ingreso: aceptar AAAA-MM-DD y convertir a Date
   body('fecha_ingreso')
-    .notEmpty().withMessage('La fecha de ingreso es requerida')
-    .custom((value) => {
+    .notEmpty()
+    .withMessage('La fecha de ingreso es requerida')
+    .custom(value => {
       const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
       if (!isoRegex.test(value)) {
         throw new Error('Formato de fecha inválido (use AAAA-MM-DD)');

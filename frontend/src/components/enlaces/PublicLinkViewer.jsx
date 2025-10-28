@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Alert,
   Badge,
@@ -8,23 +8,22 @@ import {
   Container,
   Form,
   Spinner,
-} from "react-bootstrap";
-import { accessSharedLinkPublic } from "../../api/api";
+} from 'react-bootstrap';
+import { accessSharedLinkPublic } from '../../api/api';
 
-const formatDate = value =>
-  value ? new Date(value).toLocaleString() : "-";
+const formatDate = value => (value ? new Date(value).toLocaleString() : '-');
 
 const statusFor = enlace => {
-  if (!enlace) return { variant: "secondary", label: "Desconocido" };
-  if (enlace.revocado) return { variant: "secondary", label: "Revocado" };
+  if (!enlace) return { variant: 'secondary', label: 'Desconocido' };
+  if (enlace.revocado) return { variant: 'secondary', label: 'Revocado' };
   if (enlace.fecha_expiracion) {
     const expired = new Date(enlace.fecha_expiracion) <= new Date();
-    if (expired) return { variant: "danger", label: "Expirado" };
+    if (expired) return { variant: 'danger', label: 'Expirado' };
   }
   if (enlace.max_accesos && enlace.accesos >= enlace.max_accesos) {
-    return { variant: "warning", label: "Límite alcanzado" };
+    return { variant: 'warning', label: 'Límite alcanzado' };
   }
-  return { variant: "success", label: "Vigente" };
+  return { variant: 'success', label: 'Vigente' };
 };
 
 export default function PublicLinkViewer() {
@@ -33,11 +32,11 @@ export default function PublicLinkViewer() {
   const [enlace, setEnlace] = useState(null);
   const [error, setError] = useState(null);
   const [necesitaContrasena, setNecesitaContrasena] = useState(false);
-  const [contrasena, setContrasena] = useState("");
+  const [contrasena, setContrasena] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const requestAccess = useCallback(
-    async (password = "") => {
+    async (password = '') => {
       setLoading(true);
       setError(null);
       setNecesitaContrasena(false);
@@ -51,8 +50,7 @@ export default function PublicLinkViewer() {
       } catch (err) {
         const payload = err?.response?.data ?? {};
         const status = err?.response?.status;
-        const passwordRequired =
-          payload.necesitaContrasena || status === 401;
+        const passwordRequired = payload.necesitaContrasena || status === 401;
 
         if (passwordRequired) {
           setNecesitaContrasena(true);
@@ -60,7 +58,7 @@ export default function PublicLinkViewer() {
             setError(payload.error);
           }
         } else {
-          setError(payload.error || "No se pudo acceder al enlace");
+          setError(payload.error || 'No se pudo acceder al enlace');
         }
         setEnlace(null);
       } finally {
@@ -79,7 +77,7 @@ export default function PublicLinkViewer() {
     setSubmitting(true);
     try {
       await requestAccess(contrasena);
-      setContrasena("");
+      setContrasena('');
     } finally {
       setSubmitting(false);
     }
@@ -113,31 +111,34 @@ export default function PublicLinkViewer() {
             </div>
             <div className="mb-3">
               <strong>Descripción:</strong>
-              <div>{publicData.descripcion || "Sin descripción"}</div>
+              <div>{publicData.descripcion || 'Sin descripción'}</div>
             </div>
             <div className="mb-3">
               <strong>Registro asociado:</strong>
-              <div>{publicData.registro_id ?? "-"}</div>
+              <div>{publicData.registro_id ?? '-'}</div>
             </div>
             <div className="d-flex flex-column gap-2 mb-3">
               <div>
-                <strong>Fecha de creación:</strong> {formatDate(publicData.fecha_creacion)}
+                <strong>Fecha de creación:</strong>{' '}
+                {formatDate(publicData.fecha_creacion)}
               </div>
               <div>
-                <strong>Fecha de expiración:</strong> {formatDate(publicData.fecha_expiracion)}
+                <strong>Fecha de expiración:</strong>{' '}
+                {formatDate(publicData.fecha_expiracion)}
               </div>
               <div>
                 <strong>Accesos:</strong> {publicData.accesos || 0}
-                {publicData.max_accesos ? ` / ${publicData.max_accesos}` : ""}
+                {publicData.max_accesos ? ` / ${publicData.max_accesos}` : ''}
               </div>
             </div>
             <Alert variant="info" className="mb-0">
-              Si el enlace da acceso a documentación adicional, comuníquese con la persona que lo compartió para recibir instrucciones.
+              Si el enlace da acceso a documentación adicional, comuníquese con
+              la persona que lo compartió para recibir instrucciones.
             </Alert>
           </>
         ) : necesitaContrasena ? (
           <>
-            <Alert variant={error ? "danger" : "warning"}>
+            <Alert variant={error ? 'danger' : 'warning'}>
               Este enlace requiere una contraseña proporcionada por el emisor.
               {error ? <div className="mt-2 mb-0">{error}</div> : null}
             </Alert>
@@ -152,12 +153,18 @@ export default function PublicLinkViewer() {
                 required
               />
               <Button type="submit" disabled={submitting}>
-                {submitting ? <Spinner animation="border" size="sm" /> : "Validar"}
+                {submitting ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  'Validar'
+                )}
               </Button>
             </Form>
           </>
         ) : (
-          <Alert variant="secondary">No hay información asociada a este enlace.</Alert>
+          <Alert variant="secondary">
+            No hay información asociada a este enlace.
+          </Alert>
         )}
       </Card>
     </Container>
