@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { fetchRegistros } from "../../api/api";
+import React, { useContext, useEffect, useState } from "react";
 import { Card, Form, Button, Table } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { fetchRegistros } from "../../api/api";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Registros() {
   const [registros, setRegistros] = useState([]);
   const [term, setTerm] = useState("");
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const canShare = ["administrador", "usuario_consulta"].includes(user?.rol);
 
   async function load(params = {}) {
     try {
@@ -40,7 +45,11 @@ export default function Registros() {
         <Table striped bordered hover size="sm">
           <thead>
             <tr>
-              <th>#</th><th>Numero Causa</th><th>Año</th><th>Detalle</th>
+              <th>#</th>
+              <th>Numero Causa</th>
+              <th>Año</th>
+              <th>Detalle</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -50,6 +59,21 @@ export default function Registros() {
                 <td>{r.numero_causa}</td>
                 <td>{r.fecha_delito ? new Date(r.fecha_delito).getFullYear() : ''}</td>
                 <td>{r.detalle_secuestro || r.descripcion || '-'}</td>
+                <td>
+                  {canShare ? (
+                    <Button
+                      size="sm"
+                      variant="outline-dark"
+                      onClick={() => navigate(`/enlaces?registro=${r.id}`)}
+                    >
+                      Compartir
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="secondary" disabled>
+                      Compartir
+                    </Button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

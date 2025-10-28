@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -35,6 +35,26 @@ export async function fetchUsers() {
 
 export async function createUser(payload) {
   return api.post("/usuarios", payload);
+}
+
+export async function fetchSharedLinks(params = {}) {
+  return api.get("/enlaces-compartidos", { params });
+}
+
+export async function createSharedLink(payload) {
+  return api.post("/enlaces-compartidos", payload);
+}
+
+export async function getSharedLink(token) {
+  return api.get(`/enlaces-compartidos/${token}`);
+}
+
+export async function revokeSharedLink(token) {
+  return api.post(`/enlaces-compartidos/${token}/revocar`);
+}
+
+export async function accessSharedLinkPublic(token, payload = {}) {
+  return axios.post(`${API_URL}/public/enlaces/${token}/acceso`, payload);
 }
 
 export default api;

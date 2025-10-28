@@ -159,6 +159,81 @@ const searchValidators = [
     .withMessage('Límite debe estar entre 1 y 100'),
 ];
 
+/**
+ * Validadores para enlaces compartidos
+ */
+const createEnlaceCompartidoValidators = [
+  body('registro_id')
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1 })
+    .withMessage('El ID del registro debe ser un entero positivo'),
+  body('descripcion')
+    .optional({ checkFalsy: true })
+    .isLength({ max: 255 })
+    .withMessage('La descripción no puede exceder 255 caracteres'),
+  body('duracion_horas')
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1, max: 720 })
+    .withMessage('La duración debe estar entre 1 y 720 horas'),
+  body('max_accesos')
+    .optional({ checkFalsy: true })
+    .isInt({ min: 1, max: 1000 })
+    .withMessage('El máximo de accesos debe ser un entero entre 1 y 1000'),
+  body('requiere_contrasena')
+    .optional()
+    .isBoolean()
+    .withMessage('El campo requiere_contrasena debe ser booleano')
+    .toBoolean(),
+  body('contrasena')
+    .optional({ checkFalsy: true })
+    .isLength({ min: 8, max: 128 })
+    .withMessage('La contraseña debe tener entre 8 y 128 caracteres')
+    .custom((value, { req }) => {
+      if (req.body.requiere_contrasena && !value) {
+        throw new Error('Debe proporcionar una contraseña cuando se requiere');
+      }
+      return true;
+    }),
+  body('tipo')
+    .optional({ checkFalsy: true })
+    .isIn(['registro', 'archivo', 'custom'])
+    .withMessage('Tipo de enlace inválido'),
+];
+
+const listEnlaceCompartidoValidators = [
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Número de página inválido'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Límite debe estar entre 1 y 100'),
+  query('includeRevoked')
+    .optional()
+    .isBoolean()
+    .withMessage('includeRevoked debe ser booleano')
+    .toBoolean(),
+];
+
+const tokenParamValidator = [
+  param('token')
+    .trim()
+    .notEmpty()
+    .withMessage('El token es requerido')
+    .isLength({ min: 10, max: 128 })
+    .withMessage('Token inválido')
+    .matches(/^[A-Za-z0-9_-]+$/)
+    .withMessage('El token debe estar en formato base64url'),
+];
+
+const publicAccessValidators = [
+  body('contrasena')
+    .optional({ checkFalsy: true })
+    .isLength({ min: 8, max: 128 })
+    .withMessage('La contraseña debe tener entre 8 y 128 caracteres'),
+];
+
 module.exports = {
   handleValidationErrors,
   loginValidators,
@@ -167,4 +242,8 @@ module.exports = {
   createRegistroValidators,
   idParamValidator,
   searchValidators,
+  createEnlaceCompartidoValidators,
+  listEnlaceCompartidoValidators,
+  tokenParamValidator,
+  publicAccessValidators,
 };

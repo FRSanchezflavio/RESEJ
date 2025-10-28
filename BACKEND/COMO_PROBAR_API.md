@@ -161,6 +161,52 @@ http://localhost:4000/health
 | GET    | `/api/personas`     | Listar personas registradas    |
 | GET    | `/api/registros`    | Listar registros de secuestros |
 | POST   | `/api/registros`    | Crear nuevo registro (admin)   |
+| GET    | `/api/enlaces-compartidos` | Listar enlaces compartidos (consulta/admin) |
+| POST   | `/api/enlaces-compartidos` | Crear enlace compartido (consulta/admin) |
+| POST   | `/api/enlaces-compartidos/:token/revocar` | Revocar un enlace existente |
+| POST   | `/api/public/enlaces/:token/acceso` | Acceder a un enlace público con IP registrada |
+
+#### Ejemplos rápidos para enlaces compartidos
+
+1. **Crear enlace protegido (requiere token JWT)**
+
+```bash
+curl -X POST http://localhost:4000/api/enlaces-compartidos \
+  -H "Authorization: Bearer TU_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "registro_id": 1,
+    "descripcion": "Enlace temporal para fiscalía",
+    "duracion_horas": 48,
+    "max_accesos": 10,
+    "requiere_contrasena": true,
+    "contrasena": "ClaveTemporal!"
+  }'
+```
+
+2. **Listar enlaces vigentes del usuario autenticado**
+
+```bash
+curl http://localhost:4000/api/enlaces-compartidos \
+  -H "Authorization: Bearer TU_TOKEN"
+```
+
+3. **Revocar un enlace**
+
+```bash
+curl -X POST http://localhost:4000/api/enlaces-compartidos/TOKEN_GENERADO/revocar \
+  -H "Authorization: Bearer TU_TOKEN"
+```
+
+4. **Acceso público (con seguimiento de IP)**
+
+```bash
+curl -X POST http://localhost:4000/api/public/enlaces/TOKEN_GENERADO/acceso \
+  -H "Content-Type: application/json" \
+  -d '{ "contrasena": "ClaveTemporal!" }'
+```
+
+> El endpoint público responde con `401` si el enlace requiere contraseña, `410` si está revocado/expirado y `403` si superó el máximo de accesos.
 
 Consulta `API_EXAMPLES.md` para ver **70+ ejemplos** de todos los endpoints.
 

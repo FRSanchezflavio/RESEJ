@@ -8,6 +8,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const isAdmin = user?.rol === "administrador";
+  const canManageLinks = ["administrador", "usuario_consulta"].includes(
+    user?.rol
+  );
 
   return (
     <Container style={{ paddingTop: 20 }}>
@@ -19,6 +22,15 @@ export default function Dashboard() {
               <Button variant="outline-dark" onClick={() => navigate("/registros")}>
                 🔍 Buscar Registros
               </Button>
+              {canManageLinks ? (
+                <Button variant="outline-dark" onClick={() => navigate("/enlaces")}>
+                  🔗 Enlaces Compartidos
+                </Button>
+              ) : (
+                <Button variant="secondary" disabled>
+                  🔗 Enlaces Compartidos
+                </Button>
+              )}
               {isAdmin ? (
                 <>
                   <Button variant="dark" onClick={() => navigate("/cargar")}>
