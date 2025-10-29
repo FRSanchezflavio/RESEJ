@@ -27,22 +27,26 @@ Deberías ver algo como:
 ### **2. Identifica qué URL usar**
 
 #### **Opción A: Desarrollo local (mismo equipo)**
+
 Si frontend y backend están en el **mismo equipo**:
 
 **Frontend `.env`:**
+
 ```env
 VITE_API_URL=http://localhost:3000/api
 ```
 
 #### **Opción B: Acceso desde la red (otro dispositivo)**
+
 Si accedes desde **otro equipo/celular en la misma red**:
 
 **Frontend `.env`:**
+
 ```env
 VITE_API_URL=http://192.168.1.23:3000/api
 ```
 
-*(Reemplaza `192.168.1.23` con la IP que muestra el servidor backend)*
+_(Reemplaza `192.168.1.23` con la IP que muestra el servidor backend)_
 
 ### **3. Configura CORS en el backend**
 
@@ -56,12 +60,14 @@ ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://192.168.1.23:
 ### **4. Reinicia ambos servidores**
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd BACKEND
 node server.js
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd frontend
 npm run dev
@@ -70,9 +76,11 @@ npm run dev
 ### **5. Verifica la conexión**
 
 Abre el navegador y ve a:
+
 - `http://localhost:3000/health` (debería mostrar JSON)
 
 En la consola del navegador (F12), deberías ver:
+
 ```
 🌐 API configurada: http://localhost:3000/api
 ```
@@ -110,6 +118,7 @@ netsh advfirewall firewall add rule name="Node Backend" dir=in action=allow prot
 **Causa:** El frontend no puede conectarse al backend
 
 **Solución:**
+
 1. Verifica que el backend esté corriendo
 2. Verifica que la URL en `.env` sea correcta
 3. Verifica que CORS permita el origen
@@ -121,6 +130,7 @@ netsh advfirewall firewall add rule name="Node Backend" dir=in action=allow prot
 
 **Solución:**
 Agrega el origen a `ALLOWED_ORIGINS` en `BACKEND/.env`:
+
 ```env
 ALLOWED_ORIGINS=http://localhost:5173,http://192.168.1.23:5173
 ```
@@ -130,6 +140,7 @@ ALLOWED_ORIGINS=http://localhost:5173,http://192.168.1.23:5173
 **Causa:** Vite no recarga las variables de entorno automáticamente
 
 **Solución:**
+
 ```bash
 # Detén el servidor (Ctrl+C)
 npm run dev
@@ -147,6 +158,7 @@ fetch('http://localhost:3000/health')
 ```
 
 Si funciona, deberías ver:
+
 ```json
 {
   "status": "OK",

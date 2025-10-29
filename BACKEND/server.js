@@ -11,7 +11,7 @@ const getNetworkAddresses = () => {
   const os = require('os');
   const interfaces = os.networkInterfaces();
   const addresses = [];
-  
+
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       if (iface.family === 'IPv4' && !iface.internal) {
@@ -19,7 +19,7 @@ const getNetworkAddresses = () => {
       }
     }
   }
-  
+
   return addresses;
 };
 
@@ -33,7 +33,7 @@ const startServer = async () => {
     // Iniciar el servidor
     app.listen(PORT, HOST, () => {
       const networkAddresses = getNetworkAddresses();
-      
+
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
       logger.info(`🚀 Servidor RE.SE.J iniciado correctamente`);
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
@@ -43,19 +43,21 @@ const startServer = async () => {
       logger.info(`📍 URLs de acceso disponibles:`);
       logger.info(`   - Local:    http://localhost:${PORT}`);
       logger.info(`   - Local:    http://127.0.0.1:${PORT}`);
-      
+
       if (networkAddresses.length > 0) {
         networkAddresses.forEach(address => {
           logger.info(`   - Red:      http://${address}:${PORT}`);
         });
       }
-      
+
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
       logger.info(`💡 Configura el frontend con:`);
       logger.info(`   VITE_API_URL=http://localhost:${PORT}/api`);
       if (networkAddresses.length > 0) {
         logger.info(`   O para acceso desde la red:`);
-        logger.info(`   VITE_API_URL=http://${networkAddresses[0]}:${PORT}/api`);
+        logger.info(
+          `   VITE_API_URL=http://${networkAddresses[0]}:${PORT}/api`
+        );
       }
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     });
