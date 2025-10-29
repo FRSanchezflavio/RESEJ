@@ -1,76 +1,63 @@
-const express = require('express');const express = require('express');
+const express = require('express');
+const router = express.Router();
+const {
+  create,
+  list,
+  getByToken,
+  revoke,
+  accessPublico,
+} = require('../controllers/enlacesCompartidosController');
+const { authenticateToken } = require('../middleware/auth');
+const { createLimiter } = require('../middleware/rateLimiter');
 
-const router = express.Router();const router = express.Router();
-
-const enlacesCompartidosController = require('../controllers/enlacesCompartidosController');const {
-
-const { authenticateToken } = require('../middleware/auth');  crearEnlace,
-
-const auditLogger = require('../middleware/auditLogger');  listarEnlaces,
-
-const { createLimiter } = require('../middleware/rateLimiter');  obtenerEnlace,
-
-const {  revocarEnlace,
-
-  createEnlaceCompartidoValidators,  obtenerEnlacePublico,
-
-  listEnlaceCompartidoValidators,  obtenerEstadisticas,
-
-  tokenParamValidator,  obtenerQR,
-
-  handleValidationErrors,} = require('../controllers/enlacesCompartidosController');
-
-} = require('../utils/validators');const { authenticateToken } = require('../middleware/auth');
-
-const { limitadorEnlaces } = require('../middleware/rateLimiter');
-
-// Todas las rutas requieren usuario autenticado
-
-router.use(authenticateToken);// Rutas públicas (sin autenticación)
-
+// Rutas públicas (sin autenticación)
 // ⚠️ ORDEN IMPORTANTE: Esta debe ir antes de las rutas con :token
+router.get('/publico/:token', createLimiter, accessPublico);
 
-router.get(router.get('/publico/:token', limitadorEnlaces, obtenerEnlacePublico);
-
-  '/',
-
-  listEnlaceCompartidoValidators,// Rutas protegidas (requieren autenticación)
-
-  handleValidationErrors,router.post('/', authenticateToken, limitadorEnlaces, crearEnlace);
-
-  enlacesCompartidosController.listrouter.get('/', authenticateToken, listarEnlaces);
-
-);// Cambio: ahora busca por token en lugar de por id
-
-router.get('/:token', authenticateToken, obtenerEnlace);
-
-router.post(router.get('/:token/qr', authenticateToken, obtenerQR);
-
-  '/',router.get('/:token/estadisticas', authenticateToken, obtenerEstadisticas);
-
-  createLimiter,router.post('/:token/revocar', authenticateToken, revocarEnlace);
-
-  createEnlaceCompartidoValidators,
-
-  handleValidationErrors,module.exports = router;
-
-  auditLogger('CREAR_ENLACE_COMPARTIDO', 'enlace_compartido'),
-  enlacesCompartidosController.create
-);
-
-router.get(
-  '/:token',
-  tokenParamValidator,
-  handleValidationErrors,
-  enlacesCompartidosController.getByToken
-);
-
-router.post(
-  '/:token/revocar',
-  tokenParamValidator,
-  handleValidationErrors,
-  auditLogger('REVOCAR_ENLACE_COMPARTIDO', 'enlace_compartido'),
-  enlacesCompartidosController.revoke
-);
+// Rutas protegidas (requieren autenticación)
+router.post('/', authenticateToken, createLimiter, create);
+router.get('/', authenticateToken, list);
+router.get('/:token', authenticateToken, getByToken);
+router.post('/:token/revocar', authenticateToken, revoke);
 
 module.exports = router;
+
+exports.up = function (knex) {
+  return knex.schema.createTable('enlaces_compartidos', table => {
+    table.increments('id').primary();
+    table.string('token', 64).notNullable().unique();
+
+    // 🔹 CAMBIO: debe ser usuario_creador_id, no usuario_id
+    table
+      .integer('usuario_creador_id')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('usuarios')
+      .onDelete('CASCADE');
+
+    table
+      .integer('registro_id')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('registros_secuestros')
+      .onDelete('CASCADE');
+
+    table.timestamp('fecha_creacion').defaultTo(knex.fn.now());
+    table.timestamp('fecha_expiracion').notNullable();
+    table.boolean('revocado').defaultTo(false);
+    table.timestamp('fecha_revocacion');
+    table.integer('max_accesos').unsigned();
+    table.integer('accesos_realizados').defaultTo(0);
+
+    table.index(['token']);
+    table.index(['usuario_creador_id']);
+    table.index(['registro_id']);
+    table.index(['fecha_expiracion']);
+  });
+};
+
+exports.down = function (knex) {
+  return knex.schema.dropTableIfExists('enlaces_compartidos');
+};

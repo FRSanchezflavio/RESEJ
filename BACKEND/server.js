@@ -6,6 +6,23 @@ const db = require('./src/config/database');
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+// Obtener las interfaces de red para mostrar todas las URLs disponibles
+const getNetworkAddresses = () => {
+  const os = require('os');
+  const interfaces = os.networkInterfaces();
+  const addresses = [];
+  
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        addresses.push(iface.address);
+      }
+    }
+  }
+  
+  return addresses;
+};
+
 // Función para iniciar el servidor
 const startServer = async () => {
   try {
@@ -15,12 +32,31 @@ const startServer = async () => {
 
     // Iniciar el servidor
     app.listen(PORT, HOST, () => {
+      const networkAddresses = getNetworkAddresses();
+      
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
       logger.info(`🚀 Servidor RE.SE.J iniciado correctamente`);
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-      logger.info(`📍 URL: http://${HOST}:${PORT}`);
       logger.info(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`⏰ Timestamp: ${new Date().toISOString()}`);
+      logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      logger.info(`📍 URLs de acceso disponibles:`);
+      logger.info(`   - Local:    http://localhost:${PORT}`);
+      logger.info(`   - Local:    http://127.0.0.1:${PORT}`);
+      
+      if (networkAddresses.length > 0) {
+        networkAddresses.forEach(address => {
+          logger.info(`   - Red:      http://${address}:${PORT}`);
+        });
+      }
+      
+      logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+      logger.info(`💡 Configura el frontend con:`);
+      logger.info(`   VITE_API_URL=http://localhost:${PORT}/api`);
+      if (networkAddresses.length > 0) {
+        logger.info(`   O para acceso desde la red:`);
+        logger.info(`   VITE_API_URL=http://${networkAddresses[0]}:${PORT}/api`);
+      }
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     });
   } catch (error) {

@@ -19,7 +19,6 @@ import {
 } from '../../api/api';
 
 const EMPTY_FORM = {
-  registro_id: '',
   descripcion: '',
   duracion_horas: '24',
   max_accesos: '',
@@ -124,7 +123,6 @@ export default function SharedLinks() {
     try {
       const payload = {
         ...form,
-        registro_id: form.registro_id ? Number(form.registro_id) : null,
         max_accesos: form.max_accesos ? Number(form.max_accesos) : null,
         duracion_horas: form.duracion_horas
           ? Number(form.duracion_horas)
@@ -380,17 +378,6 @@ export default function SharedLinks() {
           </Modal.Header>
           <Modal.Body>
             {renderCreationSummary()}
-            <Form.Group className="mb-3">
-              <Form.Label>ID del registro</Form.Label>
-              <Form.Control
-                required
-                name="registro_id"
-                value={form.registro_id}
-                type="number"
-                min="1"
-                onChange={handleChange}
-              />
-            </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
               <Form.Control

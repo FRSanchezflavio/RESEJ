@@ -2,9 +2,20 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
+// Debug: Mostrar la URL configurada
+if (import.meta.env.DEV) {
+  console.log('🌐 API configurada:', API_URL);
+  console.log('📋 Variables de entorno:', {
+    VITE_API_URL: import.meta.env.VITE_API_URL,
+    MODE: import.meta.env.MODE,
+    DEV: import.meta.env.DEV,
+  });
+}
+
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: false,
+  timeout: 10000, // 10 segundos de timeout
 });
 
 // attach token automatically
