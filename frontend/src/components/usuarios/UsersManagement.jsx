@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Card, Table, Button, Modal, Form } from "react-bootstrap";
-import { fetchUsers, createUser } from "../../api/api";
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Button, Modal, Form } from 'react-bootstrap';
+import { fetchUsers, createUser } from '../../api/api';
 
 export default function UsersManagement() {
   const [users, setUsers] = useState([]);
   const [show, setShow] = useState(false);
   const [form, setForm] = useState({
-    usuario: "",
-    nombre: "",
-    apellido: "",
-    email: "",
-    password: "",
-    rol: "usuario_consulta",
+    usuario: '',
+    nombre: '',
+    apellido: '',
+    email: '',
+    password: '',
+    rol: 'usuario_consulta',
   });
   const [enviarEmail, setEnviarEmail] = useState(true);
-  const [mensajeEmail, setMensajeEmail] = useState("");
+  const [mensajeEmail, setMensajeEmail] = useState('');
 
   useEffect(() => {
     load();
@@ -28,7 +28,7 @@ export default function UsersManagement() {
       if (!Array.isArray(data)) data = [];
       setUsers(data);
     } catch (err) {
-      console.error("Error cargando usuarios:", err);
+      console.error('Error cargando usuarios:', err);
       setUsers([]); // fallback
     }
   }
@@ -37,43 +37,52 @@ export default function UsersManagement() {
     try {
       // Validar que el email esté presente si se quiere enviar
       if (enviarEmail && !form.email) {
-        alert("Por favor ingresa un email para enviar las credenciales");
+        alert('Por favor ingresa un email para enviar las credenciales');
         return;
       }
 
       const datosUsuario = {
         ...form,
-        enviarEmail: enviarEmail && form.email ? true : false
+        enviarEmail: enviarEmail && form.email ? true : false,
       };
 
       const response = await createUser(datosUsuario);
-      
+
       // Mostrar mensaje sobre el envío del email
       if (response.data?.data?.emailEnviado) {
-        setMensajeEmail("✓ Usuario creado y credenciales enviadas por email");
-        alert(`Usuario creado exitosamente.\n\n✉️ Se han enviado las credenciales al correo: ${form.email}`);
+        setMensajeEmail('✓ Usuario creado y credenciales enviadas por email');
+        alert(
+          `Usuario creado exitosamente.\n\n✉️ Se han enviado las credenciales al correo: ${form.email}`
+        );
       } else if (enviarEmail && form.email) {
-        setMensajeEmail("⚠ Usuario creado pero no se pudo enviar el email");
-        alert(`Usuario creado exitosamente.\n\n⚠️ Advertencia: No se pudo enviar el correo con las credenciales.\n${response.data?.data?.mensajeEmail || 'Verifica la configuración del servidor de email.'}`);
+        setMensajeEmail('⚠ Usuario creado pero no se pudo enviar el email');
+        alert(
+          `Usuario creado exitosamente.\n\n⚠️ Advertencia: No se pudo enviar el correo con las credenciales.\n${
+            response.data?.data?.mensajeEmail ||
+            'Verifica la configuración del servidor de email.'
+          }`
+        );
       } else {
-        alert("Usuario creado exitosamente");
+        alert('Usuario creado exitosamente');
       }
 
       setShow(false);
       setForm({
-        usuario: "",
-        nombre: "",
-        apellido: "",
-        email: "",
-        password: "",
-        rol: "usuario_consulta",
+        usuario: '',
+        nombre: '',
+        apellido: '',
+        email: '',
+        password: '',
+        rol: 'usuario_consulta',
       });
       setEnviarEmail(true);
-      setMensajeEmail("");
+      setMensajeEmail('');
       load();
     } catch (err) {
-      console.error("Error creando usuario:", err);
-      alert(`Error al crear usuario: ${err.response?.data?.message || err.message}`);
+      console.error('Error creando usuario:', err);
+      alert(
+        `Error al crear usuario: ${err.response?.data?.message || err.message}`
+      );
     }
   };
 
@@ -105,21 +114,31 @@ export default function UsersManagement() {
               </td>
             </tr>
           ) : (
-            users.map((u) => (
+            users.map(u => (
               <tr key={u.id}>
                 <td>{u.id}</td>
                 <td>{u.usuario}</td>
                 <td>
                   {u.nombre} {u.apellido}
                 </td>
-                <td>{u.email || <span className="text-muted">Sin email</span>}</td>
                 <td>
-                  <span className={`badge ${u.rol === 'administrador' ? 'bg-danger' : 'bg-info'}`}>
+                  {u.email || <span className="text-muted">Sin email</span>}
+                </td>
+                <td>
+                  <span
+                    className={`badge ${
+                      u.rol === 'administrador' ? 'bg-danger' : 'bg-info'
+                    }`}
+                  >
                     {u.rol === 'administrador' ? '👑 Admin' : '👤 Usuario'}
                   </span>
                 </td>
                 <td>
-                  <span className={`badge ${u.activo ? 'bg-success' : 'bg-secondary'}`}>
+                  <span
+                    className={`badge ${
+                      u.activo ? 'bg-success' : 'bg-secondary'
+                    }`}
+                  >
                     {u.activo ? '✓ Activo' : '✗ Inactivo'}
                   </span>
                 </td>
@@ -140,21 +159,21 @@ export default function UsersManagement() {
               <Form.Label>Usuario</Form.Label>
               <Form.Control
                 value={form.usuario}
-                onChange={(e) => setForm({ ...form, usuario: e.target.value })}
+                onChange={e => setForm({ ...form, usuario: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
                 value={form.nombre}
-                onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                onChange={e => setForm({ ...form, nombre: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Apellido</Form.Label>
               <Form.Control
                 value={form.apellido}
-                onChange={(e) => setForm({ ...form, apellido: e.target.value })}
+                onChange={e => setForm({ ...form, apellido: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
@@ -163,7 +182,7 @@ export default function UsersManagement() {
                 type="email"
                 placeholder="usuario@example.com"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={e => setForm({ ...form, email: e.target.value })}
               />
               <Form.Text className="text-muted">
                 Necesario para enviar las credenciales por correo
@@ -175,16 +194,14 @@ export default function UsersManagement() {
                 type="password"
                 placeholder="Mínimo 6 caracteres"
                 value={form.password}
-                onChange={(e) =>
-                  setForm({ ...form, password: e.target.value })
-                }
+                onChange={e => setForm({ ...form, password: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label>Rol</Form.Label>
               <Form.Select
                 value={form.rol}
-                onChange={(e) => setForm({ ...form, rol: e.target.value })}
+                onChange={e => setForm({ ...form, rol: e.target.value })}
               >
                 <option value="usuario_consulta">Usuario Consulta</option>
                 <option value="administrador">Administrador</option>
@@ -198,13 +215,14 @@ export default function UsersManagement() {
                 type="checkbox"
                 id="enviarEmailCheck"
                 checked={enviarEmail}
-                onChange={(e) => setEnviarEmail(e.target.checked)}
+                onChange={e => setEnviarEmail(e.target.checked)}
                 label={
                   <span>
                     <strong>✉️ Enviar credenciales por email</strong>
                     <br />
                     <small className="text-muted">
-                      El usuario recibirá un correo con su usuario, contraseña y un link de acceso directo
+                      El usuario recibirá un correo con su usuario, contraseña y
+                      un link de acceso directo
                     </small>
                   </span>
                 }
@@ -212,7 +230,11 @@ export default function UsersManagement() {
             </Form.Group>
 
             {mensajeEmail && (
-              <div className={`alert ${mensajeEmail.includes('✓') ? 'alert-success' : 'alert-warning'} py-2`}>
+              <div
+                className={`alert ${
+                  mensajeEmail.includes('✓') ? 'alert-success' : 'alert-warning'
+                } py-2`}
+              >
                 <small>{mensajeEmail}</small>
               </div>
             )}

@@ -33,7 +33,9 @@ const verificarConfiguracion = async () => {
     logger.info('✓ Configuración de email verificada correctamente');
     return true;
   } catch (error) {
-    logger.warn(`⚠ No se pudo verificar configuración de email: ${error.message}`);
+    logger.warn(
+      `⚠ No se pudo verificar configuración de email: ${error.message}`
+    );
     return false;
   }
 };
@@ -41,10 +43,18 @@ const verificarConfiguracion = async () => {
 /**
  * Enviar credenciales a un nuevo usuario
  */
-const enviarCredencialesNuevoUsuario = async (email, usuario, contraseña, nombreCompleto) => {
+const enviarCredencialesNuevoUsuario = async (
+  email,
+  usuario,
+  contraseña,
+  nombreCompleto
+) => {
   try {
     // Verificar que las credenciales de email estén configuradas
-    if (!process.env.EMAIL_USER || process.env.EMAIL_USER === 'tu-correo@gmail.com') {
+    if (
+      !process.env.EMAIL_USER ||
+      process.env.EMAIL_USER === 'tu-correo@gmail.com'
+    ) {
       logger.warn('Email no configurado. No se enviará correo.');
       return {
         success: false,
@@ -200,7 +210,9 @@ const enviarCredencialesNuevoUsuario = async (email, usuario, contraseña, nombr
 
     const info = await transporter.sendMail(mailOptions);
 
-    logger.info(`✓ Correo de credenciales enviado a: ${email} - MessageID: ${info.messageId}`);
+    logger.info(
+      `✓ Correo de credenciales enviado a: ${email} - MessageID: ${info.messageId}`
+    );
 
     return {
       success: true,
@@ -222,7 +234,10 @@ const enviarCredencialesNuevoUsuario = async (email, usuario, contraseña, nombr
  */
 const enviarRestablecimientoPassword = async (email, usuario, tokenReset) => {
   try {
-    if (!process.env.EMAIL_USER || process.env.EMAIL_USER === 'tu-correo@gmail.com') {
+    if (
+      !process.env.EMAIL_USER ||
+      process.env.EMAIL_USER === 'tu-correo@gmail.com'
+    ) {
       logger.warn('Email no configurado. No se enviará correo.');
       return {
         success: false,
@@ -300,7 +315,9 @@ const enviarRestablecimientoPassword = async (email, usuario, tokenReset) => {
       messageId: info.messageId,
     };
   } catch (error) {
-    logger.error(`Error al enviar correo de restablecimiento a ${email}: ${error.message}`);
+    logger.error(
+      `Error al enviar correo de restablecimiento a ${email}: ${error.message}`
+    );
     return {
       success: false,
       message: 'Error al enviar correo',

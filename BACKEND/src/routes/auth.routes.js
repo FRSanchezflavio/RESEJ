@@ -27,6 +27,10 @@ router.post('/logout', authController.logout);
 router.get('/me', authenticateToken, authController.me);
 
 // POST /api/auth/validate-password - Validar contraseña del usuario actual
-router.post('/validate-password', authenticateToken, authController.validatePassword);
+router.post(
+  '/validate-password',
+  authenticateToken,
+  authController.validatePassword
+);
 
 module.exports = router;

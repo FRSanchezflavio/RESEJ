@@ -36,6 +36,7 @@ FRONTEND_URL=http://localhost:5173
 ```
 
 **Importante:**
+
 - `EMAIL_USER`: Tu correo completo de Gmail
 - `EMAIL_PASSWORD`: La contraseña de 16 caracteres que generaste (puede incluir espacios)
 - `EMAIL_FROM`: Puede ser el mismo correo o un nombre personalizado
@@ -97,16 +98,19 @@ npm start
 ```
 
 En los logs deberías ver:
+
 ```
 ✓ Configuración de email verificada correctamente
 ```
 
 Si ves una advertencia:
+
 ```
 ⚠ No se pudo verificar configuración de email
 ```
 
 Revisa que:
+
 - El correo y contraseña sean correctos
 - La verificación en dos pasos esté activa (Gmail)
 - La contraseña de aplicación esté correcta
@@ -127,6 +131,7 @@ Revisa que:
 5. Haz clic en **Crear**
 
 Si todo está configurado correctamente:
+
 - Verás un mensaje: "Usuario creado exitosamente. ✉️ Se han enviado las credenciales al correo: ..."
 - El usuario recibirá un correo con:
   - Sus credenciales de acceso
@@ -136,20 +141,25 @@ Si todo está configurado correctamente:
 ## 🚨 Solución de problemas
 
 ### Error: "EAUTH - Invalid login"
+
 - Verifica que el correo y contraseña sean correctos
 - En Gmail, asegúrate de usar la contraseña de aplicación, no tu contraseña normal
 
 ### Error: "ETIMEDOUT" o "ECONNREFUSED"
+
 - Verifica que el `EMAIL_HOST` y `EMAIL_PORT` sean correctos
 - Revisa que no haya firewall bloqueando el puerto 587
 
 ### Error: "self signed certificate"
+
 Si usas un servidor SMTP con certificado autofirmado, cambia:
+
 ```env
 EMAIL_SECURE=true
 ```
 
 ### No llega el correo
+
 - Revisa la carpeta de **Spam**
 - Verifica que el email del usuario sea correcto
 - Revisa los logs del backend para ver detalles del error

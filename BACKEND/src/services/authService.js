@@ -214,7 +214,11 @@ class AuthService {
 
       const passwordMatch = await comparePassword(password, user.password_hash);
 
-      logger.info(`Validación de contraseña para usuario: ${user.usuario} - ${passwordMatch ? 'exitosa' : 'fallida'}`);
+      logger.info(
+        `Validación de contraseña para usuario: ${user.usuario} - ${
+          passwordMatch ? 'exitosa' : 'fallida'
+        }`
+      );
 
       return passwordMatch;
     } catch (error) {

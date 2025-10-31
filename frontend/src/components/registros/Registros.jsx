@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRegistros } from '../../api/api';
-import { Card, Form, Button, Table, Row, Col, Collapse, Modal } from 'react-bootstrap';
+import {
+  Card,
+  Form,
+  Button,
+  Table,
+  Row,
+  Col,
+  Collapse,
+  Modal,
+} from 'react-bootstrap';
 import api from '../../api/api';
 
 export default function Registros() {
@@ -55,7 +64,7 @@ export default function Registros() {
     }));
   };
 
-  const handleEditClick = (registro) => {
+  const handleEditClick = registro => {
     setSelectedRegistroId(registro.id);
     setEditData(registro);
     setShowPasswordModal(true);
@@ -65,7 +74,7 @@ export default function Registros() {
     try {
       // Validar la contraseña del administrador
       const response = await api.post('/auth/validate-password', {
-        password: passwordInput
+        password: passwordInput,
       });
 
       if (response.data.success) {
@@ -79,12 +88,12 @@ export default function Registros() {
     }
   };
 
-  const handleCancelEdit = (registroId) => {
+  const handleCancelEdit = registroId => {
     setEditMode(prev => ({ ...prev, [registroId]: false }));
     setEditData({});
   };
 
-  const handleSaveEdit = async (registroId) => {
+  const handleSaveEdit = async registroId => {
     try {
       // Filtrar solo los campos que existen en la tabla registros_secuestros
       const camposPermitidos = {
@@ -107,7 +116,7 @@ export default function Registros() {
         estado_causa: editData.estado_causa,
         numero_causa: editData.numero_causa,
         juzgado: editData.juzgado,
-        observaciones: editData.observaciones
+        observaciones: editData.observaciones,
       };
 
       await api.put(`/registros/${registroId}`, camposPermitidos);
@@ -128,7 +137,11 @@ export default function Registros() {
   return (
     <>
       {/* Modal de validación de contraseña */}
-      <Modal show={showPasswordModal} onHide={() => setShowPasswordModal(false)} centered>
+      <Modal
+        show={showPasswordModal}
+        onHide={() => setShowPasswordModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>🔒 Verificación de Administrador</Modal.Title>
         </Modal.Header>
@@ -138,15 +151,18 @@ export default function Registros() {
             <Form.Control
               type="password"
               value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+              onChange={e => setPasswordInput(e.target.value)}
+              onKeyPress={e => e.key === 'Enter' && handlePasswordSubmit()}
               placeholder="Contraseña"
               autoFocus
             />
           </Form.Group>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowPasswordModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowPasswordModal(false)}
+          >
             Cancelar
           </Button>
           <Button variant="primary" onClick={handlePasswordSubmit}>
@@ -159,302 +175,380 @@ export default function Registros() {
         <h5>Buscar registro</h5>
 
         <Form onSubmit={handleSearch}>
-        <Row className="mb-3">
-          <Col md={12}>
-            <Form.Control
-              placeholder="Ingrese término de búsqueda (persona, DNI, legajo, UFI, protocolo...)"
-              value={term}
-              onChange={e => setTerm(e.target.value)}
+          <Row className="mb-3">
+            <Col md={12}>
+              <Form.Control
+                placeholder="Ingrese término de búsqueda (persona, DNI, legajo, UFI, protocolo...)"
+                value={term}
+                onChange={e => setTerm(e.target.value)}
+                disabled={loading}
+              />
+            </Col>
+          </Row>
+          <div className="d-flex gap-2 mb-3">
+            <Button type="submit" variant="dark" disabled={loading}>
+              {loading ? 'Buscando...' : 'BUSCAR'}
+            </Button>
+            <Button
+              variant="outline-secondary"
+              onClick={handleClearFilters}
               disabled={loading}
-            />
-          </Col>
-        </Row>
-        <div className="d-flex gap-2 mb-3">
-          <Button type="submit" variant="dark" disabled={loading}>
-            {loading ? 'Buscando...' : 'BUSCAR'}
-          </Button>
-          <Button
-            variant="outline-secondary"
-            onClick={handleClearFilters}
-            disabled={loading}
-          >
-            LIMPIAR FILTROS
-          </Button>
-        </div>
-      </Form>
+            >
+              LIMPIAR FILTROS
+            </Button>
+          </div>
+        </Form>
 
-      {pagination && (
-        <div className="mb-2 text-muted">
-          Mostrando {registros.length} de {pagination.total} registros (Página{' '}
-          {pagination.page} de {pagination.totalPages})
-        </div>
-      )}
+        {pagination && (
+          <div className="mb-2 text-muted">
+            Mostrando {registros.length} de {pagination.total} registros (Página{' '}
+            {pagination.page} de {pagination.totalPages})
+          </div>
+        )}
 
-      {loading ? (
-        <p>Cargando registros...</p>
-      ) : registros.length === 0 ? (
-        <p>No hay registros que coincidan con la búsqueda</p>
-      ) : (
-        <Table striped bordered hover size="sm" responsive>
-          <thead>
-            <tr>
-              <th style={{ width: '40px' }}>Ver</th>
-              <th>#</th>
-              <th>Persona</th>
-              <th>DNI</th>
-              <th>N° Causa</th>
-              <th>N° Legajo</th>
-              <th>UFI</th>
-              <th>Fecha Ingreso</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            {registros.map(r => (
-              <React.Fragment key={r.id}>
-                <tr
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => toggleRow(r.id)}
-                >
-                  <td className="text-center">
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={e => {
-                        e.stopPropagation();
-                        toggleRow(r.id);
-                      }}
-                      style={{ padding: 0, textDecoration: 'none' }}
-                    >
-                      {expandedRows[r.id] ? '▼' : '▶'}
-                    </Button>
-                  </td>
-                  <td>{r.id}</td>
-                  <td>{r.persona_nombre_completo || '-'}</td>
-                  <td>{r.persona_dni || '-'}</td>
-                  <td>{r.numero_causa || '-'}</td>
-                  <td>{r.numero_legajo || '-'}</td>
-                  <td>{r.ufi || '-'}</td>
-                  <td>
-                    {r.fecha_ingreso
-                      ? new Date(r.fecha_ingreso).toLocaleDateString('es-AR')
-                      : '-'}
-                  </td>
-                  <td
-                    style={{
-                      maxWidth: '200px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
+        {loading ? (
+          <p>Cargando registros...</p>
+        ) : registros.length === 0 ? (
+          <p>No hay registros que coincidan con la búsqueda</p>
+        ) : (
+          <Table striped bordered hover size="sm" responsive>
+            <thead>
+              <tr>
+                <th style={{ width: '40px' }}>Ver</th>
+                <th>#</th>
+                <th>Persona</th>
+                <th>DNI</th>
+                <th>N° Causa</th>
+                <th>N° Legajo</th>
+                <th>UFI</th>
+                <th>Fecha Ingreso</th>
+                <th>Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              {registros.map(r => (
+                <React.Fragment key={r.id}>
+                  <tr
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => toggleRow(r.id)}
                   >
-                    {r.detalle_secuestro || r.descripcion || '-'}
-                  </td>
-                </tr>
-                <tr>
-                  <td colSpan="9" style={{ padding: 0, border: 'none' }}>
-                    <Collapse in={expandedRows[r.id]}>
-                      <div
-                        style={{
-                          padding: '15px',
-                          backgroundColor: '#f8f9fa',
-                          border: '1px solid #dee2e6',
+                    <td className="text-center">
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={e => {
+                          e.stopPropagation();
+                          toggleRow(r.id);
                         }}
+                        style={{ padding: 0, textDecoration: 'none' }}
                       >
-                        <Row>
-                          <Col md={6}>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                              <h6 className="mb-0">
-                                📋 Información del Registro
-                              </h6>
-                              {!editMode[r.id] ? (
-                                <Button
-                                  variant="warning"
-                                  size="sm"
-                                  onClick={() => handleEditClick(r)}
-                                >
-                                  ✏️ Editar
-                                </Button>
-                              ) : (
-                                <div>
+                        {expandedRows[r.id] ? '▼' : '▶'}
+                      </Button>
+                    </td>
+                    <td>{r.id}</td>
+                    <td>{r.persona_nombre_completo || '-'}</td>
+                    <td>{r.persona_dni || '-'}</td>
+                    <td>{r.numero_causa || '-'}</td>
+                    <td>{r.numero_legajo || '-'}</td>
+                    <td>{r.ufi || '-'}</td>
+                    <td>
+                      {r.fecha_ingreso
+                        ? new Date(r.fecha_ingreso).toLocaleDateString('es-AR')
+                        : '-'}
+                    </td>
+                    <td
+                      style={{
+                        maxWidth: '200px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.detalle_secuestro || r.descripcion || '-'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan="9" style={{ padding: 0, border: 'none' }}>
+                      <Collapse in={expandedRows[r.id]}>
+                        <div
+                          style={{
+                            padding: '15px',
+                            backgroundColor: '#f8f9fa',
+                            border: '1px solid #dee2e6',
+                          }}
+                        >
+                          <Row>
+                            <Col md={6}>
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h6 className="mb-0">
+                                  📋 Información del Registro
+                                </h6>
+                                {!editMode[r.id] ? (
                                   <Button
-                                    variant="success"
+                                    variant="warning"
                                     size="sm"
-                                    onClick={() => handleSaveEdit(r.id)}
-                                    className="me-2"
+                                    onClick={() => handleEditClick(r)}
                                   >
-                                    💾 Guardar
+                                    ✏️ Editar
                                   </Button>
-                                  <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => handleCancelEdit(r.id)}
-                                  >
-                                    ❌ Cancelar
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
+                                ) : (
+                                  <div>
+                                    <Button
+                                      variant="success"
+                                      size="sm"
+                                      onClick={() => handleSaveEdit(r.id)}
+                                      className="me-2"
+                                    >
+                                      💾 Guardar
+                                    </Button>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => handleCancelEdit(r.id)}
+                                    >
+                                      ❌ Cancelar
+                                    </Button>
+                                  </div>
+                                )}
+                              </div>
 
-                            {!editMode[r.id] ? (
-                              <>
-                                <div className="mb-2">
-                                  <strong>Fecha de inicio:</strong>{' '}
-                                  {r.fecha_ingreso
-                                    ? new Date(r.fecha_ingreso).toLocaleDateString(
-                                        'es-AR'
-                                      )
-                                    : '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>UFI:</strong> {r.ufi || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>N° Legajo / Causa:</strong>{' '}
-                                  {r.numero_legajo || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>Sección que interviene:</strong>{' '}
-                                  {r.seccion_que_interviene || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>Detalle del secuestro:</strong>{' '}
-                                  {r.detalle_secuestro || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>N° de protocolo:</strong>{' '}
-                                  {r.numero_protocolo || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>Cadena de custodia:</strong>{' '}
-                                  {r.cadena_custodia || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>N° de folio:</strong> {r.nro_folio || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>N° de libro de secuestro:</strong>{' '}
-                                  {r.nro_libro_secuestro || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>De. a cargo de la causa:</strong>{' '}
-                                  {r.of_a_cargo || '-'}
-                                </div>
-                                <div className="mb-2">
-                                  <strong>Observaciones:</strong> {r.tramite || '-'}
-                                </div>
-                              </>
-                            ) : (
-                              <Form>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>Fecha de inicio:</strong></Form.Label>
-                                  <Form.Control
-                                    type="date"
-                                    value={editData.fecha_ingreso || ''}
-                                    onChange={(e) => handleEditChange('fecha_ingreso', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>UFI:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.ufi || ''}
-                                    onChange={(e) => handleEditChange('ufi', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>N° Legajo / Causa:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.numero_legajo || ''}
-                                    onChange={(e) => handleEditChange('numero_legajo', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>Sección que interviene:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.seccion_que_interviene || ''}
-                                    onChange={(e) => handleEditChange('seccion_que_interviene', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>Detalle del secuestro:</strong></Form.Label>
-                                  <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    value={editData.detalle_secuestro || ''}
-                                    onChange={(e) => handleEditChange('detalle_secuestro', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>N° de protocolo:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.numero_protocolo || ''}
-                                    onChange={(e) => handleEditChange('numero_protocolo', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>Cadena de custodia:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.cadena_custodia || ''}
-                                    onChange={(e) => handleEditChange('cadena_custodia', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>N° de folio:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.nro_folio || ''}
-                                    onChange={(e) => handleEditChange('nro_folio', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>N° de libro de secuestro:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.nro_libro_secuestro || ''}
-                                    onChange={(e) => handleEditChange('nro_libro_secuestro', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>De. a cargo de la causa:</strong></Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    value={editData.of_a_cargo || ''}
-                                    onChange={(e) => handleEditChange('of_a_cargo', e.target.value)}
-                                  />
-                                </Form.Group>
-                                <Form.Group className="mb-2">
-                                  <Form.Label><strong>Observaciones:</strong></Form.Label>
-                                  <Form.Control
-                                    as="textarea"
-                                    rows={2}
-                                    value={editData.tramite || ''}
-                                    onChange={(e) => handleEditChange('tramite', e.target.value)}
-                                  />
-                                </Form.Group>
-                              </Form>
-                            )}
-                          </Col>
-                          <Col md={6}>
-                            <h6 className="mb-3">
-                              📎 Archivos Adjuntos (PDF, JPG, PNG)
-                            </h6>
-                            <ArchivosAdjuntos registroId={r.id} />
-                          </Col>
-                        </Row>
-                      </div>
-                    </Collapse>
-                  </td>
-                </tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </Table>
-      )}
+                              {!editMode[r.id] ? (
+                                <>
+                                  <div className="mb-2">
+                                    <strong>Fecha de inicio:</strong>{' '}
+                                    {r.fecha_ingreso
+                                      ? new Date(
+                                          r.fecha_ingreso
+                                        ).toLocaleDateString('es-AR')
+                                      : '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>UFI:</strong> {r.ufi || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>N° Legajo / Causa:</strong>{' '}
+                                    {r.numero_legajo || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>Sección que interviene:</strong>{' '}
+                                    {r.seccion_que_interviene || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>Detalle del secuestro:</strong>{' '}
+                                    {r.detalle_secuestro || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>N° de protocolo:</strong>{' '}
+                                    {r.numero_protocolo || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>Cadena de custodia:</strong>{' '}
+                                    {r.cadena_custodia || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>N° de folio:</strong>{' '}
+                                    {r.nro_folio || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>N° de libro de secuestro:</strong>{' '}
+                                    {r.nro_libro_secuestro || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>De. a cargo de la causa:</strong>{' '}
+                                    {r.of_a_cargo || '-'}
+                                  </div>
+                                  <div className="mb-2">
+                                    <strong>Observaciones:</strong>{' '}
+                                    {r.tramite || '-'}
+                                  </div>
+                                </>
+                              ) : (
+                                <Form>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>Fecha de inicio:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="date"
+                                      value={editData.fecha_ingreso || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'fecha_ingreso',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>UFI:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.ufi || ''}
+                                      onChange={e =>
+                                        handleEditChange('ufi', e.target.value)
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>N° Legajo / Causa:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.numero_legajo || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'numero_legajo',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>Sección que interviene:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={
+                                        editData.seccion_que_interviene || ''
+                                      }
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'seccion_que_interviene',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>Detalle del secuestro:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      as="textarea"
+                                      rows={3}
+                                      value={editData.detalle_secuestro || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'detalle_secuestro',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>N° de protocolo:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.numero_protocolo || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'numero_protocolo',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>Cadena de custodia:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.cadena_custodia || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'cadena_custodia',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>N° de folio:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.nro_folio || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'nro_folio',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>N° de libro de secuestro:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.nro_libro_secuestro || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'nro_libro_secuestro',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>De. a cargo de la causa:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      type="text"
+                                      value={editData.of_a_cargo || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'of_a_cargo',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                  <Form.Group className="mb-2">
+                                    <Form.Label>
+                                      <strong>Observaciones:</strong>
+                                    </Form.Label>
+                                    <Form.Control
+                                      as="textarea"
+                                      rows={2}
+                                      value={editData.tramite || ''}
+                                      onChange={e =>
+                                        handleEditChange(
+                                          'tramite',
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </Form.Group>
+                                </Form>
+                              )}
+                            </Col>
+                            <Col md={6}>
+                              <h6 className="mb-3">
+                                📎 Archivos Adjuntos (PDF, JPG, PNG)
+                              </h6>
+                              <ArchivosAdjuntos registroId={r.id} />
+                            </Col>
+                          </Row>
+                        </div>
+                      </Collapse>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </Table>
+        )}
       </Card>
     </>
   );
