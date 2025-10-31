@@ -8,9 +8,14 @@ const logger = require('../utils/logger');
  */
 const authenticateToken = (req, res, next) => {
   try {
-    // Obtener token del header Authorization
+    // Obtener token del header Authorization o query string (para imágenes)
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer TOKEN"
+    let token = authHeader && authHeader.split(' ')[1]; // Format: "Bearer TOKEN"
+
+    // Si no hay token en el header, intentar obtenerlo del query string
+    if (!token && req.query.token) {
+      token = req.query.token;
+    }
 
     if (!token) {
       return res

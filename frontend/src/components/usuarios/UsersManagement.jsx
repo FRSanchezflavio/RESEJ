@@ -9,9 +9,12 @@ export default function UsersManagement() {
     usuario: "",
     nombre: "",
     apellido: "",
+    email: "",
     password: "",
     rol: "usuario_consulta",
   });
+  const [enviarEmail, setEnviarEmail] = useState(true);
+  const [mensajeEmail, setMensajeEmail] = useState("");
 
   useEffect(() => {
     load();
@@ -32,18 +35,45 @@ export default function UsersManagement() {
 
   const handleCreate = async () => {
     try {
-      await createUser(form);
+      // Validar que el email esté presente si se quiere enviar
+      if (enviarEmail && !form.email) {
+        alert("Por favor ingresa un email para enviar las credenciales");
+        return;
+      }
+
+      const datosUsuario = {
+        ...form,
+        enviarEmail: enviarEmail && form.email ? true : false
+      };
+
+      const response = await createUser(datosUsuario);
+      
+      // Mostrar mensaje sobre el envío del email
+      if (response.data?.data?.emailEnviado) {
+        setMensajeEmail("✓ Usuario creado y credenciales enviadas por email");
+        alert(`Usuario creado exitosamente.\n\n✉️ Se han enviado las credenciales al correo: ${form.email}`);
+      } else if (enviarEmail && form.email) {
+        setMensajeEmail("⚠ Usuario creado pero no se pudo enviar el email");
+        alert(`Usuario creado exitosamente.\n\n⚠️ Advertencia: No se pudo enviar el correo con las credenciales.\n${response.data?.data?.mensajeEmail || 'Verifica la configuración del servidor de email.'}`);
+      } else {
+        alert("Usuario creado exitosamente");
+      }
+
       setShow(false);
       setForm({
         usuario: "",
         nombre: "",
         apellido: "",
+        email: "",
         password: "",
         rol: "usuario_consulta",
       });
+      setEnviarEmail(true);
+      setMensajeEmail("");
       load();
     } catch (err) {
       console.error("Error creando usuario:", err);
+      alert(`Error al crear usuario: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -62,13 +92,15 @@ export default function UsersManagement() {
             <th>ID</th>
             <th>Usuario</th>
             <th>Nombre</th>
+            <th>Email</th>
             <th>Rol</th>
+            <th>Estado</th>
           </tr>
         </thead>
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan="4" className="text-center">
+              <td colSpan="6" className="text-center">
                 No hay usuarios registrados
               </td>
             </tr>
@@ -80,7 +112,17 @@ export default function UsersManagement() {
                 <td>
                   {u.nombre} {u.apellido}
                 </td>
-                <td>{u.rol}</td>
+                <td>{u.email || <span className="text-muted">Sin email</span>}</td>
+                <td>
+                  <span className={`badge ${u.rol === 'administrador' ? 'bg-danger' : 'bg-info'}`}>
+                    {u.rol === 'administrador' ? '👑 Admin' : '👤 Usuario'}
+                  </span>
+                </td>
+                <td>
+                  <span className={`badge ${u.activo ? 'bg-success' : 'bg-secondary'}`}>
+                    {u.activo ? '✓ Activo' : '✗ Inactivo'}
+                  </span>
+                </td>
               </tr>
             ))
           )}
@@ -116,9 +158,22 @@ export default function UsersManagement() {
               />
             </Form.Group>
             <Form.Group className="mb-2">
+              <Form.Label>📧 Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="usuario@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+              <Form.Text className="text-muted">
+                Necesario para enviar las credenciales por correo
+              </Form.Text>
+            </Form.Group>
+            <Form.Group className="mb-2">
               <Form.Label>Contraseña</Form.Label>
               <Form.Control
                 type="password"
+                placeholder="Mínimo 6 caracteres"
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
@@ -135,6 +190,32 @@ export default function UsersManagement() {
                 <option value="administrador">Administrador</option>
               </Form.Select>
             </Form.Group>
+
+            <hr />
+
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                id="enviarEmailCheck"
+                checked={enviarEmail}
+                onChange={(e) => setEnviarEmail(e.target.checked)}
+                label={
+                  <span>
+                    <strong>✉️ Enviar credenciales por email</strong>
+                    <br />
+                    <small className="text-muted">
+                      El usuario recibirá un correo con su usuario, contraseña y un link de acceso directo
+                    </small>
+                  </span>
+                }
+              />
+            </Form.Group>
+
+            {mensajeEmail && (
+              <div className={`alert ${mensajeEmail.includes('✓') ? 'alert-success' : 'alert-warning'} py-2`}>
+                <small>{mensajeEmail}</small>
+              </div>
+            )}
           </Form>
         </Modal.Body>
         <Modal.Footer>

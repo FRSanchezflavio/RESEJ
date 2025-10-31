@@ -55,6 +55,23 @@ class AuthController {
       next(error);
     }
   }
+
+  async validatePassword(req, res, next) {
+    try {
+      const { password } = req.body;
+      const userId = req.user.id;
+
+      const isValid = await AuthService.validatePassword(userId, password);
+
+      if (isValid) {
+        res.json(createSuccessResponse({ valid: true }, 'Contraseña correcta'));
+      } else {
+        res.json(createErrorResponse('Contraseña incorrecta', 401));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AuthController();

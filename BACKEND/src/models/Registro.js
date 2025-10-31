@@ -108,25 +108,29 @@ class Registro {
 
     // Aplicar búsqueda por término según criterio
     if (termino) {
-      if (criterio === 'todos' || criterio === 'persona') {
-        query = query.where(function () {
+      query = query.where(function () {
+        if (criterio === 'todos') {
+          // Búsqueda en todos los campos
+          this.where('p.nombre', 'ilike', `%${termino}%`)
+            .orWhere('p.apellido', 'ilike', `%${termino}%`)
+            .orWhere('p.dni', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_legajo', 'ilike', `%${termino}%`)
+            .orWhere('r.ufi', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_protocolo', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_causa', 'ilike', `%${termino}%`)
+            .orWhere('r.detalle_secuestro', 'ilike', `%${termino}%`);
+        } else if (criterio === 'persona') {
           this.where('p.nombre', 'ilike', `%${termino}%`)
             .orWhere('p.apellido', 'ilike', `%${termino}%`)
             .orWhere('p.dni', 'ilike', `%${termino}%`);
-        });
-      }
-
-      if (criterio === 'todos' || criterio === 'legajo') {
-        query = query.orWhere('r.numero_legajo', 'ilike', `%${termino}%`);
-      }
-
-      if (criterio === 'todos' || criterio === 'ufi') {
-        query = query.orWhere('r.ufi', 'ilike', `%${termino}%`);
-      }
-
-      if (criterio === 'todos' || criterio === 'protocolo') {
-        query = query.orWhere('r.numero_protocolo', 'ilike', `%${termino}%`);
-      }
+        } else if (criterio === 'legajo') {
+          this.where('r.numero_legajo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'ufi') {
+          this.where('r.ufi', 'ilike', `%${termino}%`);
+        } else if (criterio === 'protocolo') {
+          this.where('r.numero_protocolo', 'ilike', `%${termino}%`);
+        }
+      });
     }
 
     // Filtros adicionales

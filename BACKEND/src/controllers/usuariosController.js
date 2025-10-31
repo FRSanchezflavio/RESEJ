@@ -1,5 +1,6 @@
 const UsuarioService = require('../services/usuarioService');
 const { createSuccessResponse } = require('../utils/helpers');
+const { enviarCredencialesNuevoUsuario } = require('../services/emailService');
 
 class UsuariosController {
   async getAll(req, res, next) {
@@ -27,10 +28,52 @@ class UsuariosController {
 
   async create(req, res, next) {
     try {
-      const usuario = await UsuarioService.createUsuario(req.body, req.user.id);
+      const { enviarEmail, ...usuarioData } = req.body;
+      
+      // Guardar la contraseña original antes de hashearla (solo para enviar por email)
+      const passwordOriginal = usuarioData.password;
+      
+      const usuario = await UsuarioService.createUsuario(usuarioData, req.user.id);
+      
+      let emailEnviado = false;
+      let mensajeEmail = '';
+      
+      // Si se solicita enviar email y el usuario tiene email
+      if (enviarEmail && usuario.email) {
+        const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`;
+        const resultadoEmail = await enviarCredencialesNuevoUsuario(
+          usuario.email,
+          usuario.usuario,
+          passwordOriginal,
+          nombreCompleto
+        );
+        
+        emailEnviado = resultadoEmail.success;
+        mensajeEmail = resultadoEmail.message;
+        
+        if (!resultadoEmail.success) {
+          console.warn('Usuario creado pero no se pudo enviar el correo:', resultadoEmail.message);
+        }
+      }
+      
+      // Crear respuesta con información del email
+      const respuesta = {
+        usuario: {
+          id: usuario.id,
+          usuario: usuario.usuario,
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          email: usuario.email,
+          rol: usuario.rol,
+          activo: usuario.activo
+        },
+        emailEnviado,
+        mensajeEmail: emailEnviado ? 'Correo con credenciales enviado exitosamente' : mensajeEmail
+      };
+      
       res
         .status(201)
-        .json(createSuccessResponse(usuario, 'Usuario creado exitosamente'));
+        .json(createSuccessResponse(respuesta, 'Usuario creado exitosamente'));
     } catch (error) {
       next(error);
     }

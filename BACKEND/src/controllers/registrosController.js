@@ -55,10 +55,50 @@ class RegistrosController {
 
   async create(req, res, next) {
     try {
+      // Crear el registro
       const registro = await RegistroService.createRegistro(
         req.body,
         req.user.id
       );
+
+      // Si hay archivos adjuntos, guardarlos
+      if (req.files && req.files.length > 0) {
+        const FileService = require('../services/fileService');
+        const fs = require('fs').promises;
+        const path = require('path');
+
+        for (const file of req.files) {
+          try {
+            // Crear directorio uploads si no existe
+            const uploadsDir = path.join(__dirname, '../../uploads');
+            await fs.mkdir(uploadsDir, { recursive: true });
+
+            // Generar nombre único para el archivo
+            const timestamp = Date.now();
+            const fileName = `${timestamp}-${file.originalname}`;
+            const filePath = path.join(uploadsDir, fileName);
+
+            // Guardar archivo físicamente
+            await fs.writeFile(filePath, file.buffer);
+
+            // Crear objeto file compatible con FileService
+            const fileObj = {
+              originalname: file.originalname,
+              filename: fileName,
+              path: filePath,
+              mimetype: file.mimetype,
+              size: file.size,
+            };
+
+            // Guardar en la base de datos
+            await FileService.saveFile(fileObj, registro.id, req.user.id);
+          } catch (fileError) {
+            console.error('Error al guardar archivo:', fileError);
+            // Continuar con los demás archivos aunque uno falle
+          }
+        }
+      }
+
       res
         .status(201)
         .json(createSuccessResponse(registro, 'Registro creado exitosamente'));

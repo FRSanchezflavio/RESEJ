@@ -45,7 +45,18 @@ class ArchivosController {
   async download(req, res, next) {
     try {
       const archivo = await FileService.getFile(req.params.id);
-      res.download(archivo.ruta_archivo, archivo.nombre_original);
+
+      // Si hay un query param 'inline', mostrar en el navegador en lugar de descargar
+      if (
+        req.query.inline === 'true' &&
+        archivo.tipo_mime &&
+        archivo.tipo_mime.startsWith('image/')
+      ) {
+        res.setHeader('Content-Type', archivo.tipo_mime);
+        res.sendFile(path.resolve(archivo.ruta_archivo));
+      } else {
+        res.download(archivo.ruta_archivo, archivo.nombre_original);
+      }
     } catch (error) {
       next(error);
     }

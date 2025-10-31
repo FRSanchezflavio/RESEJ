@@ -200,6 +200,28 @@ class AuthService {
       throw error;
     }
   }
+
+  /**
+   * Validar contraseña del usuario
+   */
+  static async validatePassword(userId, password) {
+    try {
+      const user = await Usuario.findById(userId);
+
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const passwordMatch = await comparePassword(password, user.password_hash);
+
+      logger.info(`Validación de contraseña para usuario: ${user.usuario} - ${passwordMatch ? 'exitosa' : 'fallida'}`);
+
+      return passwordMatch;
+    } catch (error) {
+      logger.error(`Error al validar contraseña: ${error.message}`);
+      throw error;
+    }
+  }
 }
 
 module.exports = AuthService;
