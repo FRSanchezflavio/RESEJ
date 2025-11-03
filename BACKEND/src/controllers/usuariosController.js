@@ -40,6 +40,20 @@ class UsuariosController {
 
       let emailEnviado = false;
       let mensajeEmail = '';
+      let rolNombre = 'usuario_consulta'; // valor por defecto
+
+      // Obtener el nombre del rol desde la base de datos
+      if (usuario.rol_id) {
+        const db = require('../config/database');
+        const rol = await db('roles')
+          .select('nombre')
+          .where('id', usuario.rol_id)
+          .first();
+
+        if (rol) {
+          rolNombre = rol.nombre;
+        }
+      }
 
       // Si se solicita enviar email y el usuario tiene email
       if (enviarEmail && usuario.email) {
@@ -48,7 +62,8 @@ class UsuariosController {
           usuario.email,
           usuario.usuario,
           passwordOriginal,
-          nombreCompleto
+          nombreCompleto,
+          rolNombre
         );
 
         emailEnviado = resultadoEmail.success;
@@ -71,6 +86,8 @@ class UsuariosController {
           apellido: usuario.apellido,
           email: usuario.email,
           rol: usuario.rol,
+          rol_id: usuario.rol_id,
+          rol_nombre: rolNombre,
           activo: usuario.activo,
         },
         emailEnviado,
@@ -144,6 +161,27 @@ class UsuariosController {
         limit: parseInt(limit) || 20,
       });
       res.json(createSuccessResponse(result));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getRoles(req, res, next) {
+    try {
+      const db = require('../config/database');
+      const roles = await db('roles')
+        .select(
+          'id',
+          'nombre',
+          'descripcion',
+          'puede_crear',
+          'puede_editar',
+          'puede_eliminar',
+          'puede_consultar'
+        )
+        .orderBy('id');
+
+      res.json(createSuccessResponse(roles, 'Roles obtenidos exitosamente'));
     } catch (error) {
       next(error);
     }

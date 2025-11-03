@@ -47,7 +47,8 @@ const enviarCredencialesNuevoUsuario = async (
   email,
   usuario,
   contraseña,
-  nombreCompleto
+  nombreCompleto,
+  rol = 'usuario_consulta'
 ) => {
   try {
     // Verificar que las credenciales de email estén configuradas
@@ -155,8 +156,37 @@ const enviarCredencialesNuevoUsuario = async (
               <ul>
                 <li><strong>Usuario:</strong> ${usuario}</li>
                 <li><strong>Contraseña:</strong> ${contraseña}</li>
+                <li><strong>Rol:</strong> ${
+                  rol === 'administrador'
+                    ? '👑 Administrador'
+                    : '👤 Usuario Consulta'
+                }</li>
               </ul>
             </div>
+            
+            ${
+              rol === 'usuario_consulta'
+                ? `<div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                    <strong>📌 Tu rol: Usuario de Consulta</strong>
+                    <p style="margin: 10px 0 0 0;">Con este rol podrás:</p>
+                    <ul style="margin: 10px 0 0 20px;">
+                      <li>✓ Buscar y visualizar registros</li>
+                      <li>✓ Ver detalles de secuestros judiciales</li>
+                      <li>✓ Descargar archivos adjuntos</li>
+                    </ul>
+                    <p style="margin: 10px 0 0 0; font-style: italic;">No podrás crear, editar o eliminar registros.</p>
+                  </div>`
+                : `<div style="background: #f3e5f5; border-left: 4px solid #9c27b0; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                    <strong>👑 Tu rol: Administrador</strong>
+                    <p style="margin: 10px 0 0 0;">Tienes acceso completo al sistema:</p>
+                    <ul style="margin: 10px 0 0 20px;">
+                      <li>✓ Crear nuevos registros</li>
+                      <li>✓ Editar registros existentes</li>
+                      <li>✓ Eliminar registros</li>
+                      <li>✓ Gestionar usuarios</li>
+                    </ul>
+                  </div>`
+            }
             
             <div style="text-align: center;">
               <a href="${loginUrl}" class="button">🚀 Acceder al Sistema</a>
@@ -198,6 +228,24 @@ const enviarCredencialesNuevoUsuario = async (
         Credenciales de Acceso:
         - Usuario: ${usuario}
         - Contraseña: ${contraseña}
+        - Rol: ${rol === 'administrador' ? 'Administrador' : 'Usuario Consulta'}
+        
+        ${
+          rol === 'usuario_consulta'
+            ? `Tu Rol: Usuario de Consulta
+        Con este rol podrás:
+        ✓ Buscar y visualizar registros
+        ✓ Ver detalles de secuestros judiciales
+        ✓ Descargar archivos adjuntos
+        
+        No podrás crear, editar o eliminar registros.`
+            : `Tu Rol: Administrador
+        Tienes acceso completo al sistema:
+        ✓ Crear nuevos registros
+        ✓ Editar registros existentes
+        ✓ Eliminar registros
+        ✓ Gestionar usuarios`
+        }
         
         Accede al sistema en: ${loginUrl}
         

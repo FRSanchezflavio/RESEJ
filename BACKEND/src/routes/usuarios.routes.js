@@ -13,6 +13,9 @@ const {
 // Todas las rutas requieren autenticación y rol de administrador
 router.use(authenticateToken, requireAdmin);
 
+// GET /api/usuarios/roles - Obtener lista de roles disponibles
+router.get('/roles', usuariosController.getRoles);
+
 // GET /api/usuarios - Listar todos los usuarios
 router.get('/', usuariosController.getAll);
 

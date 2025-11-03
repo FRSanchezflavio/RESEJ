@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-bootstrap';
 import api from '../../api/api';
+import AccionProtegida from '../AccionProtegida';
 
 export default function Registros() {
   const [registros, setRegistros] = useState([]);
@@ -283,33 +284,35 @@ export default function Registros() {
                                 <h6 className="mb-0">
                                   📋 Información del Registro
                                 </h6>
-                                {!editMode[r.id] ? (
-                                  <Button
-                                    variant="warning"
-                                    size="sm"
-                                    onClick={() => handleEditClick(r)}
-                                  >
-                                    ✏️ Editar
-                                  </Button>
-                                ) : (
-                                  <div>
+                                <AccionProtegida permiso="editar">
+                                  {!editMode[r.id] ? (
                                     <Button
-                                      variant="success"
+                                      variant="warning"
                                       size="sm"
-                                      onClick={() => handleSaveEdit(r.id)}
-                                      className="me-2"
+                                      onClick={() => handleEditClick(r)}
                                     >
-                                      💾 Guardar
+                                      ✏️ Editar
                                     </Button>
-                                    <Button
-                                      variant="secondary"
-                                      size="sm"
-                                      onClick={() => handleCancelEdit(r.id)}
-                                    >
-                                      ❌ Cancelar
-                                    </Button>
-                                  </div>
-                                )}
+                                  ) : (
+                                    <div>
+                                      <Button
+                                        variant="success"
+                                        size="sm"
+                                        onClick={() => handleSaveEdit(r.id)}
+                                        className="me-2"
+                                      >
+                                        💾 Guardar
+                                      </Button>
+                                      <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => handleCancelEdit(r.id)}
+                                      >
+                                        ❌ Cancelar
+                                      </Button>
+                                    </div>
+                                  )}
+                                </AccionProtegida>
                               </div>
 
                               {!editMode[r.id] ? (

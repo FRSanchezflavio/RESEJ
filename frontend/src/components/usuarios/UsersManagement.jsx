@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Button, Modal, Form } from 'react-bootstrap';
-import { fetchUsers, createUser } from '../../api/api';
+import { Card, Table, Button, Modal, Form, Badge } from 'react-bootstrap';
+import { fetchUsers, createUser, fetchRoles } from '../../api/api';
 
 export default function UsersManagement() {
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [show, setShow] = useState(false);
   const [form, setForm] = useState({
     usuario: '',
@@ -11,13 +12,14 @@ export default function UsersManagement() {
     apellido: '',
     email: '',
     password: '',
-    rol: 'usuario_consulta',
+    rol_id: 2, // Por defecto: usuario_consulta
   });
   const [enviarEmail, setEnviarEmail] = useState(true);
   const [mensajeEmail, setMensajeEmail] = useState('');
 
   useEffect(() => {
     load();
+    loadRoles();
   }, []);
 
   async function load() {
@@ -30,6 +32,18 @@ export default function UsersManagement() {
     } catch (err) {
       console.error('Error cargando usuarios:', err);
       setUsers([]); // fallback
+    }
+  }
+
+  async function loadRoles() {
+    try {
+      const res = await fetchRoles();
+      let data = res?.data?.data || res?.data || [];
+      if (!Array.isArray(data)) data = [];
+      setRoles(data);
+    } catch (err) {
+      console.error('Error cargando roles:', err);
+      setRoles([]);
     }
   }
 
@@ -73,7 +87,7 @@ export default function UsersManagement() {
         apellido: '',
         email: '',
         password: '',
-        rol: 'usuario_consulta',
+        rol_id: 2,
       });
       setEnviarEmail(true);
       setMensajeEmail('');
@@ -200,12 +214,66 @@ export default function UsersManagement() {
             <Form.Group className="mb-2">
               <Form.Label>Rol</Form.Label>
               <Form.Select
-                value={form.rol}
-                onChange={e => setForm({ ...form, rol: e.target.value })}
+                value={form.rol_id}
+                onChange={e =>
+                  setForm({ ...form, rol_id: parseInt(e.target.value) })
+                }
               >
-                <option value="usuario_consulta">Usuario Consulta</option>
-                <option value="administrador">Administrador</option>
+                {roles.length > 0 ? (
+                  roles.map(rol => (
+                    <option key={rol.id} value={rol.id}>
+                      {rol.nombre === 'administrador'
+                        ? '👑 Administrador'
+                        : '👤 Usuario Consulta'}{' '}
+                      - {rol.descripcion}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="2">
+                      👤 Usuario Consulta - Solo puede consultar
+                    </option>
+                    <option value="1">
+                      👑 Administrador - Acceso completo
+                    </option>
+                  </>
+                )}
               </Form.Select>
+              {roles.length > 0 && form.rol_id && (
+                <Form.Text className="text-muted">
+                  {(() => {
+                    const selectedRole = roles.find(r => r.id === form.rol_id);
+                    if (!selectedRole) return null;
+                    return (
+                      <div className="mt-2">
+                        <strong>Permisos:</strong>
+                        <div className="ms-2">
+                          {selectedRole.puede_consultar && (
+                            <Badge bg="info" className="me-1">
+                              Consultar
+                            </Badge>
+                          )}
+                          {selectedRole.puede_crear && (
+                            <Badge bg="success" className="me-1">
+                              Crear
+                            </Badge>
+                          )}
+                          {selectedRole.puede_editar && (
+                            <Badge bg="warning" className="me-1">
+                              Editar
+                            </Badge>
+                          )}
+                          {selectedRole.puede_eliminar && (
+                            <Badge bg="danger" className="me-1">
+                              Eliminar
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </Form.Text>
+              )}
             </Form.Group>
 
             <hr />

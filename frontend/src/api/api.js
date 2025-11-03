@@ -39,4 +39,8 @@ export async function createUser(payload) {
   return api.post('/usuarios', payload);
 }
 
+export async function fetchRoles() {
+  return api.get('/usuarios/roles');
+}
+
 export default api;
