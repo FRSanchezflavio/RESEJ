@@ -2,12 +2,14 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+  padding-bottom: 90px; /* Espacio para el footer */
   text-align: center;
+  min-height: 100vh;
 }
 
 .logo {
   height: 6em;
-  padding: 1.5em;
+  padding: 1.9em;
   will-change: filter;
   transition: filter 300ms;
 }

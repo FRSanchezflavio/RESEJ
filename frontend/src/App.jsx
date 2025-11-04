@@ -9,6 +9,7 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import { PermisosProvider } from './context/PermisosContext';
 
 import AppNavbar from './components/layout/AppNavbar';
+import Footer from './components/layout/Footer';
 import Login from './components/auth/Login';
 import Dashboard from './components/dashboard/Dashboard';
 import Registros from './components/registros/Registros';
@@ -53,6 +54,7 @@ function AppInner() {
         {/* Cualquier ruta no válida → redirige */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
