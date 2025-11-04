@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 import api from '../../api/api';
 import AccionProtegida from '../AccionProtegida';
+import './Registros.css';
 
 export default function Registros() {
   const [registros, setRegistros] = useState([]);

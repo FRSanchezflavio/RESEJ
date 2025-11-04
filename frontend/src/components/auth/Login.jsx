@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { loginRequest } from '../../api/api';
 import api from '../../api/api';
 import { AuthContext } from '../../context/AuthContext';
 import { usePermisos } from '../../context/usePermisos';
+import './Login.css';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
@@ -105,67 +105,93 @@ export default function Login() {
 
   if (validandoToken) {
     return (
-      <Container
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: '80vh' }}
-      >
-        <Card
-          style={{
-            width: 420,
-            padding: 30,
-            boxShadow: '0 2px 8px rgba(0,0,0,.08)',
-            textAlign: 'center',
-          }}
-        >
-          <Spinner animation="border" variant="primary" className="mb-3" />
-          <h5>{infoToken}</h5>
-          <p className="text-muted mt-2" style={{ fontSize: '14px' }}>
-            Estás accediendo con un enlace temporal de un solo uso
-          </p>
-        </Card>
-      </Container>
+      <div className="login-container">
+        <div className="login-wrapper">
+          <div className="login-header">
+            <div className="login-logo">⚖️</div>
+            <h1 className="login-title">RESEJ</h1>
+            <p className="login-subtitle">Sistema Policial-Judicial</p>
+          </div>
+
+          <div className="login-card">
+            <div className="token-validation">
+              <div className="validation-spinner"></div>
+              <h3 className="validation-message">{infoToken}</h3>
+              <p className="validation-description">
+                🔐 Estás accediendo con un enlace temporal de un solo uso
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container
-      className="d-flex justify-content-center align-items-center"
-      style={{ minHeight: '80vh' }}
-    >
-      <Card
-        style={{
-          width: 420,
-          padding: 20,
-          boxShadow: '0 2px 8px rgba(0,0,0,.08)',
-        }}
-      >
-        <h4 className="mb-3">Iniciar Sesión</h4>
-        {err && <Alert variant="danger">{err}</Alert>}
-        {infoToken && !err && <Alert variant="info">{infoToken}</Alert>}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Nombre de usuario</Form.Label>
-            <Form.Control
-              value={usuario}
-              onChange={e => setUsuario(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Contraseña</Form.Label>
-            <Form.Control
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-            />
-          </Form.Group>
-          <div className="d-flex justify-content-between align-items-center">
-            <Button type="submit" variant="dark">
-              INICIAR SESIÓN
-            </Button>
-            <small className="text-muted">© 2025 - Policía de Tucumán</small>
+    <div className="login-container">
+      <div className="login-wrapper">
+        <div className="login-header">
+          <div className="login-logo">⚖️</div>
+          <h1 className="login-title">RESEJ</h1>
+          <p className="login-subtitle">Sistema Policial-Judicial</p>
+        </div>
+
+        <div className="login-card">
+          {err && <div className="login-alert error">⚠️ {err}</div>}
+          {infoToken && !err && (
+            <div className="login-alert info">ℹ️ {infoToken}</div>
+          )}
+
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div className="form-group-login">
+              <label className="form-label-login">Usuario</label>
+              <input
+                type="text"
+                className="form-input-login"
+                value={usuario}
+                onChange={e => setUsuario(e.target.value)}
+                placeholder="Ingrese su nombre de usuario"
+                required
+                autoComplete="username"
+              />
+            </div>
+
+            <div className="form-group-login">
+              <label className="form-label-login">Contraseña</label>
+              <input
+                type="password"
+                className="form-input-login"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Ingrese su contraseña"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+
+            <div className="login-actions">
+              <button type="submit" className="btn-login">
+                🔐 Iniciar Sesión
+              </button>
+            </div>
+
+            <div className="login-security-note">
+              <span className="security-icon">🛡️</span>
+              <p className="security-text">
+                Todas las sesiones son monitoreadas y auditadas por razones de
+                seguridad. Acceso exclusivo para personal autorizado.
+              </p>
+            </div>
+          </form>
+
+          <div className="login-footer">
+            <div className="login-footer-text">
+              <span className="login-footer-badge">🏛️ Policía de Tucumán</span>
+              <span>© {new Date().getFullYear()} SanzTech & LJD</span>
+            </div>
           </div>
-        </Form>
-      </Card>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

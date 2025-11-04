@@ -1,43 +1,155 @@
+/* ============================================
+   FOOTER POLICIAL-JUDICIAL PROFESIONAL
+   ============================================ */
+
 .app-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
-  padding: 10px 40px;
-  z-index: 1000;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(
+    135deg,
+    var(--bg-secondary) 0%,
+    var(--bg-primary) 100%
+  );
+  border-top: 2px solid var(--color-primary-light);
+  padding: var(--spacing-md) var(--spacing-lg);
+  z-index: var(--z-fixed);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .footer-content {
-  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  padding-right: 20px;
+  gap: var(--spacing-lg);
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.footer-logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: white;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
 }
 
 .footer-text {
-  font-size: 14px;
-  color: #6c757d;
-  font-weight: 500;
-  letter-spacing: 0.3px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
-/* Animación sutil al hover */
-.footer-text:hover {
-  color: #495057;
-  transition: color 0.2s ease;
+.footer-brand {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  letter-spacing: 0.1em;
 }
 
-/* Responsive */
+.footer-text:hover .footer-brand {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.footer-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 10px var(--color-success);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.footer-copyright {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.footer-year {
+  color: var(--color-primary-light);
+  font-weight: 700;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
 @media (max-width: 768px) {
   .app-footer {
-    padding: 8px 15px;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
-  .footer-text {
-    font-size: 12px;
+  .footer-content {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+
+  .footer-info {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .footer-logo {
+    display: none;
+  }
+
+  .footer-meta {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .footer-text,
+  .footer-copyright,
+  .footer-status {
+    font-size: 0.65rem;
   }
 }

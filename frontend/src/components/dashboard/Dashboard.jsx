@@ -1,105 +1,180 @@
-import React, { useContext } from "react";
-import { Container, Card, Row, Col, Button, Alert } from "react-bootstrap";
-import { AuthContext } from "../../context/AuthContext";
-import { usePermisos } from "../../context/usePermisos";
-import { useNavigate } from "react-router-dom";
-import AccionProtegida from "../AccionProtegida";
+import React, { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { usePermisos } from '../../context/usePermisos';
+import { useNavigate } from 'react-router-dom';
+import AccionProtegida from '../AccionProtegida';
+import './Dashboard.css';
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
   const { permisos } = usePermisos();
   const navigate = useNavigate();
 
+  const isAdmin = permisos?.rol === 'administrador';
+
   return (
-    <Container style={{ paddingTop: 20 }}>
-      <Row>
-        <Col>
-          <Card className="mb-3 p-3">
-            <h5>Bienvenido/a, {user?.nombreCompleto}</h5>
-            <p className="text-muted mb-0">
-              Rol:{' '}
-              {permisos?.rol === 'administrador'
-                ? '👑 Administrador'
-                : '👤 Usuario Consulta'}
+    <div className="dashboard-container">
+      {/* Header de Bienvenida */}
+      <div className="dashboard-header">
+        <div className="welcome-card">
+          <div className="welcome-content">
+            <h1 className="welcome-title">
+              ¡Bienvenido/a, {user?.nombreCompleto}!
+            </h1>
+            <p className="welcome-subtitle">
+              <span className="user-role-badge">
+                {isAdmin ? '👑 Administrador' : '👤 Usuario Consulta'}
+              </span>
             </p>
-          </Card>
+          </div>
+        </div>
+      </div>
 
-          {permisos?.rol === 'usuario_consulta' && (
-            <Alert variant="info" className="mb-3">
-              <Alert.Heading>ℹ️ Tu acceso es de solo lectura</Alert.Heading>
-              <p className="mb-0">
-                Puedes buscar y visualizar registros, pero no crear, editar o
-                eliminar información.
-              </p>
-            </Alert>
-          )}
+      {/* Estadísticas Rápidas */}
+      <div className="stats-grid">
+        <div className="stat-card-dashboard primary">
+          <div className="stat-icon-dashboard primary">📊</div>
+          <div className="stat-content-dashboard">
+            <div className="stat-label-dashboard">Sistema</div>
+            <div className="stat-value-dashboard">Activo</div>
+          </div>
+        </div>
 
-          <Card className="mb-3 p-3">
-            <h5>Accesos rápidos</h5>
-            <div className="d-flex gap-2 mt-3 flex-wrap">
-              <Button
-                variant="outline-dark"
-                onClick={() => navigate('/registros')}
-              >
-                🔍 Buscar Registros
-              </Button>
+        <div className="stat-card-dashboard success">
+          <div className="stat-icon-dashboard success">✓</div>
+          <div className="stat-content-dashboard">
+            <div className="stat-label-dashboard">Estado</div>
+            <div className="stat-value-dashboard">Operativo</div>
+          </div>
+        </div>
 
-              <AccionProtegida permiso="crear">
-                <Button variant="dark" onClick={() => navigate('/cargar')}>
-                  📄 Cargar Registros
-                </Button>
-              </AccionProtegida>
+        <div className="stat-card-dashboard warning">
+          <div className="stat-icon-dashboard warning">👤</div>
+          <div className="stat-content-dashboard">
+            <div className="stat-label-dashboard">Usuario</div>
+            <div className="stat-value-dashboard">{user?.username}</div>
+          </div>
+        </div>
+      </div>
 
-              <AccionProtegida
-                permiso="crear"
-                fallback={
-                  <Button
-                    variant="secondary"
-                    disabled
-                    title="Solo administradores"
-                  >
-                    📄 Cargar Registros
-                  </Button>
-                }
-              />
+      {/* Alerta para usuarios de consulta */}
+      {!isAdmin && (
+        <div className="info-alert-dashboard">
+          <h3 className="alert-title">ℹ️ Acceso de Solo Lectura</h3>
+          <p className="alert-description">
+            Tu cuenta tiene permisos de consulta. Puedes buscar y visualizar
+            registros, pero no crear, editar o eliminar información del sistema.
+          </p>
+        </div>
+      )}
 
-              <AccionProtegida permiso="crear">
-                <Button
-                  variant="outline-dark"
-                  onClick={() => navigate('/usuarios')}
-                >
-                  👥 Gestionar Usuarios
-                </Button>
-              </AccionProtegida>
-
-              <AccionProtegida
-                permiso="crear"
-                fallback={
-                  <Button
-                    variant="secondary"
-                    disabled
-                    title="Solo administradores"
-                  >
-                    👥 Gestionar Usuarios
-                  </Button>
-                }
-              />
+      {/* Accesos Rápidos */}
+      <section className="quick-actions-section">
+        <h2 className="section-title-dashboard">🚀 Accesos Rápidos</h2>
+        <div className="quick-actions-grid">
+          <button
+            className="action-button"
+            onClick={() => navigate('/registros')}
+          >
+            <span className="action-icon">🔍</span>
+            <div>
+              <div className="action-label">Buscar Registros</div>
+              <div className="action-description">Consultar expedientes</div>
             </div>
-          </Card>
+          </button>
 
-          <Card className="p-3">
-            <h6>Tus permisos:</h6>
-            <ul className="mb-0">
-              {permisos?.puede_consultar && (
-                <li>✓ Consultar y visualizar registros</li>
-              )}
-              {permisos?.puede_crear && <li>✓ Crear nuevos registros</li>}
-              {permisos?.puede_editar && <li>✓ Editar registros existentes</li>}
-              {permisos?.puede_eliminar && <li>✓ Eliminar registros</li>}
-            </ul>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          <AccionProtegida
+            permiso="crear"
+            fallback={
+              <button
+                className="action-button"
+                disabled
+                title="Solo administradores"
+              >
+                <span className="action-icon">📤</span>
+                <div>
+                  <div className="action-label">Cargar Registros</div>
+                  <div className="action-description">Acceso restringido</div>
+                </div>
+              </button>
+            }
+          >
+            <button
+              className="action-button"
+              onClick={() => navigate('/cargar')}
+            >
+              <span className="action-icon">📤</span>
+              <div>
+                <div className="action-label">Cargar Registros</div>
+                <div className="action-description">Subir expedientes</div>
+              </div>
+            </button>
+          </AccionProtegida>
+
+          <AccionProtegida
+            permiso="crear"
+            fallback={
+              <button
+                className="action-button"
+                disabled
+                title="Solo administradores"
+              >
+                <span className="action-icon">👥</span>
+                <div>
+                  <div className="action-label">Gestionar Usuarios</div>
+                  <div className="action-description">Acceso restringido</div>
+                </div>
+              </button>
+            }
+          >
+            <button
+              className="action-button"
+              onClick={() => navigate('/usuarios')}
+            >
+              <span className="action-icon">👥</span>
+              <div>
+                <div className="action-label">Gestionar Usuarios</div>
+                <div className="action-description">Administrar accesos</div>
+              </div>
+            </button>
+          </AccionProtegida>
+        </div>
+      </section>
+
+      {/* Permisos del Usuario */}
+      <div className="permissions-card">
+        <h3 className="permissions-title">🔐 Tus Permisos</h3>
+        <ul className="permissions-list">
+          {permisos?.puede_consultar && (
+            <li className="permission-item">
+              <span className="permission-icon">✓</span>
+              <span className="permission-text">
+                Consultar y visualizar registros
+              </span>
+            </li>
+          )}
+          {permisos?.puede_crear && (
+            <li className="permission-item">
+              <span className="permission-icon">✓</span>
+              <span className="permission-text">Crear nuevos registros</span>
+            </li>
+          )}
+          {permisos?.puede_editar && (
+            <li className="permission-item">
+              <span className="permission-icon">✓</span>
+              <span className="permission-text">
+                Editar registros existentes
+              </span>
+            </li>
+          )}
+          {permisos?.puede_eliminar && (
+            <li className="permission-item">
+              <span className="permission-icon">✓</span>
+              <span className="permission-text">Eliminar registros</span>
+            </li>
+          )}
+        </ul>
+      </div>
+    </div>
   );
 }
