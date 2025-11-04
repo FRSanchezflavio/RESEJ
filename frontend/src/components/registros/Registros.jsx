@@ -51,12 +51,12 @@ export default function Registros() {
   const handleSearch = e => {
     e.preventDefault();
     const params = { termino: term };
-    
+
     // Si se seleccionó un campo específico, agregarlo a los parámetros
     if (searchField !== 'all') {
       params.campo = searchField;
     }
-    
+
     load(params);
   };
 
@@ -267,13 +267,17 @@ export default function Registros() {
               <tr>
                 <th style={{ width: '40px' }}>Ver</th>
                 <th>#</th>
-                <th>Persona</th>
-                <th>DNI</th>
-                <th>N° Causa</th>
-                <th>N° Legajo</th>
-                <th>UFI</th>
                 <th>Fecha Ingreso</th>
-                <th>Detalle</th>
+                <th>UFI</th>
+                <th>N° Legajo/Causa</th>
+                <th>Sección</th>
+                <th>Detalle Secuestro</th>
+                <th>N° Protocolo</th>
+                <th>Cadena Custodia</th>
+                <th>N° Folio</th>
+                <th>N° Libro Secuestro</th>
+                <th>Oficial a Cargo</th>
+                <th>Observaciones</th>
               </tr>
             </thead>
             <tbody>
@@ -297,15 +301,22 @@ export default function Registros() {
                       </Button>
                     </td>
                     <td>{r.id}</td>
-                    <td>{r.persona_nombre_completo || '-'}</td>
-                    <td>{r.persona_dni || '-'}</td>
-                    <td>{r.numero_causa || '-'}</td>
-                    <td>{r.numero_legajo || '-'}</td>
-                    <td>{r.ufi || '-'}</td>
                     <td>
                       {r.fecha_ingreso
                         ? new Date(r.fecha_ingreso).toLocaleDateString('es-AR')
                         : '-'}
+                    </td>
+                    <td>{r.ufi || '-'}</td>
+                    <td>{r.numero_legajo || '-'}</td>
+                    <td
+                      style={{
+                        maxWidth: '150px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.seccion_que_interviene || '-'}
                     </td>
                     <td
                       style={{
@@ -317,9 +328,33 @@ export default function Registros() {
                     >
                       {r.detalle_secuestro || r.descripcion || '-'}
                     </td>
+                    <td>{r.numero_protocolo || '-'}</td>
+                    <td>{r.cadena_custodia || '-'}</td>
+                    <td>{r.nro_folio || '-'}</td>
+                    <td>{r.nro_libro_secuestro || '-'}</td>
+                    <td
+                      style={{
+                        maxWidth: '150px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.of_a_cargo || '-'}
+                    </td>
+                    <td
+                      style={{
+                        maxWidth: '150px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {r.observaciones || '-'}
+                    </td>
                   </tr>
                   <tr>
-                    <td colSpan="9" style={{ padding: 0, border: 'none' }}>
+                    <td colSpan="13" style={{ padding: 0, border: 'none' }}>
                       <Collapse in={expandedRows[r.id]}>
                         <div
                           style={{

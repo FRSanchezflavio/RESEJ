@@ -122,8 +122,11 @@ class Registro {
             .orWhere('r.cadena_custodia', 'ilike', `%${termino}%`)
             .orWhere('r.of_a_cargo', 'ilike', `%${termino}%`);
         } else if (criterio === 'persona') {
-          this.where('p.nombre', 'ilike', `%${termino}%`)
-            .orWhere('p.apellido', 'ilike', `%${termino}%`);
+          this.where('p.nombre', 'ilike', `%${termino}%`).orWhere(
+            'p.apellido',
+            'ilike',
+            `%${termino}%`
+          );
         } else if (criterio === 'dni') {
           this.where('p.dni', 'ilike', `%${termino}%`);
         } else if (criterio === 'legajo') {

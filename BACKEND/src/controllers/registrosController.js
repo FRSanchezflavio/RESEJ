@@ -39,10 +39,10 @@ class RegistrosController {
         fecha_desde,
         fecha_hasta,
       } = req.query;
-      
+
       // Mapear 'campo' a 'criterio' si se proporciona
       let criterioFinal = criterio || campo || 'todos';
-      
+
       // Mapear nombres de campos específicos
       if (campo === 'all') criterioFinal = 'todos';
       if (campo === 'persona') criterioFinal = 'persona';
@@ -54,7 +54,7 @@ class RegistrosController {
       if (campo === 'cadena_custodia') criterioFinal = 'cadena_custodia';
       if (campo === 'detalle_secuestro') criterioFinal = 'detalle';
       if (campo === 'of_a_cargo') criterioFinal = 'oficial';
-      
+
       const result = await RegistroService.searchRegistros({
         termino,
         criterio: criterioFinal,
