@@ -1,5 +1,84 @@
 {
+  "name": "sistema-resej-policia",
+  "version": "1.0.0",
+  "description": "Sistema de Registro de Secuestros - Policía",
+  "main": "electron.js",
+  "author": "Policía",
+  "license": "MIT",
+  "homepage": "./",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd BACKEND && npm start",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run start:backend\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:with-backend": "electron electron-with-backend.js",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "echo Backend no requiere build",
+    "electron:build": "npm run build:frontend && electron-builder",
+    "electron:build:win": "npm run build:frontend && electron-builder --win",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.policia.resej",
+    "productName": "Sistema RESEJ Policía",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron.js",
+      "electron-with-backend.js",
+      "frontend/dist/**/*",
+      "BACKEND/**/*",
+      "!BACKEND/node_modules/**/*",
+      "!BACKEND/uploads/**/*",
+      "!BACKEND/logs/**/*",
+      "!BACKEND/test/**/*",
+      "!BACKEND/tests/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "frontend/public/favicon.ico",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "frontend/public/favicon.ico",
+      "uninstallerIcon": "frontend/public/favicon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sistema RESEJ Policía",
+      "menuCategory": true,
+      "runAfterFinish": true
+    },
+    "extraResources": [
+      {
+        "from": "BACKEND/.env.example",
+        "to": ".env.example"
+      }
+    ]
+  },
   "dependencies": {
     "knex": "^3.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^28.0.0",
+    "electron-builder": "^26.0.12",
+    "electron-is-dev": "^3.0.1",
+    "wait-on": "^9.0.1"
   }
 }
