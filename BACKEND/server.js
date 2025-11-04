@@ -2,7 +2,6 @@ require('dotenv').config();
 const app = require('./src/app');
 const logger = require('./src/utils/logger');
 const db = require('./src/config/database');
-const { verificarConfiguracion } = require('./src/services/emailService');
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -14,8 +13,12 @@ const startServer = async () => {
     await db.raw('SELECT 1');
     logger.info('✓ Conexión a la base de datos establecida correctamente');
 
-    // Verificar configuración de email (no bloquea el inicio si falla)
-    await verificarConfiguracion();
+    // Verificar configuración de email (opcional, no bloquea)
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      logger.info('✓ Configuración de email detectada');
+    } else {
+      logger.warn('⚠️  Configuración de email no encontrada (opcional)');
+    }
 
     // Iniciar el servidor
     app.listen(PORT, HOST, () => {

@@ -1,381 +1,85 @@
 const nodemailer = require('nodemailer');
-const logger = require('../utils/logger');
 
-/**
- * Crear transporter de nodemailer con configuración desde variables de entorno
- */
-const createTransporter = () => {
-  try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT, 10),
-      secure: process.env.EMAIL_SECURE === 'true',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+// Configurar transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.EMAIL_PORT || '587'),
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
-    return transporter;
-  } catch (error) {
-    logger.error(`Error al crear transporter de email: ${error.message}`);
-    throw error;
-  }
-};
-
-/**
- * Verificar configuración de email
- */
-const verificarConfiguracion = async () => {
-  try {
-    const transporter = createTransporter();
-    await transporter.verify();
-    logger.info('✓ Configuración de email verificada correctamente');
-    return true;
-  } catch (error) {
-    logger.warn(
-      `⚠ No se pudo verificar configuración de email: ${error.message}`
-    );
-    return false;
-  }
-};
-
-/**
- * Enviar credenciales a un nuevo usuario
- */
 const enviarCredencialesNuevoUsuario = async (
   email,
   usuario,
   contraseña,
-  nombreCompleto,
-  rol = 'usuario_consulta'
+  rol
 ) => {
-  try {
-    // Verificar que las credenciales de email estén configuradas
-    if (
-      !process.env.EMAIL_USER ||
-      process.env.EMAIL_USER === 'tu-correo@gmail.com'
-    ) {
-      logger.warn('Email no configurado. No se enviará correo.');
-      return {
-        success: false,
-        message: 'Servicio de email no configurado',
-      };
-    }
-
-    const transporter = createTransporter();
-    const loginUrl = `${process.env.FRONTEND_URL}/`;
-
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: '🔐 Credenciales de Acceso - Sistema RESEJ',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 10px 10px 0 0;
-            }
-            .content {
-              background: #f9f9f9;
-              padding: 30px;
-              border: 1px solid #ddd;
-            }
-            .credentials {
-              background: white;
-              padding: 20px;
-              border-left: 4px solid #667eea;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
-            .credentials strong {
-              color: #667eea;
-            }
-            .button {
-              display: inline-block;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 15px 30px;
-              text-decoration: none;
-              border-radius: 5px;
-              margin: 20px 0;
-              font-weight: bold;
-            }
-            .warning {
-              background: #fff3cd;
-              border-left: 4px solid #ffc107;
-              padding: 15px;
-              margin: 20px 0;
-              border-radius: 5px;
-            }
-            .footer {
-              text-align: center;
-              padding: 20px;
-              color: #666;
-              font-size: 12px;
-              border-top: 1px solid #ddd;
-            }
-            ul {
-              list-style: none;
-              padding: 0;
-            }
-            ul li {
-              padding: 8px 0;
-              border-bottom: 1px solid #eee;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>🎉 ¡Bienvenido/a!</h1>
-            <p>Tu cuenta ha sido creada exitosamente</p>
-          </div>
-          
-          <div class="content">
-            <p>Hola <strong>${nombreCompleto}</strong>,</p>
-            
-            <p>Se ha creado una cuenta para ti en el <strong>Sistema de Registro de Secuestros Judiciales (RESEJ)</strong>.</p>
-            
-            <div class="credentials">
-              <h3>📋 Tus Credenciales de Acceso:</h3>
-              <ul>
-                <li><strong>Usuario:</strong> ${usuario}</li>
-                <li><strong>Contraseña:</strong> ${contraseña}</li>
-                <li><strong>Rol:</strong> ${
-                  rol === 'administrador'
-                    ? '👑 Administrador'
-                    : '👤 Usuario Consulta'
-                }</li>
-              </ul>
-            </div>
-            
-            ${
-              rol === 'usuario_consulta'
-                ? `<div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                    <strong>📌 Tu rol: Usuario de Consulta</strong>
-                    <p style="margin: 10px 0 0 0;">Con este rol podrás:</p>
-                    <ul style="margin: 10px 0 0 20px;">
-                      <li>✓ Buscar y visualizar registros</li>
-                      <li>✓ Ver detalles de secuestros judiciales</li>
-                      <li>✓ Descargar archivos adjuntos</li>
-                    </ul>
-                    <p style="margin: 10px 0 0 0; font-style: italic;">No podrás crear, editar o eliminar registros.</p>
-                  </div>`
-                : `<div style="background: #f3e5f5; border-left: 4px solid #9c27b0; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                    <strong>👑 Tu rol: Administrador</strong>
-                    <p style="margin: 10px 0 0 0;">Tienes acceso completo al sistema:</p>
-                    <ul style="margin: 10px 0 0 20px;">
-                      <li>✓ Crear nuevos registros</li>
-                      <li>✓ Editar registros existentes</li>
-                      <li>✓ Eliminar registros</li>
-                      <li>✓ Gestionar usuarios</li>
-                    </ul>
-                  </div>`
-            }
-            
-            <div style="text-align: center;">
-              <a href="${loginUrl}" class="button">🚀 Acceder al Sistema</a>
-            </div>
-            
-            <p style="text-align: center; color: #666; font-size: 14px;">
-              O copia y pega este enlace en tu navegador:<br>
-              <a href="${loginUrl}">${loginUrl}</a>
-            </p>
-            
-            <div class="warning">
-              <strong>⚠️ Importante - Seguridad:</strong>
-              <ul style="margin: 10px 0 0 20px;">
-                <li>Cambia tu contraseña después del primer inicio de sesión</li>
-                <li>No compartas tus credenciales con nadie</li>
-                <li>Cierra sesión al terminar de usar el sistema</li>
-                <li>Este correo contiene información confidencial</li>
-              </ul>
-            </div>
-            
-            <p>Si tienes algún problema para acceder al sistema, por favor contacta al administrador.</p>
-            
-            <p>Saludos,<br>
-            <strong>Equipo RESEJ</strong></p>
-          </div>
-          
-          <div class="footer">
-            <p>Este es un correo automático. Por favor, no responder.</p>
-            <p>&copy; ${new Date().getFullYear()} Sistema RESEJ - Todos los derechos reservados</p>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `
-        Bienvenido/a ${nombreCompleto},
-        
-        Se ha creado una cuenta para ti en el Sistema RESEJ.
-        
-        Credenciales de Acceso:
-        - Usuario: ${usuario}
-        - Contraseña: ${contraseña}
-        - Rol: ${rol === 'administrador' ? 'Administrador' : 'Usuario Consulta'}
-        
-        ${
-          rol === 'usuario_consulta'
-            ? `Tu Rol: Usuario de Consulta
-        Con este rol podrás:
-        ✓ Buscar y visualizar registros
-        ✓ Ver detalles de secuestros judiciales
-        ✓ Descargar archivos adjuntos
-        
-        No podrás crear, editar o eliminar registros.`
-            : `Tu Rol: Administrador
-        Tienes acceso completo al sistema:
-        ✓ Crear nuevos registros
-        ✓ Editar registros existentes
-        ✓ Eliminar registros
-        ✓ Gestionar usuarios`
-        }
-        
-        Accede al sistema en: ${loginUrl}
-        
-        IMPORTANTE: Por seguridad, cambia tu contraseña después del primer inicio de sesión.
-        
-        Saludos,
-        Equipo RESEJ
-      `,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    logger.info(
-      `✓ Correo de credenciales enviado a: ${email} - MessageID: ${info.messageId}`
-    );
-
-    return {
-      success: true,
-      message: 'Correo enviado exitosamente',
-      messageId: info.messageId,
-    };
-  } catch (error) {
-    logger.error(`Error al enviar correo a ${email}: ${error.message}`);
+  // Si no está configurado el email, retornar éxito sin enviar
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.warn('Configuración de email no encontrada. Email no enviado.');
     return {
       success: false,
-      message: 'Error al enviar correo',
-      error: error.message,
+      message: 'Configuración de email no disponible',
     };
   }
-};
 
-/**
- * Enviar correo de restablecimiento de contraseña
- */
-const enviarRestablecimientoPassword = async (email, usuario, tokenReset) => {
+  const loginUrl = `${
+    process.env.FRONTEND_URL || 'http://localhost:5173'
+  }/login`;
+
+  const permisos =
+    rol === 'consulta'
+      ? '<strong>Solo podrás buscar y visualizar información.</strong> No podrás crear, editar o eliminar registros.'
+      : 'Tienes acceso completo al sistema.';
+
+  const mailOptions = {
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    to: email,
+    subject: 'Credenciales de acceso - Nuevo Usuario',
+    html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #333;">Bienvenido a la plataforma</h2>
+                <p>Se ha creado una cuenta para ti con las siguientes credenciales:</p>
+                <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 10px 0;"><strong>Usuario:</strong> ${usuario}</li>
+                        <li style="margin: 10px 0;"><strong>Contraseña:</strong> ${contraseña}</li>
+                        <li style="margin: 10px 0;"><strong>Rol:</strong> ${rol}</li>
+                    </ul>
+                </div>
+                <p><strong>Permisos:</strong> ${permisos}</p>
+                <p>Puedes acceder a la aplicación haciendo clic en el siguiente botón:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${loginUrl}" style="background-color: #4CAF50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Acceder a la aplicación</a>
+                </div>
+                <p style="color: #666; font-size: 14px;">O copia y pega este enlace en tu navegador:</p>
+                <p style="color: #2196F3; word-break: break-all;">${loginUrl}</p>
+                <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin-top: 20px;">
+                    <p style="margin: 0;"><strong>⚠️ Importante:</strong> Por seguridad, te recomendamos cambiar tu contraseña después del primer inicio de sesión.</p>
+                </div>
+            </div>
+        `,
+  };
+
   try {
-    if (
-      !process.env.EMAIL_USER ||
-      process.env.EMAIL_USER === 'tu-correo@gmail.com'
-    ) {
-      logger.warn('Email no configurado. No se enviará correo.');
-      return {
-        success: false,
-        message: 'Servicio de email no configurado',
-      };
-    }
-
-    const transporter = createTransporter();
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${tokenReset}`;
-
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: '🔑 Restablecimiento de Contraseña - Sistema RESEJ',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #dc3545; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
-            .button { display: inline-block; background: #dc3545; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
-            .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #ddd; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>🔑 Restablecimiento de Contraseña</h1>
-          </div>
-          
-          <div class="content">
-            <p>Hola <strong>${usuario}</strong>,</p>
-            
-            <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en el Sistema RESEJ.</p>
-            
-            <div style="text-align: center;">
-              <a href="${resetUrl}" class="button">Restablecer Contraseña</a>
-            </div>
-            
-            <p style="text-align: center; color: #666; font-size: 14px;">
-              O copia y pega este enlace en tu navegador:<br>
-              <a href="${resetUrl}">${resetUrl}</a>
-            </p>
-            
-            <div class="warning">
-              <strong>⚠️ Nota Importante:</strong>
-              <ul style="margin: 10px 0 0 20px;">
-                <li>Este enlace expirará en 1 hora</li>
-                <li>Si no solicitaste este cambio, ignora este correo</li>
-                <li>Tu contraseña actual seguirá siendo válida</li>
-              </ul>
-            </div>
-            
-            <p>Saludos,<br><strong>Equipo RESEJ</strong></p>
-          </div>
-          
-          <div class="footer">
-            <p>Este es un correo automático. Por favor, no responder.</p>
-          </div>
-        </body>
-        </html>
-      `,
-    };
-
     const info = await transporter.sendMail(mailOptions);
-
-    logger.info(`✓ Correo de restablecimiento enviado a: ${email}`);
-
+    console.log('Correo enviado:', info.messageId);
     return {
       success: true,
       message: 'Correo enviado exitosamente',
-      messageId: info.messageId,
     };
   } catch (error) {
-    logger.error(
-      `Error al enviar correo de restablecimiento a ${email}: ${error.message}`
-    );
+    console.error('Error al enviar correo:', error);
     return {
       success: false,
-      message: 'Error al enviar correo',
-      error: error.message,
+      message: `Error al enviar correo: ${error.message}`,
     };
   }
 };
 
 module.exports = {
   enviarCredencialesNuevoUsuario,
-  enviarRestablecimientoPassword,
-  verificarConfiguracion,
 };

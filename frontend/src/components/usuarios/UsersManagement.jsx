@@ -1,320 +1,433 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Button, Modal, Form, Badge } from 'react-bootstrap';
-import { fetchUsers, createUser, fetchRoles } from '../../api/api';
+import React, { useState, useEffect } from 'react';
+import api from '../../api/api';
+import './UsersManagement.css';
 
-export default function UsersManagement() {
-  const [users, setUsers] = useState([]);
+const UsersManagement = () => {
+  const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
-  const [show, setShow] = useState(false);
-  const [form, setForm] = useState({
-    usuario: '',
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
+
+  const [formData, setFormData] = useState({
+    username: '',
     nombre: '',
     apellido: '',
     email: '',
     password: '',
-    rol_id: 2, // Por defecto: usuario_consulta
+    rol_id: 2,
+    enviarEmail: true,
   });
-  const [enviarEmail, setEnviarEmail] = useState(true);
-  const [mensajeEmail, setMensajeEmail] = useState('');
 
   useEffect(() => {
-    load();
-    loadRoles();
+    cargarDatos();
   }, []);
 
-  async function load() {
+  const cargarDatos = async () => {
     try {
-      const res = await fetchUsers();
-      // asegura que users sea siempre array
-      let data = res?.data?.data || res?.data || [];
-      if (!Array.isArray(data)) data = [];
-      setUsers(data);
-    } catch (err) {
-      console.error('Error cargando usuarios:', err);
-      setUsers([]); // fallback
-    }
-  }
-
-  async function loadRoles() {
-    try {
-      const res = await fetchRoles();
-      let data = res?.data?.data || res?.data || [];
-      if (!Array.isArray(data)) data = [];
-      setRoles(data);
-    } catch (err) {
-      console.error('Error cargando roles:', err);
-      setRoles([]);
-    }
-  }
-
-  const handleCreate = async () => {
-    try {
-      // Validar que el email esté presente si se quiere enviar
-      if (enviarEmail && !form.email) {
-        alert('Por favor ingresa un email para enviar las credenciales');
-        return;
-      }
-
-      const datosUsuario = {
-        ...form,
-        enviarEmail: enviarEmail && form.email ? true : false,
-      };
-
-      const response = await createUser(datosUsuario);
-
-      // Mostrar mensaje sobre el envío del email
-      if (response.data?.data?.emailEnviado) {
-        setMensajeEmail('✓ Usuario creado y credenciales enviadas por email');
-        alert(
-          `Usuario creado exitosamente.\n\n✉️ Se han enviado las credenciales al correo: ${form.email}`
-        );
-      } else if (enviarEmail && form.email) {
-        setMensajeEmail('⚠ Usuario creado pero no se pudo enviar el email');
-        alert(
-          `Usuario creado exitosamente.\n\n⚠️ Advertencia: No se pudo enviar el correo con las credenciales.\n${
-            response.data?.data?.mensajeEmail ||
-            'Verifica la configuración del servidor de email.'
-          }`
-        );
-      } else {
-        alert('Usuario creado exitosamente');
-      }
-
-      setShow(false);
-      setForm({
-        usuario: '',
-        nombre: '',
-        apellido: '',
-        email: '',
-        password: '',
-        rol_id: 2,
-      });
-      setEnviarEmail(true);
-      setMensajeEmail('');
-      load();
-    } catch (err) {
-      console.error('Error creando usuario:', err);
-      alert(
-        `Error al crear usuario: ${err.response?.data?.message || err.message}`
-      );
+      setLoading(true);
+      await Promise.all([cargarUsuarios(), cargarRoles()]);
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      mostrarMensaje('error', 'Error al cargar los datos');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const cargarUsuarios = async () => {
+    try {
+      const response = await api.get('/usuarios');
+      console.log('Usuarios cargados:', response.data);
+      setUsuarios(response.data);
+    } catch (error) {
+      console.error('Error al cargar usuarios:', error);
+      throw error;
+    }
+  };
+
+  const cargarRoles = async () => {
+    try {
+      const response = await api.get('/usuarios/roles');
+      console.log('Roles cargados:', response.data);
+      setRoles(response.data);
+    } catch (error) {
+      console.error('Error al cargar roles:', error);
+      throw error;
+    }
+  };
+
+  const mostrarMensaje = (tipo, texto) => {
+    setMensaje({ tipo, texto });
+    setTimeout(() => setMensaje({ tipo: '', texto: '' }), 5000);
+  };
+
+  const handleChange = e => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    // Validaciones del lado del cliente
+    if (!formData.username.trim()) {
+      mostrarMensaje('error', 'El nombre de usuario es requerido');
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      mostrarMensaje('error', 'El email es requerido');
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      mostrarMensaje('error', 'La contraseña es requerida');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      mostrarMensaje('error', 'La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      mostrarMensaje('error', 'El formato del email no es válido');
+      return;
+    }
+
+    try {
+      console.log('========================================');
+      console.log('📤 INICIANDO CREACIÓN DE USUARIO');
+      console.log('FormData original:', formData);
+
+      const dataToSend = {
+        username: formData.username.trim(),
+        nombre: formData.nombre.trim() || null,
+        apellido: formData.apellido.trim() || null,
+        email: formData.email.trim(),
+        password: formData.password,
+        rol_id: parseInt(formData.rol_id),
+        enviarEmail: formData.enviarEmail,
+      };
+
+      console.log('📋 Datos preparados para enviar:');
+      console.log(JSON.stringify(dataToSend, null, 2));
+      console.log('========================================');
+
+      const response = await api.post('/usuarios', dataToSend);
+
+      console.log('✅ Respuesta exitosa del servidor:');
+      console.log(JSON.stringify(response.data, null, 2));
+      console.log('========================================');
+
+      if (response.data.success) {
+        let mensajeExito = 'Usuario creado exitosamente';
+        if (formData.enviarEmail) {
+          if (response.data.emailEnviado) {
+            mensajeExito += ' y correo enviado';
+          } else {
+            mensajeExito += ` (${
+              response.data.mensajeEmail || 'pero no se pudo enviar el correo'
+            })`;
+          }
+        }
+
+        mostrarMensaje('success', mensajeExito);
+
+        // Resetear formulario
+        setFormData({
+          username: '',
+          nombre: '',
+          apellido: '',
+          email: '',
+          password: '',
+          rol_id: 2,
+          enviarEmail: true,
+        });
+
+        setShowModal(false);
+        await cargarUsuarios();
+      }
+    } catch (error) {
+      console.error('========================================');
+      console.error('❌ ERROR AL CREAR USUARIO');
+      console.error('Error completo:', error);
+      console.error('Mensaje:', error.message);
+      console.error('Código de estado:', error.response?.status);
+      console.error('Datos de respuesta:', error.response?.data);
+      console.error('Headers de respuesta:', error.response?.headers);
+      console.error('========================================');
+
+      const mensajeError =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'Error al crear el usuario';
+
+      mostrarMensaje('error', mensajeError);
+    }
+  };
+
+  const handleEliminar = async id => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/usuarios/${id}`);
+      mostrarMensaje('success', 'Usuario eliminado exitosamente');
+      await cargarUsuarios();
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error);
+      const mensajeError =
+        error.response?.data?.error || 'Error al eliminar el usuario';
+      mostrarMensaje('error', mensajeError);
+    }
+  };
+
+  const rolSeleccionado = roles.find(r => r.id === parseInt(formData.rol_id));
+
+  if (loading) {
+    return <div className="loading">Cargando...</div>;
+  }
+
   return (
-    <Card className="p-3 shadow-sm">
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6>👥 Gestión de Usuarios</h6>
-        <Button size="sm" onClick={() => setShow(true)}>
-          Crear Nuevo Usuario
-        </Button>
+    <div className="users-management">
+      <div className="header">
+        <h2>Gestión de Usuarios</h2>
+        <button className="btn-primary" onClick={() => setShowModal(true)}>
+          + Crear Usuario
+        </button>
       </div>
 
-      <Table size="sm" striped bordered hover>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Usuario</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.length === 0 ? (
+      {mensaje.texto && (
+        <div className={`mensaje mensaje-${mensaje.tipo}`}>{mensaje.texto}</div>
+      )}
+
+      <div className="usuarios-lista">
+        <table>
+          <thead>
             <tr>
-              <td colSpan="6" className="text-center">
-                No hay usuarios registrados
-              </td>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Fecha Creación</th>
+              <th>Acciones</th>
             </tr>
-          ) : (
-            users.map(u => (
-              <tr key={u.id}>
-                <td>{u.id}</td>
-                <td>{u.usuario}</td>
+          </thead>
+          <tbody>
+            {usuarios.map(usuario => (
+              <tr key={usuario.id}>
+                <td>{usuario.id}</td>
+                <td>{usuario.username}</td>
                 <td>
-                  {u.nombre} {u.apellido}
+                  {usuario.nombre} {usuario.apellido}
                 </td>
+                <td>{usuario.email}</td>
                 <td>
-                  {u.email || <span className="text-muted">Sin email</span>}
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      u.rol === 'administrador' ? 'bg-danger' : 'bg-info'
-                    }`}
-                  >
-                    {u.rol === 'administrador' ? '👑 Admin' : '👤 Usuario'}
+                  <span className={`badge badge-${usuario.rol}`}>
+                    {usuario.rol}
                   </span>
                 </td>
+                <td>{new Date(usuario.created_at).toLocaleDateString()}</td>
                 <td>
-                  <span
-                    className={`badge ${
-                      u.activo ? 'bg-success' : 'bg-secondary'
-                    }`}
+                  <button
+                    className="btn-danger btn-sm"
+                    onClick={() => handleEliminar(usuario.id)}
+                    disabled={usuario.id === 1}
                   >
-                    {u.activo ? '✓ Activo' : '✗ Inactivo'}
-                  </span>
+                    Eliminar
+                  </button>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </Table>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Modal para crear usuario */}
-      <Modal show={show} onHide={() => setShow(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Crear Usuario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Usuario</Form.Label>
-              <Form.Control
-                value={form.usuario}
-                onChange={e => setForm({ ...form, usuario: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control
-                value={form.nombre}
-                onChange={e => setForm({ ...form, nombre: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Apellido</Form.Label>
-              <Form.Control
-                value={form.apellido}
-                onChange={e => setForm({ ...form, apellido: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>📧 Email</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="usuario@example.com"
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-              />
-              <Form.Text className="text-muted">
-                Necesario para enviar las credenciales por correo
-              </Form.Text>
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Rol</Form.Label>
-              <Form.Select
-                value={form.rol_id}
-                onChange={e =>
-                  setForm({ ...form, rol_id: parseInt(e.target.value) })
-                }
-              >
-                {roles.length > 0 ? (
-                  roles.map(rol => (
-                    <option key={rol.id} value={rol.id}>
-                      {rol.nombre === 'administrador'
-                        ? '👑 Administrador'
-                        : '👤 Usuario Consulta'}{' '}
-                      - {rol.descripcion}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="2">
-                      👤 Usuario Consulta - Solo puede consultar
-                    </option>
-                    <option value="1">
-                      👑 Administrador - Acceso completo
-                    </option>
-                  </>
-                )}
-              </Form.Select>
-              {roles.length > 0 && form.rol_id && (
-                <Form.Text className="text-muted">
-                  {(() => {
-                    const selectedRole = roles.find(r => r.id === form.rol_id);
-                    if (!selectedRole) return null;
-                    return (
-                      <div className="mt-2">
-                        <strong>Permisos:</strong>
-                        <div className="ms-2">
-                          {selectedRole.puede_consultar && (
-                            <Badge bg="info" className="me-1">
-                              Consultar
-                            </Badge>
-                          )}
-                          {selectedRole.puede_crear && (
-                            <Badge bg="success" className="me-1">
-                              Crear
-                            </Badge>
-                          )}
-                          {selectedRole.puede_editar && (
-                            <Badge bg="warning" className="me-1">
-                              Editar
-                            </Badge>
-                          )}
-                          {selectedRole.puede_eliminar && (
-                            <Badge bg="danger" className="me-1">
-                              Eliminar
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </Form.Text>
-              )}
-            </Form.Group>
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Crear Nuevo Usuario</h3>
+              <button className="btn-close" onClick={() => setShowModal(false)}>
+                ×
+              </button>
+            </div>
 
-            <hr />
-
-            <Form.Group className="mb-3">
-              <Form.Check
-                type="checkbox"
-                id="enviarEmailCheck"
-                checked={enviarEmail}
-                onChange={e => setEnviarEmail(e.target.checked)}
-                label={
-                  <span>
-                    <strong>✉️ Enviar credenciales por email</strong>
-                    <br />
-                    <small className="text-muted">
-                      El usuario recibirá un correo con su usuario, contraseña y
-                      un link de acceso directo
-                    </small>
-                  </span>
-                }
-              />
-            </Form.Group>
-
-            {mensajeEmail && (
-              <div
-                className={`alert ${
-                  mensajeEmail.includes('✓') ? 'alert-success' : 'alert-warning'
-                } py-2`}
-              >
-                <small>{mensajeEmail}</small>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="username">Usuario *</label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="Nombre de usuario"
+                />
               </div>
-            )}
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShow(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleCreate}>Crear</Button>
-        </Modal.Footer>
-      </Modal>
-    </Card>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="nombre">Nombre</label>
+                  <input
+                    type="text"
+                    id="nombre"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Nombre"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="apellido">Apellido</label>
+                  <input
+                    type="text"
+                    id="apellido"
+                    name="apellido"
+                    value={formData.apellido}
+                    onChange={handleChange}
+                    placeholder="Apellido"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">Contraseña *</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  minLength="6"
+                  placeholder="Mínimo 6 caracteres"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="rol_id">Rol de Usuario *</label>
+                <select
+                  id="rol_id"
+                  name="rol_id"
+                  value={formData.rol_id}
+                  onChange={handleChange}
+                  required
+                >
+                  {roles.map(rol => (
+                    <option key={rol.id} value={rol.id}>
+                      {rol.nombre.charAt(0).toUpperCase() + rol.nombre.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                {rolSeleccionado && (
+                  <small className="rol-descripcion">
+                    {rolSeleccionado.descripcion}
+                  </small>
+                )}
+              </div>
+
+              <div className="form-group-checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="enviarEmail"
+                    checked={formData.enviarEmail}
+                    onChange={handleChange}
+                  />
+                  <span>Enviar credenciales por correo electrónico</span>
+                </label>
+                <small>
+                  El usuario recibirá un email con sus credenciales y un enlace
+                  para acceder
+                </small>
+              </div>
+
+              {rolSeleccionado && (
+                <div className="permisos-info">
+                  <h4>Permisos del rol:</h4>
+                  <ul>
+                    <li
+                      className={
+                        rolSeleccionado.puede_consultar
+                          ? 'permiso-si'
+                          : 'permiso-no'
+                      }
+                    >
+                      {rolSeleccionado.puede_consultar ? '✓' : '✗'} Consultar
+                    </li>
+                    <li
+                      className={
+                        rolSeleccionado.puede_crear
+                          ? 'permiso-si'
+                          : 'permiso-no'
+                      }
+                    >
+                      {rolSeleccionado.puede_crear ? '✓' : '✗'} Crear
+                    </li>
+                    <li
+                      className={
+                        rolSeleccionado.puede_editar
+                          ? 'permiso-si'
+                          : 'permiso-no'
+                      }
+                    >
+                      {rolSeleccionado.puede_editar ? '✓' : '✗'} Editar
+                    </li>
+                    <li
+                      className={
+                        rolSeleccionado.puede_eliminar
+                          ? 'permiso-si'
+                          : 'permiso-no'
+                      }
+                    >
+                      {rolSeleccionado.puede_eliminar ? '✓' : '✗'} Eliminar
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-primary">
+                  Crear Usuario
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
-}
+};
+
+export default UsersManagement;
