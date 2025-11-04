@@ -16,6 +16,7 @@ import AccionProtegida from '../AccionProtegida';
 export default function Registros() {
   const [registros, setRegistros] = useState([]);
   const [term, setTerm] = useState('');
+  const [searchField, setSearchField] = useState('all'); // Campo de búsqueda seleccionado
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
@@ -50,11 +51,18 @@ export default function Registros() {
   const handleSearch = e => {
     e.preventDefault();
     const params = { termino: term };
+    
+    // Si se seleccionó un campo específico, agregarlo a los parámetros
+    if (searchField !== 'all') {
+      params.campo = searchField;
+    }
+    
     load(params);
   };
 
   const handleClearFilters = () => {
     setTerm('');
+    setSearchField('all');
     load({});
   };
 
@@ -177,9 +185,51 @@ export default function Registros() {
 
         <Form onSubmit={handleSearch}>
           <Row className="mb-3">
-            <Col md={12}>
+            <Col md={3}>
+              <Form.Label>Buscar por:</Form.Label>
+              <Form.Select
+                value={searchField}
+                onChange={e => setSearchField(e.target.value)}
+                disabled={loading}
+              >
+                <option value="all">🔍 Todos los campos</option>
+                <option value="persona">👤 Persona</option>
+                <option value="dni">🆔 DNI</option>
+                <option value="numero_legajo">📋 Nº Legajo</option>
+                <option value="numero_causa">⚖️ Nº Causa</option>
+                <option value="ufi">🏢 UFI</option>
+                <option value="numero_protocolo">📄 Nº Protocolo</option>
+                <option value="cadena_custodia">🔗 Cadena de Custodia</option>
+                <option value="detalle_secuestro">📝 Detalle</option>
+                <option value="of_a_cargo">👮 Oficial a Cargo</option>
+              </Form.Select>
+            </Col>
+            <Col md={9}>
+              <Form.Label>Término de búsqueda:</Form.Label>
               <Form.Control
-                placeholder="Ingrese término de búsqueda (persona, DNI, legajo, UFI, protocolo...)"
+                placeholder={
+                  searchField === 'all'
+                    ? 'Buscar en todos los campos...'
+                    : `Buscar por ${
+                        searchField === 'persona'
+                          ? 'nombre de persona'
+                          : searchField === 'dni'
+                          ? 'DNI'
+                          : searchField === 'numero_legajo'
+                          ? 'número de legajo'
+                          : searchField === 'numero_causa'
+                          ? 'número de causa'
+                          : searchField === 'ufi'
+                          ? 'UFI'
+                          : searchField === 'numero_protocolo'
+                          ? 'número de protocolo'
+                          : searchField === 'cadena_custodia'
+                          ? 'cadena de custodia'
+                          : searchField === 'detalle_secuestro'
+                          ? 'detalle del secuestro'
+                          : 'oficial a cargo'
+                      }...`
+                }
                 value={term}
                 onChange={e => setTerm(e.target.value)}
                 disabled={loading}
@@ -188,14 +238,14 @@ export default function Registros() {
           </Row>
           <div className="d-flex gap-2 mb-3">
             <Button type="submit" variant="dark" disabled={loading}>
-              {loading ? 'Buscando...' : 'BUSCAR'}
+              {loading ? '🔄 Buscando...' : '🔍 BUSCAR'}
             </Button>
             <Button
               variant="outline-secondary"
               onClick={handleClearFilters}
               disabled={loading}
             >
-              LIMPIAR FILTROS
+              🗑️ LIMPIAR FILTROS
             </Button>
           </div>
         </Form>

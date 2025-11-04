@@ -118,17 +118,28 @@ class Registro {
             .orWhere('r.ufi', 'ilike', `%${termino}%`)
             .orWhere('r.numero_protocolo', 'ilike', `%${termino}%`)
             .orWhere('r.numero_causa', 'ilike', `%${termino}%`)
-            .orWhere('r.detalle_secuestro', 'ilike', `%${termino}%`);
+            .orWhere('r.detalle_secuestro', 'ilike', `%${termino}%`)
+            .orWhere('r.cadena_custodia', 'ilike', `%${termino}%`)
+            .orWhere('r.of_a_cargo', 'ilike', `%${termino}%`);
         } else if (criterio === 'persona') {
           this.where('p.nombre', 'ilike', `%${termino}%`)
-            .orWhere('p.apellido', 'ilike', `%${termino}%`)
-            .orWhere('p.dni', 'ilike', `%${termino}%`);
+            .orWhere('p.apellido', 'ilike', `%${termino}%`);
+        } else if (criterio === 'dni') {
+          this.where('p.dni', 'ilike', `%${termino}%`);
         } else if (criterio === 'legajo') {
           this.where('r.numero_legajo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'causa') {
+          this.where('r.numero_causa', 'ilike', `%${termino}%`);
         } else if (criterio === 'ufi') {
           this.where('r.ufi', 'ilike', `%${termino}%`);
         } else if (criterio === 'protocolo') {
           this.where('r.numero_protocolo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'cadena_custodia') {
+          this.where('r.cadena_custodia', 'ilike', `%${termino}%`);
+        } else if (criterio === 'detalle') {
+          this.where('r.detalle_secuestro', 'ilike', `%${termino}%`);
+        } else if (criterio === 'oficial') {
+          this.where('r.of_a_cargo', 'ilike', `%${termino}%`);
         }
       });
     }

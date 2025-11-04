@@ -32,15 +32,32 @@ class RegistrosController {
       const {
         termino,
         criterio,
+        campo, // Nuevo parámetro desde frontend
         page,
         limit,
         estado_causa,
         fecha_desde,
         fecha_hasta,
       } = req.query;
+      
+      // Mapear 'campo' a 'criterio' si se proporciona
+      let criterioFinal = criterio || campo || 'todos';
+      
+      // Mapear nombres de campos específicos
+      if (campo === 'all') criterioFinal = 'todos';
+      if (campo === 'persona') criterioFinal = 'persona';
+      if (campo === 'dni') criterioFinal = 'dni';
+      if (campo === 'numero_legajo') criterioFinal = 'legajo';
+      if (campo === 'numero_causa') criterioFinal = 'causa';
+      if (campo === 'ufi') criterioFinal = 'ufi';
+      if (campo === 'numero_protocolo') criterioFinal = 'protocolo';
+      if (campo === 'cadena_custodia') criterioFinal = 'cadena_custodia';
+      if (campo === 'detalle_secuestro') criterioFinal = 'detalle';
+      if (campo === 'of_a_cargo') criterioFinal = 'oficial';
+      
       const result = await RegistroService.searchRegistros({
         termino,
-        criterio: criterio || 'todos',
+        criterio: criterioFinal,
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 10,
         estado_causa,
