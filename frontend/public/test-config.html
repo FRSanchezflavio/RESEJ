@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Configuración RESEJ</title>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          max-width: 800px;
+          margin: 50px auto;
+          padding: 20px;
+          background: #f5f5f5;
+      }
+      .test-box {
+          background: white;
+          padding: 20px;
+          margin: 10px 0;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .success { border-left: 4px solid #28a745; }
+      .error { border-left: 4px solid #dc3545; }
+      .info { border-left: 4px solid #17a2b8; }
+      button {
+          background: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          cursor: pointer;
+          margin: 5px;
+      }
+      button:hover { background: #0056b3; }
+      pre {
+          background: #f8f9fa;
+          padding: 10px;
+          border-radius: 4px;
+          overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 Test de Configuración RESEJ</h1>
+
+    <div class="test-box info">
+      <h3>📍 Información del Cliente</h3>
+      <p>
+        <strong>Tu IP/Host:</strong> <span id="clientInfo">Detectando...</span>
+      </p>
+      <p><strong>URL Actual:</strong> <span id="currentUrl"></span></p>
+    </div>
+
+    <div class="test-box info">
+      <h3>🎯 Configuración del Backend</h3>
+      <p><strong>API URL esperada:</strong> http://192.168.1.23:3000/api</p>
+    </div>
+
+    <div class="test-box" id="healthTest">
+      <h3>🏥 Test 1: Health Check Backend</h3>
+      <button onclick="testHealth()">Probar Backend</button>
+      <pre id="healthResult">Presiona el botón para probar...</pre>
+    </div>
+
+    <div class="test-box" id="loginTest">
+      <h3>🔐 Test 2: Login de Prueba</h3>
+      <input
+        type="text"
+        id="username"
+        placeholder="Usuario"
+        value="oficialruiz"
+        style="padding: 8px; margin: 5px;"
+      />
+      <input
+        type="password"
+        id="password"
+        placeholder="Contraseña"
+        style="padding: 8px; margin: 5px;"
+      />
+      <br />
+      <button onclick="testLogin()">Probar Login</button>
+      <pre id="loginResult">Ingresa credenciales y presiona el botón...</pre>
+    </div>
+
+    <script>
+      // Mostrar info del cliente
+      document.getElementById('currentUrl').textContent = window.location.href;
+      document.getElementById('clientInfo').textContent = window.location.hostname;
+
+      async function testHealth() {
+          const result = document.getElementById('healthResult');
+          const box = document.getElementById('healthTest');
+          result.textContent = '⏳ Probando conexión...';
+
+          try {
+              const response = await fetch('http://192.168.1.23:3000/health');
+              const data = await response.json();
+
+              result.textContent = JSON.stringify(data, null, 2);
+              box.className = 'test-box success';
+              result.textContent = '✅ ÉXITO!\\n\\n' + JSON.stringify(data, null, 2);
+          } catch (error) {
+              box.className = 'test-box error';
+              result.textContent = '❌ ERROR:\\n\\n' + error.message + '\\n\\nAsegúrate de que el backend esté corriendo en puerto 3000';
+          }
+      }
+
+      async function testLogin() {
+          const result = document.getElementById('loginResult');
+          const box = document.getElementById('loginTest');
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+
+          if (!username || !password) {
+              result.textContent = '⚠️  Por favor ingresa usuario y contraseña';
+              return;
+          }
+
+          result.textContent = '⏳ Intentando login...';
+
+          try {
+              const response = await fetch('http://192.168.1.23:3000/api/auth/login', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ usuario: username, password: password })
+              });
+
+              const data = await response.json();
+
+              if (response.ok) {
+                  box.className = 'test-box success';
+                  result.textContent = '✅ LOGIN EXITOSO!\\n\\n' + JSON.stringify(data, null, 2);
+              } else {
+                  box.className = 'test-box error';
+                  result.textContent = '❌ LOGIN FALLIDO:\\n\\nStatus: ' + response.status + '\\n' + JSON.stringify(data, null, 2);
+              }
+          } catch (error) {
+              box.className = 'test-box error';
+              result.textContent = '❌ ERROR DE CONEXIÓN:\\n\\n' + error.message;
+          }
+      }
+    </script>
+  </body>
+</html>

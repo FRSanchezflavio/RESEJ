@@ -31,4 +31,19 @@ router.delete(
   usuariosController.eliminarUsuario
 );
 
+// Rutas para tokens de acceso temporal
+router.post(
+  '/generar-enlace-acceso',
+  authenticateToken,
+  verificarPermiso('crear'),
+  usuariosController.generarEnlaceAcceso
+);
+router.post('/validar-token-acceso', usuariosController.validarTokenAcceso);
+router.get(
+  '/tokens-activos',
+  authenticateToken,
+  verificarPermiso('crear'),
+  usuariosController.listarTokensActivos
+);
+
 module.exports = router;

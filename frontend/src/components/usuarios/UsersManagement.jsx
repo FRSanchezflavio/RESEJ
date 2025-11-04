@@ -7,7 +7,10 @@ const UsersManagement = () => {
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
+  const [enlaceGenerado, setEnlaceGenerado] = useState(null);
+  const [copiado, setCopiado] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -21,6 +24,7 @@ const UsersManagement = () => {
 
   useEffect(() => {
     cargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cargarDatos = async () => {
@@ -189,6 +193,74 @@ const UsersManagement = () => {
     }
   };
 
+  const handleGenerarEnlace = async (usuarioId, username) => {
+    try {
+      console.log('🔗 Generando enlace de acceso para usuario:', usuarioId);
+      const response = await api.post('/usuarios/generar-enlace-acceso', {
+        usuario_id: usuarioId,
+      });
+
+      if (response.data.success) {
+        console.log('✅ Enlace generado:', response.data);
+        const data = response.data.data || response.data;
+        setEnlaceGenerado({
+          enlace: data.enlace,
+          usuarioDestino: username,
+          rolDestino: data.rol_destino,
+          validoHasta: data.valido_hasta,
+          tiempoRestante: calcularTiempoRestante(data.valido_hasta),
+        });
+        setShowLinkModal(true);
+        setCopiado(false);
+      }
+    } catch (error) {
+      console.error('❌ Error al generar enlace:', error);
+      const mensajeError =
+        error.response?.data?.error || 'Error al generar el enlace de acceso';
+      mostrarMensaje('error', mensajeError);
+    }
+  };
+
+  const copiarAlPortapapeles = () => {
+    if (enlaceGenerado?.enlace) {
+      navigator.clipboard
+        .writeText(enlaceGenerado.enlace)
+        .then(() => {
+          setCopiado(true);
+          setTimeout(() => setCopiado(false), 3000);
+          console.log('📋 Enlace copiado al portapapeles');
+        })
+        .catch(err => {
+          console.error('Error al copiar:', err);
+          mostrarMensaje('error', 'No se pudo copiar el enlace');
+        });
+    }
+  };
+
+  const formatearFecha = fecha => {
+    const date = new Date(fecha);
+    return date.toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const calcularTiempoRestante = fechaExpiracion => {
+    const ahora = new Date();
+    const expiracion = new Date(fechaExpiracion);
+    const diferencia = expiracion - ahora;
+
+    if (diferencia <= 0) return 'Expirado';
+
+    const horas = Math.floor(diferencia / (1000 * 60 * 60));
+    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${horas}h ${minutos}m`;
+  };
+
   const rolSeleccionado = roles.find(r => r.id === parseInt(formData.rol_id));
 
   if (loading) {
@@ -237,6 +309,15 @@ const UsersManagement = () => {
                 </td>
                 <td>{new Date(usuario.created_at).toLocaleDateString()}</td>
                 <td>
+                  <button
+                    className="btn-link btn-sm"
+                    onClick={() =>
+                      handleGenerarEnlace(usuario.id, usuario.username)
+                    }
+                    title="Generar enlace de acceso temporal"
+                  >
+                    🔗
+                  </button>
                   <button
                     className="btn-danger btn-sm"
                     onClick={() => handleEliminar(usuario.id)}
@@ -423,6 +504,92 @@ const UsersManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showLinkModal && enlaceGenerado && (
+        <div className="modal-overlay" onClick={() => setShowLinkModal(false)}>
+          <div
+            className="modal-content modal-link"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h3>🔗 Enlace de Acceso Temporal</h3>
+              <button
+                className="btn-close"
+                onClick={() => setShowLinkModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="link-info">
+                <div className="info-item">
+                  <strong>Usuario destino:</strong>{' '}
+                  {enlaceGenerado.usuarioDestino}
+                </div>
+                <div className="info-item">
+                  <strong>Rol:</strong>{' '}
+                  <span className={`badge badge-${enlaceGenerado.rolDestino}`}>
+                    {enlaceGenerado.rolDestino}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <strong>Válido hasta:</strong>{' '}
+                  {formatearFecha(enlaceGenerado.validoHasta)}
+                </div>
+                <div className="info-item">
+                  <strong>Tiempo restante:</strong>{' '}
+                  <span className="badge badge-tiempo">
+                    {enlaceGenerado.tiempoRestante}
+                  </span>
+                </div>
+              </div>
+
+              <div className="link-container">
+                <label>Enlace de acceso:</label>
+                <div className="link-box">{enlaceGenerado.enlace}</div>
+                <button
+                  className={`btn-copy ${copiado ? 'copiado' : ''}`}
+                  onClick={copiarAlPortapapeles}
+                >
+                  {copiado ? '✓ Copiado' : '📋 Copiar enlace'}
+                </button>
+              </div>
+
+              <div className="advertencias">
+                <div className="advertencia-warning">
+                  <strong>⚠️ Importante:</strong>
+                  <ul>
+                    <li>Este enlace solo puede ser usado UNA vez</li>
+                    <li>Expira automáticamente en 24 horas</li>
+                    <li>No envíes este enlace por canales inseguros</li>
+                  </ul>
+                </div>
+                <div className="advertencia-info">
+                  <strong>ℹ️ Recomendaciones:</strong>
+                  <ul>
+                    <li>Comparte el enlace directamente con el usuario</li>
+                    <li>Verifica la identidad antes de compartir</li>
+                    <li>
+                      El enlace está configurado para tu red local (
+                      {enlaceGenerado.enlace.split('/')[2]})
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setShowLinkModal(false)}
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}

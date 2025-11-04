@@ -2,6 +2,7 @@ require('dotenv').config();
 const app = require('./src/app');
 const logger = require('./src/utils/logger');
 const db = require('./src/config/database');
+const { iniciarTareasProgramadas } = require('./src/utils/scheduler');
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -29,6 +30,9 @@ const startServer = async () => {
       logger.info(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`⏰ Timestamp: ${new Date().toISOString()}`);
       logger.info(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+
+      // Iniciar tareas programadas
+      iniciarTareasProgramadas();
     });
   } catch (error) {
     logger.error('❌ Error al iniciar el servidor:', error);

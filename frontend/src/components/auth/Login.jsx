@@ -1,15 +1,76 @@
-import React, { useContext, useState } from "react";
-import { Container, Card, Form, Button, Alert } from "react-bootstrap";
-import { loginRequest } from "../../api/api";
-import { AuthContext } from "../../context/AuthContext";
-import { usePermisos } from "../../context/usePermisos";
+import React, { useContext, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { loginRequest } from '../../api/api';
+import api from '../../api/api';
+import { AuthContext } from '../../context/AuthContext';
+import { usePermisos } from '../../context/usePermisos';
 
 export default function Login() {
   const { login } = useContext(AuthContext);
   const { actualizarPermisos } = usePermisos();
+  const [searchParams] = useSearchParams();
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
+  const [validandoToken, setValidandoToken] = useState(false);
+  const [infoToken, setInfoToken] = useState('');
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      validarTokenAcceso(token);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const validarTokenAcceso = async token => {
+    setValidandoToken(true);
+    setInfoToken('Validando enlace de acceso temporal...');
+    setErr('');
+
+    try {
+      console.log('🔗 Validando token de acceso:', token);
+      const response = await api.post('/usuarios/validar-token-acceso', {
+        token,
+      });
+
+      if (response.data.success && response.data.token_valido) {
+        console.log('✅ Token válido, iniciando sesión automática');
+        const jwtToken = response.data.jwt_token;
+        const permisos = response.data.permisos;
+        const usuarioData = response.data.usuario;
+
+        // Guardar permisos
+        if (permisos) {
+          actualizarPermisos(permisos);
+          console.log('Permisos del usuario:', permisos);
+        }
+
+        // Guardar usuario en localStorage
+        if (usuarioData) {
+          localStorage.setItem('usuario', JSON.stringify(usuarioData));
+        }
+
+        setInfoToken(
+          `¡Bienvenido ${usuarioData?.username || 'Usuario'}! Redirigiendo...`
+        );
+
+        // Login automático
+        setTimeout(() => {
+          login(jwtToken);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('❌ Error al validar token:', error);
+      const mensajeError =
+        error.response?.data?.error ||
+        'El enlace de acceso no es válido o ha expirado';
+      setErr(mensajeError);
+      setInfoToken('Por favor, inicia sesión con tu usuario y contraseña.');
+      setValidandoToken(false);
+    }
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -42,6 +103,30 @@ export default function Login() {
     }
   };
 
+  if (validandoToken) {
+    return (
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '80vh' }}
+      >
+        <Card
+          style={{
+            width: 420,
+            padding: 30,
+            boxShadow: '0 2px 8px rgba(0,0,0,.08)',
+            textAlign: 'center',
+          }}
+        >
+          <Spinner animation="border" variant="primary" className="mb-3" />
+          <h5>{infoToken}</h5>
+          <p className="text-muted mt-2" style={{ fontSize: '14px' }}>
+            Estás accediendo con un enlace temporal de un solo uso
+          </p>
+        </Card>
+      </Container>
+    );
+  }
+
   return (
     <Container
       className="d-flex justify-content-center align-items-center"
@@ -56,6 +141,7 @@ export default function Login() {
       >
         <h4 className="mb-3">Iniciar Sesión</h4>
         {err && <Alert variant="danger">{err}</Alert>}
+        {infoToken && !err && <Alert variant="info">{infoToken}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Nombre de usuario</Form.Label>

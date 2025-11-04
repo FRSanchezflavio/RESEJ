@@ -1,6 +1,12 @@
 const bcrypt = require('bcryptjs');
 const db = require('../config/database');
+const jwt = require('jsonwebtoken');
+const os = require('os');
 const { enviarCredencialesNuevoUsuario } = require('../services/emailService');
+const {
+  generarTokenTemporal,
+  validarTokenTemporal,
+} = require('../middleware/tokenAcceso');
 
 const crearUsuario = async (req, res) => {
   try {
@@ -296,11 +302,9 @@ const eliminarUsuario = async (req, res) => {
     // No permitir eliminar al admin principal
     const usuario = await db('usuarios').where({ id }).first();
     if (usuario && usuario.id === 1) {
-      return res
-        .status(403)
-        .json({
-          error: 'No se puede eliminar el usuario administrador principal',
-        });
+      return res.status(403).json({
+        error: 'No se puede eliminar el usuario administrador principal',
+      });
     }
 
     await db('usuarios').where({ id }).del();
@@ -315,10 +319,264 @@ const eliminarUsuario = async (req, res) => {
   }
 };
 
+/**
+ * Genera un enlace de acceso temporal para un usuario
+ */
+const generarEnlaceAcceso = async (req, res) => {
+  try {
+    console.log('========================================');
+    console.log('🔗 GENERANDO ENLACE DE ACCESO TEMPORAL');
+    const { usuario_id } = req.body;
+    const adminId = req.user.id;
+
+    console.log('- Usuario destino ID:', usuario_id);
+    console.log('- Generado por ID:', adminId);
+
+    // Validar que el usuario existe y está activo
+    const usuario = await db('usuarios')
+      .join('roles', 'usuarios.rol_id', 'roles.id')
+      .where('usuarios.id', usuario_id)
+      .select('usuarios.*', 'roles.nombre as rol')
+      .first();
+
+    if (!usuario) {
+      console.log('❌ Usuario no encontrado');
+      return res.status(404).json({
+        success: false,
+        error: 'Usuario no encontrado',
+      });
+    }
+
+    if (!usuario.activo) {
+      console.log('❌ Usuario inactivo');
+      return res.status(400).json({
+        success: false,
+        error: 'El usuario no está activo',
+      });
+    }
+
+    console.log('✅ Usuario encontrado:', usuario.usuario);
+
+    // Generar token temporal
+    const { token, fecha_expiracion } = await generarTokenTemporal(
+      usuario_id,
+      adminId
+    );
+    console.log('✅ Token generado exitosamente');
+
+    // Obtener IP local del servidor (priorizar redes locales)
+    const networkInterfaces = os.networkInterfaces();
+    let ipLocal = 'localhost';
+    let ipEncontrada = false;
+
+    // Buscar IPs de red local (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+    for (const interfaceName in networkInterfaces) {
+      if (ipEncontrada) break;
+      const interfaces = networkInterfaces[interfaceName];
+      for (const iface of interfaces) {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          const ip = iface.address;
+          // Priorizar IPs de red local
+          if (
+            ip.startsWith('192.168.') ||
+            ip.startsWith('10.') ||
+            (ip.startsWith('172.') &&
+              parseInt(ip.split('.')[1]) >= 16 &&
+              parseInt(ip.split('.')[1]) <= 31)
+          ) {
+            ipLocal = ip;
+            ipEncontrada = true;
+            console.log('📡 IP de red local detectada:', ipLocal);
+            break;
+          }
+        }
+      }
+    }
+
+    // Si no se encontró IP de red local, usar cualquier IP no interna
+    if (ipLocal === 'localhost') {
+      for (const interfaceName in networkInterfaces) {
+        const interfaces = networkInterfaces[interfaceName];
+        for (const iface of interfaces) {
+          if (iface.family === 'IPv4' && !iface.internal) {
+            ipLocal = iface.address;
+            console.log('📡 IP detectada:', ipLocal);
+            break;
+          }
+        }
+        if (ipLocal !== 'localhost') break;
+      }
+    }
+
+    // Construir URL de acceso
+    const puertoFrontend = process.env.FRONTEND_PORT || '5173';
+    const frontendUrl =
+      process.env.FRONTEND_URL || `http://${ipLocal}:${puertoFrontend}`;
+    const enlaceAcceso = `${frontendUrl}/login?token=${token}`;
+
+    console.log('🌐 URL generada:', enlaceAcceso);
+
+    // Registrar en logs de auditoría
+    await db('logs_auditoria').insert({
+      usuario_id: adminId,
+      accion: 'GENERAR_ENLACE_ACCESO',
+      recurso_tipo: 'tokens_acceso_temporal',
+      recurso_id: usuario_id,
+      detalles: {
+        usuario_destino: usuario.usuario,
+        valido_hasta: fecha_expiracion,
+      },
+    });
+
+    console.log('✅ ENLACE GENERADO EXITOSAMENTE');
+    console.log('========================================\n');
+
+    res.json({
+      success: true,
+      data: {
+        enlace: enlaceAcceso,
+        usuario_destino: usuario.usuario,
+        rol_destino: usuario.rol,
+        valido_hasta: fecha_expiracion,
+        un_solo_uso: true,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Error al generar enlace de acceso:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al generar enlace de acceso',
+    });
+  }
+};
+
+/**
+ * Valida un token temporal y retorna el JWT
+ */
+const validarTokenAcceso = async (req, res) => {
+  try {
+    console.log('========================================');
+    console.log('🔍 VALIDANDO TOKEN DE ACCESO TEMPORAL');
+
+    const { token } = req.body;
+    const ipCliente = req.ip || req.connection.remoteAddress;
+
+    console.log(
+      '- Token recibido:',
+      token ? token.substring(0, 10) + '...' : 'ninguno'
+    );
+    console.log('- IP Cliente:', ipCliente);
+
+    if (!token) {
+      console.log('❌ Token no proporcionado');
+      return res.status(400).json({
+        success: false,
+        error: 'Token no proporcionado',
+      });
+    }
+
+    const resultado = await validarTokenTemporal(token, ipCliente);
+
+    if (!resultado.valido) {
+      console.log('❌ Token inválido:', resultado.mensaje);
+      return res.status(401).json({
+        success: false,
+        token_valido: false,
+        mensaje: resultado.mensaje,
+      });
+    }
+
+    console.log('✅ Token válido para usuario:', resultado.usuario.username);
+
+    // Generar JWT para la sesión
+    const jwtToken = jwt.sign(
+      {
+        id: resultado.usuario.id,
+        username: resultado.usuario.username,
+        rol: resultado.usuario.rol,
+        permisos: resultado.usuario.permisos,
+      },
+      process.env.JWT_SECRET || 'tu_secreto_jwt',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
+    );
+
+    console.log('✅ JWT generado para sesión');
+
+    // Registrar acceso en logs
+    await db('logs_auditoria').insert({
+      usuario_id: resultado.usuario.id,
+      accion: 'LOGIN_TOKEN_TEMPORAL',
+      recurso_tipo: 'usuarios',
+      recurso_id: resultado.usuario.id,
+      detalles: {
+        ip: ipCliente,
+        metodo: 'token_temporal',
+      },
+    });
+
+    console.log('✅ ACCESO VALIDADO EXITOSAMENTE');
+    console.log('========================================\n');
+
+    res.json({
+      success: true,
+      token_valido: true,
+      usuario: resultado.usuario,
+      jwt_token: jwtToken,
+      permisos: resultado.usuario.permisos,
+    });
+  } catch (error) {
+    console.error('❌ Error al validar token de acceso:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al validar token de acceso',
+    });
+  }
+};
+
+/**
+ * Lista los tokens de acceso activos (para administradores)
+ */
+const listarTokensActivos = async (req, res) => {
+  try {
+    const tokens = await db('tokens_acceso_temporal')
+      .join('usuarios', 'tokens_acceso_temporal.usuario_id', 'usuarios.id')
+      .leftJoin(
+        'usuarios as generador',
+        'tokens_acceso_temporal.generado_por',
+        'generador.id'
+      )
+      .where('tokens_acceso_temporal.usado', false)
+      .where('tokens_acceso_temporal.fecha_expiracion', '>', new Date())
+      .select(
+        'tokens_acceso_temporal.id',
+        'tokens_acceso_temporal.token',
+        'tokens_acceso_temporal.fecha_generacion',
+        'tokens_acceso_temporal.fecha_expiracion',
+        'usuarios.usuario as usuario_destino',
+        'generador.usuario as generado_por'
+      )
+      .orderBy('tokens_acceso_temporal.fecha_generacion', 'desc');
+
+    res.json({
+      success: true,
+      tokens,
+    });
+  } catch (error) {
+    console.error('Error al listar tokens activos:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al listar tokens activos',
+    });
+  }
+};
+
 module.exports = {
   crearUsuario,
   obtenerUsuarios,
   obtenerRoles,
   actualizarUsuario,
   eliminarUsuario,
+  generarEnlaceAcceso,
+  validarTokenAcceso,
+  listarTokensActivos,
 };
