@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../api/api';
 import './UsersManagement.css';
 
 const UsersManagement = () => {
+  const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -271,9 +273,14 @@ const UsersManagement = () => {
     <div className="users-management">
       <div className="header">
         <h2>Gestión de Usuarios</h2>
-        <button className="btn-primary" onClick={() => setShowModal(true)}>
-          + Crear Usuario
-        </button>
+        <div className="header-actions">
+          <button className="btn-volver" onClick={() => navigate('/dashboard')}>
+            ← Volver
+          </button>
+          <button className="btn-primary" onClick={() => setShowModal(true)}>
+            + Crear Usuario
+          </button>
+        </div>
       </div>
 
       {mensaje.texto && (

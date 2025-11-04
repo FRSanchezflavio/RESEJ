@@ -16,6 +16,30 @@
   color: #333;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-volver {
+  background-color: transparent;
+  color: #6c757d;
+  border: 1px solid #6c757d;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-volver:hover {
+  background-color: #6c757d;
+  color: white;
+  transform: translateX(-2px);
+}
+
 .btn-primary {
   background-color: #007bff;
   color: white;
@@ -489,6 +513,21 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .btn-volver,
+  .btn-primary {
+    flex: 1;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }
