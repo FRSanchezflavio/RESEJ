@@ -34,7 +34,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -65,7 +66,11 @@
 .page-title-registros {
   font-size: var(--font-size-3xl);
   font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -225,7 +230,11 @@
   justify-content: space-between;
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1),
+    rgba(14, 165, 233, 0.1)
+  );
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
@@ -282,7 +291,11 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(180deg, var(--color-primary-light), var(--color-accent));
+  background: linear-gradient(
+    180deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
   opacity: 0;
   transition: opacity var(--transition-base);
 }
@@ -298,7 +311,11 @@
 }
 
 .registro-card.expanded {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.08),
+    rgba(14, 165, 233, 0.08)
+  );
   border-color: var(--color-primary-light);
 }
 
@@ -322,7 +339,11 @@
   min-width: 64px;
   height: 64px;
   padding: 0 var(--spacing-lg);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
   color: white;
   border-radius: var(--radius-xl);
   font-size: var(--font-size-2xl);
@@ -414,7 +435,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(14, 165, 233, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(14, 165, 233, 0.2)
+  );
   border-radius: var(--radius-lg);
   font-size: 1.75rem;
   flex-shrink: 0;
@@ -485,7 +510,11 @@
 }
 
 .btn-expand {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
   color: white;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
@@ -496,7 +525,11 @@
 }
 
 .btn-edit {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(245, 158, 11, 1));
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.9),
+    rgba(245, 158, 11, 1)
+  );
   color: white;
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
@@ -507,7 +540,11 @@
 }
 
 .btn-delete {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(239, 68, 68, 1));
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.9),
+    rgba(239, 68, 68, 1)
+  );
   color: white;
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
@@ -579,7 +616,11 @@
 .archivos-section {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(14, 165, 233, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.05),
+    rgba(14, 165, 233, 0.05)
+  );
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-border);
 }
@@ -628,7 +669,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(14, 165, 233, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(14, 165, 233, 0.2)
+  );
   border-radius: var(--radius-md);
   font-size: 1.5rem;
 }
@@ -651,7 +696,11 @@
 
 .btn-download {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -741,7 +790,11 @@
   font-size: var(--font-size-xl);
   color: var(--text-primary);
   font-weight: 700;
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light),
+    var(--color-accent)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

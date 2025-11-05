@@ -330,7 +330,9 @@ function RegistroCard({
           <div className="info-icon">📅</div>
           <div className="info-content">
             <div className="info-label">Fecha de Ingreso</div>
-            <div className="info-value">{formatDate(registro.fecha_ingreso)}</div>
+            <div className="info-value">
+              {formatDate(registro.fecha_ingreso)}
+            </div>
           </div>
         </div>
 
@@ -449,9 +451,7 @@ function RegistroCard({
                   type="date"
                   className="form-input-registros"
                   value={editData.fecha_ingreso || ''}
-                  onChange={e =>
-                    onEditChange('fecha_ingreso', e.target.value)
-                  }
+                  onChange={e => onEditChange('fecha_ingreso', e.target.value)}
                 />
               </div>
 
@@ -662,12 +662,22 @@ function ArchivosAdjuntos({ registroId }) {
   };
 
   if (loading) {
-    return <div className="loading-text" style={{ fontSize: 'var(--font-size-sm)' }}>Cargando archivos...</div>;
+    return (
+      <div className="loading-text" style={{ fontSize: 'var(--font-size-sm)' }}>
+        Cargando archivos...
+      </div>
+    );
   }
 
   if (archivos.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: 'var(--spacing-lg)', color: 'var(--text-tertiary)' }}>
+      <div
+        style={{
+          textAlign: 'center',
+          padding: 'var(--spacing-lg)',
+          color: 'var(--text-tertiary)',
+        }}
+      >
         No hay archivos adjuntos
       </div>
     );
