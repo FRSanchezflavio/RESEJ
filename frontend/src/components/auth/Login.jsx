@@ -133,7 +133,7 @@ export default function Login() {
         <div className="login-header">
           <div className="login-logo">⚖️</div>
           <h1 className="login-title">RESEJ</h1>
-          <p className="login-subtitle">Sistema Policial-Judicial</p>
+          <h2 className="login-subtitle">Registro de Secuestros Judiciales</h2>
         </div>
 
         <div className="login-card">

@@ -1,100 +1,100 @@
-import React, { useState } from "react";
-import { Card, Form, Button, Row, Col } from "react-bootstrap";
-import { uploadRegistro } from "../../api/api";
+import React, { useState } from 'react';
+import { Card, Form, Button, Row, Col } from 'react-bootstrap';
+import { uploadRegistro } from '../../api/api';
 
 export default function UploadForm() {
   const [form, setForm] = useState({
-    fecha_carga: "",
-    fecha_ingreso: "",
-    ufi: "",
-    numero_legajo: "",
-    seccion_que_interviene: "",
-    detalle_secuestro: "",
-    numero_protocolo: "",
-    cadena_custodia: "",
-    nro_folio: "",
-    nro_libro_secuestro: "",
-    of_a_cargo: "",
-    observaciones: "",
+    fecha_carga: '',
+    fecha_ingreso: '',
+    ufi: '',
+    numero_legajo: '',
+    seccion_que_interviene: '',
+    detalle_secuestro: '',
+    numero_protocolo: '',
+    cadena_custodia: '',
+    nro_folio: '',
+    nro_libro_secuestro: '',
+    of_a_cargo: '',
+    observaciones: '',
   });
   const [files, setFiles] = useState(null);
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState('');
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  const fd = new FormData();
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const fd = new FormData();
 
-  // 🔹 Convertir fechas a formato ISO (yyyy-mm-dd)
-  const fechaIngresoISO = form.fecha_ingreso
-    ? new Date(form.fecha_ingreso).toISOString().split("T")[0]
-    : "";
-  const fechaCargaISO = form.fecha_carga
-    ? new Date(form.fecha_carga).toISOString().split("T")[0]
-    : "";
+    // 🔹 Convertir fechas a formato ISO (yyyy-mm-dd)
+    const fechaIngresoISO = form.fecha_ingreso
+      ? new Date(form.fecha_ingreso).toISOString().split('T')[0]
+      : '';
+    const fechaCargaISO = form.fecha_carga
+      ? new Date(form.fecha_carga).toISOString().split('T')[0]
+      : '';
 
-  // 🔹 Agregar todos los campos
-  Object.entries({
-    ...form,
-    fecha_ingreso: fechaIngresoISO,
-    fecha_carga: fechaCargaISO,
-    persona_id: 1, // temporal
-  }).forEach(([k, v]) => {
-    if (v !== undefined && v !== null) fd.append(k, v);
-  });
-
-  // 🔹 Archivos
-  if (files) {
-    for (let i = 0; i < files.length; i++) {
-      fd.append("archivos", files[i]);
-    }
-  }
-
-  // 👀 Verificar qué se está enviando
-  for (let [k, v] of fd.entries()) {
-    console.log(`${k}:`, v);
-  }
-
-  try {
-    await uploadRegistro(fd);
-    setMsg("✅ Registro cargado correctamente");
-
-    // 🔹 Resetear formulario
-    setForm({
-      fecha_carga: "",
-      fecha_ingreso: "",
-      ufi: "",
-      numero_legajo: "",
-      seccion_que_interviene: "",
-      detalle_secuestro: "",
-      numero_protocolo: "",
-      cadena_custodia: "",
-      nro_folio: "",
-      nro_libro_secuestro: "",
-      of_a_cargo: "",
-      observaciones: "",
+    // 🔹 Agregar todos los campos
+    Object.entries({
+      ...form,
+      fecha_ingreso: fechaIngresoISO,
+      fecha_carga: fechaCargaISO,
+      persona_id: 1, // temporal
+    }).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) fd.append(k, v);
     });
-    setFiles(null);
-  } catch (err) {
-    console.error("Error detallado:", err.response?.data || err.message);
-    setMsg("❌ Error al subir: " + (err.response?.data?.error || err.message));
-  }
-};
 
-
-  const handleChange = (e) => {
-  const { name, value, type } = e.target;
-
-  let newValue = value;
-  if (type === "date" && value) {
-    if (value.includes("/")) {
-      const [dia, mes, anio] = value.split("/");
-      newValue = `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+    // 🔹 Archivos
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        fd.append('archivos', files[i]);
+      }
     }
-  }
 
-  setForm({ ...form, [name]: newValue });
-};
+    // 👀 Verificar qué se está enviando
+    for (let [k, v] of fd.entries()) {
+      console.log(`${k}:`, v);
+    }
 
+    try {
+      await uploadRegistro(fd);
+      setMsg('✅ Registro cargado correctamente');
+
+      // 🔹 Resetear formulario
+      setForm({
+        fecha_carga: '',
+        fecha_ingreso: '',
+        ufi: '',
+        numero_legajo: '',
+        seccion_que_interviene: '',
+        detalle_secuestro: '',
+        numero_protocolo: '',
+        cadena_custodia: '',
+        nro_folio: '',
+        nro_libro_secuestro: '',
+        of_a_cargo: '',
+        observaciones: '',
+      });
+      setFiles(null);
+    } catch (err) {
+      console.error('Error detallado:', err.response?.data || err.message);
+      setMsg(
+        '❌ Error al subir: ' + (err.response?.data?.error || err.message)
+      );
+    }
+  };
+
+  const handleChange = e => {
+    const { name, value, type } = e.target;
+
+    let newValue = value;
+    if (type === 'date' && value) {
+      if (value.includes('/')) {
+        const [dia, mes, anio] = value.split('/');
+        newValue = `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+      }
+    }
+
+    setForm({ ...form, [name]: newValue });
+  };
 
   return (
     <Card className="p-3">
@@ -239,7 +239,7 @@ export default function UploadForm() {
           <Form.Control
             type="file"
             multiple
-            onChange={(e) => setFiles(e.target.files)}
+            onChange={e => setFiles(e.target.files)}
           />
         </Form.Group>
 
@@ -247,7 +247,10 @@ export default function UploadForm() {
           <Button variant="dark" type="submit">
             GUARDAR
           </Button>
-          <Button variant="outline-secondary" onClick={() => window.location.reload()}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => window.location.reload()}
+          >
             ← VOLVER
           </Button>
         </div>

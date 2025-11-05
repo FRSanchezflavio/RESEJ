@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRegistros } from '../../api/api';
-import {
-  Card,
-  Form,
-  Button,
-  Table,
-  Row,
-  Col,
-  Collapse,
-  Modal,
-} from 'react-bootstrap';
+import { Modal, Form, Button } from 'react-bootstrap';
 import api from '../../api/api';
 import AccionProtegida from '../AccionProtegida';
 import './Registros.css';
@@ -145,7 +136,7 @@ export default function Registros() {
   };
 
   return (
-    <>
+    <div className="registros-container">
       {/* Modal de validación de contraseña */}
       <Modal
         show={showPasswordModal}
@@ -181,14 +172,24 @@ export default function Registros() {
         </Modal.Footer>
       </Modal>
 
-      <Card className="p-3">
-        <h5>Buscar registro</h5>
+      {/* Header */}
+      <div className="registros-header">
+        <h1 className="page-title-registros">
+          🔍 Registros de Secuestros Judiciales
+        </h1>
+      </div>
 
-        <Form onSubmit={handleSearch}>
-          <Row className="mb-3">
-            <Col md={3}>
-              <Form.Label>Buscar por:</Form.Label>
-              <Form.Select
+      {/* Tarjeta de búsqueda */}
+      <div className="search-card">
+        <h3 style={{ marginBottom: 'var(--spacing-lg)', fontWeight: 700 }}>
+          🎯 Búsqueda Avanzada
+        </h3>
+        <form onSubmit={handleSearch} className="search-form">
+          <div className="search-row">
+            <div className="form-group-registros">
+              <label className="form-label-registros">Buscar por:</label>
+              <select
+                className="form-select-registros"
                 value={searchField}
                 onChange={e => setSearchField(e.target.value)}
                 disabled={loading}
@@ -203,443 +204,377 @@ export default function Registros() {
                 <option value="cadena_custodia">🔗 Cadena de Custodia</option>
                 <option value="detalle_secuestro">📝 Detalle</option>
                 <option value="of_a_cargo">👮 Oficial a Cargo</option>
-              </Form.Select>
-            </Col>
-            <Col md={9}>
-              <Form.Label>Término de búsqueda:</Form.Label>
-              <Form.Control
+              </select>
+            </div>
+
+            <div className="form-group-registros">
+              <label className="form-label-registros">Término:</label>
+              <input
+                type="text"
+                className="form-input-registros"
                 placeholder={
                   searchField === 'all'
                     ? 'Buscar en todos los campos...'
-                    : `Buscar por ${
-                        searchField === 'persona'
-                          ? 'nombre de persona'
-                          : searchField === 'dni'
-                          ? 'DNI'
-                          : searchField === 'numero_legajo'
-                          ? 'número de legajo'
-                          : searchField === 'numero_causa'
-                          ? 'número de causa'
-                          : searchField === 'ufi'
-                          ? 'UFI'
-                          : searchField === 'numero_protocolo'
-                          ? 'número de protocolo'
-                          : searchField === 'cadena_custodia'
-                          ? 'cadena de custodia'
-                          : searchField === 'detalle_secuestro'
-                          ? 'detalle del secuestro'
-                          : 'oficial a cargo'
-                      }...`
+                    : `Buscar por ${searchField}...`
                 }
                 value={term}
                 onChange={e => setTerm(e.target.value)}
                 disabled={loading}
               />
-            </Col>
-          </Row>
-          <div className="d-flex gap-2 mb-3">
-            <Button type="submit" variant="dark" disabled={loading}>
-              {loading ? '🔄 Buscando...' : '🔍 BUSCAR'}
-            </Button>
-            <Button
-              variant="outline-secondary"
+            </div>
+
+            <button type="submit" className="btn-search" disabled={loading}>
+              {loading ? '🔄 Buscando...' : '🔍 Buscar'}
+            </button>
+
+            <button
+              type="button"
+              className="btn-clear"
               onClick={handleClearFilters}
               disabled={loading}
             >
-              🗑️ LIMPIAR FILTROS
-            </Button>
+              🗑️ Limpiar
+            </button>
           </div>
-        </Form>
+        </form>
+      </div>
 
-        {pagination && (
-          <div className="mb-2 text-muted">
-            Mostrando {registros.length} de {pagination.total} registros (Página{' '}
-            {pagination.page} de {pagination.totalPages})
+      {/* Header de resultados */}
+      {!loading && registros.length > 0 && (
+        <div className="results-header">
+          <h2 className="results-title">📊 Resultados</h2>
+          {pagination && (
+            <div className="results-count">
+              {registros.length} de {pagination.total} registros (Página{' '}
+              {pagination.page} de {pagination.totalPages})
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Estados de carga y vacío */}
+      {loading ? (
+        <div className="loading-state">
+          <div className="spinner-registros"></div>
+          <p className="loading-text">Cargando registros...</p>
+        </div>
+      ) : registros.length === 0 ? (
+        <div className="empty-state-registros">
+          <div className="empty-icon">🔍</div>
+          <h3 className="empty-title">No se encontraron registros</h3>
+          <p className="empty-description">
+            No hay registros que coincidan con tu búsqueda. Intenta con otros
+            términos o limpia los filtros.
+          </p>
+          <div className="empty-actions">
+            <button className="btn-search" onClick={handleClearFilters}>
+              🔄 Limpiar filtros
+            </button>
           </div>
-        )}
+        </div>
+      ) : (
+        /* Grid de Cards */
+        <div className="registros-grid">
+          {registros.map(registro => (
+            <RegistroCard
+              key={registro.id}
+              registro={registro}
+              isExpanded={expandedRows[registro.id]}
+              isEditing={editMode[registro.id]}
+              editData={editData}
+              onToggle={() => toggleRow(registro.id)}
+              onEdit={() => handleEditClick(registro)}
+              onSave={() => handleSaveEdit(registro.id)}
+              onCancel={() => handleCancelEdit(registro.id)}
+              onEditChange={handleEditChange}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-        {loading ? (
-          <p>Cargando registros...</p>
-        ) : registros.length === 0 ? (
-          <p>No hay registros que coincidan con la búsqueda</p>
-        ) : (
-          <Table striped bordered hover size="sm" responsive>
-            <thead>
-              <tr>
-                <th style={{ width: '40px' }}>Ver</th>
-                <th>#</th>
-                <th>Fecha Ingreso</th>
-                <th>UFI</th>
-                <th>N° Legajo/Causa</th>
-                <th>Sección</th>
-                <th>Detalle Secuestro</th>
-                <th>N° Protocolo</th>
-                <th>Cadena Custodia</th>
-                <th>N° Folio</th>
-                <th>N° Libro Secuestro</th>
-                <th>Oficial a Cargo</th>
-                <th>Observaciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {registros.map(r => (
-                <React.Fragment key={r.id}>
-                  <tr
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => toggleRow(r.id)}
-                  >
-                    <td className="text-center">
-                      <Button
-                        variant="link"
-                        size="sm"
-                        onClick={e => {
-                          e.stopPropagation();
-                          toggleRow(r.id);
-                        }}
-                        style={{ padding: 0, textDecoration: 'none' }}
-                      >
-                        {expandedRows[r.id] ? '▼' : '▶'}
-                      </Button>
-                    </td>
-                    <td>{r.id}</td>
-                    <td>
-                      {r.fecha_ingreso
-                        ? new Date(r.fecha_ingreso).toLocaleDateString('es-AR')
-                        : '-'}
-                    </td>
-                    <td>{r.ufi || '-'}</td>
-                    <td>{r.numero_legajo || '-'}</td>
-                    <td
-                      style={{
-                        maxWidth: '150px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.seccion_que_interviene || '-'}
-                    </td>
-                    <td
-                      style={{
-                        maxWidth: '200px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.detalle_secuestro || r.descripcion || '-'}
-                    </td>
-                    <td>{r.numero_protocolo || '-'}</td>
-                    <td>{r.cadena_custodia || '-'}</td>
-                    <td>{r.nro_folio || '-'}</td>
-                    <td>{r.nro_libro_secuestro || '-'}</td>
-                    <td
-                      style={{
-                        maxWidth: '150px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.of_a_cargo || '-'}
-                    </td>
-                    <td
-                      style={{
-                        maxWidth: '150px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {r.observaciones || '-'}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan="13" style={{ padding: 0, border: 'none' }}>
-                      <Collapse in={expandedRows[r.id]}>
-                        <div
-                          style={{
-                            padding: '15px',
-                            backgroundColor: '#f8f9fa',
-                            border: '1px solid #dee2e6',
-                          }}
-                        >
-                          <Row>
-                            <Col md={6}>
-                              <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h6 className="mb-0">
-                                  📋 Información del Registro
-                                </h6>
-                                <AccionProtegida permiso="editar">
-                                  {!editMode[r.id] ? (
-                                    <Button
-                                      variant="warning"
-                                      size="sm"
-                                      onClick={() => handleEditClick(r)}
-                                    >
-                                      ✏️ Editar
-                                    </Button>
-                                  ) : (
-                                    <div>
-                                      <Button
-                                        variant="success"
-                                        size="sm"
-                                        onClick={() => handleSaveEdit(r.id)}
-                                        className="me-2"
-                                      >
-                                        💾 Guardar
-                                      </Button>
-                                      <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => handleCancelEdit(r.id)}
-                                      >
-                                        ❌ Cancelar
-                                      </Button>
-                                    </div>
-                                  )}
-                                </AccionProtegida>
-                              </div>
+// Componente de Card Individual
+function RegistroCard({
+  registro,
+  isExpanded,
+  isEditing,
+  editData,
+  onToggle,
+  onEdit,
+  onSave,
+  onCancel,
+  onEditChange,
+}) {
+  const formatDate = date => {
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString('es-AR');
+  };
 
-                              {!editMode[r.id] ? (
-                                <>
-                                  <div className="mb-2">
-                                    <strong>Fecha de inicio:</strong>{' '}
-                                    {r.fecha_ingreso
-                                      ? new Date(
-                                          r.fecha_ingreso
-                                        ).toLocaleDateString('es-AR')
-                                      : '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>UFI:</strong> {r.ufi || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>N° Legajo / Causa:</strong>{' '}
-                                    {r.numero_legajo || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>Sección que interviene:</strong>{' '}
-                                    {r.seccion_que_interviene || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>Detalle del secuestro:</strong>{' '}
-                                    {r.detalle_secuestro || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>N° de protocolo:</strong>{' '}
-                                    {r.numero_protocolo || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>Cadena de custodia:</strong>{' '}
-                                    {r.cadena_custodia || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>N° de folio:</strong>{' '}
-                                    {r.nro_folio || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>N° de libro de secuestro:</strong>{' '}
-                                    {r.nro_libro_secuestro || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>De. a cargo de la causa:</strong>{' '}
-                                    {r.of_a_cargo || '-'}
-                                  </div>
-                                  <div className="mb-2">
-                                    <strong>Observaciones:</strong>{' '}
-                                    {r.tramite || '-'}
-                                  </div>
-                                </>
-                              ) : (
-                                <Form>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>Fecha de inicio:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="date"
-                                      value={editData.fecha_ingreso || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'fecha_ingreso',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>UFI:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.ufi || ''}
-                                      onChange={e =>
-                                        handleEditChange('ufi', e.target.value)
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>N° Legajo / Causa:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.numero_legajo || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'numero_legajo',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>Sección que interviene:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={
-                                        editData.seccion_que_interviene || ''
-                                      }
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'seccion_que_interviene',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>Detalle del secuestro:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      as="textarea"
-                                      rows={3}
-                                      value={editData.detalle_secuestro || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'detalle_secuestro',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>N° de protocolo:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.numero_protocolo || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'numero_protocolo',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>Cadena de custodia:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.cadena_custodia || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'cadena_custodia',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>N° de folio:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.nro_folio || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'nro_folio',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>N° de libro de secuestro:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.nro_libro_secuestro || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'nro_libro_secuestro',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>De. a cargo de la causa:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      type="text"
-                                      value={editData.of_a_cargo || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'of_a_cargo',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                  <Form.Group className="mb-2">
-                                    <Form.Label>
-                                      <strong>Observaciones:</strong>
-                                    </Form.Label>
-                                    <Form.Control
-                                      as="textarea"
-                                      rows={2}
-                                      value={editData.tramite || ''}
-                                      onChange={e =>
-                                        handleEditChange(
-                                          'tramite',
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </Form.Group>
-                                </Form>
-                              )}
-                            </Col>
-                            <Col md={6}>
-                              <h6 className="mb-3">
-                                📎 Archivos Adjuntos (PDF, JPG, PNG)
-                              </h6>
-                              <ArchivosAdjuntos registroId={r.id} />
-                            </Col>
-                          </Row>
-                        </div>
-                      </Collapse>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))}
-            </tbody>
-          </Table>
-        )}
-      </Card>
-    </>
+  return (
+    <div className={`registro-card ${isExpanded ? 'expanded' : ''}`}>
+      {/* Header de la Card */}
+      <div className="card-header-registro">
+        <div className="card-id-badge">#{registro.id}</div>
+        <div className="card-actions">
+          <button className="btn-table btn-expand" onClick={onToggle}>
+            {isExpanded ? '▼ Contraer' : '▶ Expandir'}
+          </button>
+        </div>
+      </div>
+
+      {/* Contenido principal de la Card */}
+      <div className="card-content">
+        <div className="card-info-row">
+          <div className="info-icon">📅</div>
+          <div className="info-content">
+            <div className="info-label">Fecha de Ingreso</div>
+            <div className="info-value">{formatDate(registro.fecha_ingreso)}</div>
+          </div>
+        </div>
+
+        <div className="card-info-row">
+          <div className="info-icon">🏢</div>
+          <div className="info-content">
+            <div className="info-label">UFI</div>
+            <div className="info-value highlight">{registro.ufi || '-'}</div>
+          </div>
+        </div>
+
+        <div className="card-info-row">
+          <div className="info-icon">📋</div>
+          <div className="info-content">
+            <div className="info-label">Nº Legajo / Causa</div>
+            <div className="info-value highlight">
+              {registro.numero_legajo || '-'}
+            </div>
+          </div>
+        </div>
+
+        <div className="card-info-row">
+          <div className="info-icon">🏛️</div>
+          <div className="info-content">
+            <div className="info-label">Sección</div>
+            <div className="info-value">
+              {registro.seccion_que_interviene || '-'}
+            </div>
+          </div>
+        </div>
+
+        <div className="card-info-row">
+          <div className="info-icon">📝</div>
+          <div className="info-content">
+            <div className="info-label">Detalle del Secuestro</div>
+            <div className="info-value">
+              {isExpanded
+                ? registro.detalle_secuestro || '-'
+                : (registro.detalle_secuestro || '-').substring(0, 100) +
+                  (registro.detalle_secuestro?.length > 100 ? '...' : '')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sección expandida */}
+      {isExpanded && (
+        <div className="expanded-section">
+          {/* Botones de acción */}
+          <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+            <AccionProtegida permiso="editar">
+              {!isEditing ? (
+                <button className="btn-table btn-edit" onClick={onEdit}>
+                  ✏️ Editar Registro
+                </button>
+              ) : (
+                <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                  <button className="btn-table btn-expand" onClick={onSave}>
+                    💾 Guardar Cambios
+                  </button>
+                  <button className="btn-table btn-delete" onClick={onCancel}>
+                    ❌ Cancelar
+                  </button>
+                </div>
+              )}
+            </AccionProtegida>
+          </div>
+
+          {/* Detalles completos */}
+          {!isEditing ? (
+            <div className="expanded-content">
+              <div className="detail-group">
+                <div className="detail-label">📄 Nº de Protocolo</div>
+                <div className="detail-value">
+                  {registro.numero_protocolo || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">🔗 Cadena de Custodia</div>
+                <div className="detail-value">
+                  {registro.cadena_custodia || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">📑 Nº de Folio</div>
+                <div className="detail-value">{registro.nro_folio || '-'}</div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">📚 Nº Libro de Secuestro</div>
+                <div className="detail-value">
+                  {registro.nro_libro_secuestro || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">👮 Oficial a Cargo</div>
+                <div className="detail-value">{registro.of_a_cargo || '-'}</div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">💬 Observaciones</div>
+                <div className="detail-value">
+                  {registro.observaciones || registro.tramite || '-'}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Formulario de edición */
+            <div className="expanded-content">
+              <div className="detail-group">
+                <label className="detail-label">📅 Fecha de Ingreso</label>
+                <input
+                  type="date"
+                  className="form-input-registros"
+                  value={editData.fecha_ingreso || ''}
+                  onChange={e =>
+                    onEditChange('fecha_ingreso', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">🏢 UFI</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.ufi || ''}
+                  onChange={e => onEditChange('ufi', e.target.value)}
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📋 Nº Legajo / Causa</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.numero_legajo || ''}
+                  onChange={e => onEditChange('numero_legajo', e.target.value)}
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">🏛️ Sección</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.seccion_que_interviene || ''}
+                  onChange={e =>
+                    onEditChange('seccion_que_interviene', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="detail-label">📝 Detalle del Secuestro</label>
+                <textarea
+                  className="form-input-registros"
+                  rows="3"
+                  value={editData.detalle_secuestro || ''}
+                  onChange={e =>
+                    onEditChange('detalle_secuestro', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📄 Nº de Protocolo</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.numero_protocolo || ''}
+                  onChange={e =>
+                    onEditChange('numero_protocolo', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">🔗 Cadena de Custodia</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.cadena_custodia || ''}
+                  onChange={e =>
+                    onEditChange('cadena_custodia', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📑 Nº de Folio</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.nro_folio || ''}
+                  onChange={e => onEditChange('nro_folio', e.target.value)}
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📚 Nº Libro de Secuestro</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.nro_libro_secuestro || ''}
+                  onChange={e =>
+                    onEditChange('nro_libro_secuestro', e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">👮 Oficial a Cargo</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.of_a_cargo || ''}
+                  onChange={e => onEditChange('of_a_cargo', e.target.value)}
+                />
+              </div>
+
+              <div className="detail-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="detail-label">💬 Observaciones</label>
+                <textarea
+                  className="form-input-registros"
+                  rows="2"
+                  value={editData.tramite || editData.observaciones || ''}
+                  onChange={e => onEditChange('tramite', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Archivos Adjuntos */}
+          <div className="archivos-section">
+            <h4 className="archivos-title">📎 Archivos Adjuntos</h4>
+            <ArchivosAdjuntos registroId={registro.id} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -726,50 +661,39 @@ function ArchivosAdjuntos({ registroId }) {
     }
   };
 
-  if (archivos.length === 0 && !loading) {
-    return <div className="text-muted small">No hay archivos adjuntos</div>;
+  if (loading) {
+    return <div className="loading-text" style={{ fontSize: 'var(--font-size-sm)' }}>Cargando archivos...</div>;
   }
 
-  if (loading) {
-    return <div className="text-muted small">Cargando...</div>;
+  if (archivos.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: 'var(--spacing-lg)', color: 'var(--text-tertiary)' }}>
+        No hay archivos adjuntos
+      </div>
+    );
   }
 
   return (
     <div>
       {archivos.map(archivo => (
-        <div
-          key={archivo.id}
-          className="mb-2 p-2"
-          style={{
-            backgroundColor: '#fff',
-            border: '1px solid #dee2e6',
-            borderRadius: '4px',
-          }}
-        >
-          <div className="d-flex justify-content-between align-items-center">
-            <div style={{ flex: 1 }}>
-              <div className="d-flex align-items-center">
-                <span style={{ fontSize: '1.5rem', marginRight: '8px' }}>
-                  {getFileIcon(archivo.tipo_mime)}
-                </span>
-                <div>
-                  <strong style={{ fontSize: '0.9rem' }}>
-                    {archivo.nombre_original || 'Archivo sin nombre'}
-                  </strong>
-                  <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                    {formatFileSize(archivo.tamano_bytes)}
-                  </div>
-                </div>
+        <div key={archivo.id} className="archivo-item">
+          <div className="archivo-info">
+            <div className="archivo-icon">{getFileIcon(archivo.tipo_mime)}</div>
+            <div className="archivo-details">
+              <div className="archivo-name">
+                {archivo.nombre_original || 'Archivo sin nombre'}
+              </div>
+              <div className="archivo-size">
+                {formatFileSize(archivo.tamano_bytes)}
               </div>
             </div>
-            <Button
-              variant="outline-primary"
-              size="sm"
-              onClick={() => handleDownload(archivo)}
-            >
-              ⬇️
-            </Button>
           </div>
+          <button
+            className="btn-download"
+            onClick={() => handleDownload(archivo)}
+          >
+            ⬇️ Descargar
+          </button>
         </div>
       ))}
     </div>

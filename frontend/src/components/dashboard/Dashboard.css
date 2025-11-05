@@ -6,6 +6,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-2xl) var(--spacing-lg);
+  /* Dejar espacio al final para que el footer fijo no cubra el contenido */
+  padding-bottom: 120px;
   animation: fadeIn var(--transition-slow) ease-out;
 }
 
@@ -87,10 +89,13 @@
    ============================================ */
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* Mostrar las tarjetas en una sola fila; permitir scroll horizontal en pantallas pequeñas */
+  display: flex;
+  flex-wrap: nowrap; /* mantener en una línea */
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-2xl);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .stat-card-dashboard {
@@ -105,6 +110,12 @@
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
+}
+
+/* Forzar tamaño mínimo para que las tarjetas no se compriman en una sola fila */
+.stat-card-dashboard {
+  min-width: 240px;
+  flex: 0 0 auto; /* evitar que las tarjetas crezcan/reduzcan para mantenerse en línea */
 }
 
 .stat-card-dashboard::before {
