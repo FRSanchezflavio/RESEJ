@@ -129,7 +129,7 @@ export default function UploadForm() {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
   return (
@@ -137,12 +137,19 @@ export default function UploadForm() {
       <div className="upload-form-header">
         <div className="header-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
         </div>
         <div>
           <h1 className="upload-form-title">Nuevo Registro de Secuestro</h1>
-          <p className="upload-form-subtitle">Complete el formulario con los datos del secuestro judicial</p>
+          <p className="upload-form-subtitle">
+            Complete el formulario con los datos del secuestro judicial
+          </p>
         </div>
       </div>
 
@@ -150,7 +157,7 @@ export default function UploadForm() {
         <div className="alert-upload alert-success">
           <div className="alert-icon">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
           </div>
           <div className="alert-content">
@@ -164,7 +171,7 @@ export default function UploadForm() {
         <div className="alert-upload alert-error">
           <div className="alert-icon">
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
             </svg>
           </div>
           <div className="alert-content">
@@ -181,7 +188,7 @@ export default function UploadForm() {
             <span className="section-number">01</span>
             <h2 className="section-title">Información Básica</h2>
           </div>
-          
+
           <div className="form-grid">
             <div className="form-field">
               <label className="form-label">
@@ -189,11 +196,16 @@ export default function UploadForm() {
                 <span className="label-required">*</span>
               </label>
               <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                  <line x1="16" y1="2" x2="16" y2="6"/>
-                  <line x1="8" y1="2" x2="8" y2="6"/>
-                  <line x1="3" y1="10" x2="21" y2="10"/>
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
                 <input
                   type="date"
@@ -211,8 +223,18 @@ export default function UploadForm() {
                 <span className="label-text">U.F.I</span>
               </label>
               <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
                 </svg>
                 <input
                   type="text"
@@ -230,8 +252,18 @@ export default function UploadForm() {
                 <span className="label-text">N° Legajo / Causa</span>
               </label>
               <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                 <input
                   type="text"
@@ -250,8 +282,18 @@ export default function UploadForm() {
                 <span className="label-required">*</span>
               </label>
               <div className="input-wrapper">
-                <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  />
                 </svg>
                 <select
                   name="seccion_que_interviene"
@@ -412,10 +454,15 @@ export default function UploadForm() {
               className="file-input-hidden"
               accept=".pdf,.jpg,.jpeg,.png"
             />
-            
+
             <div className="file-drop-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
               </svg>
             </div>
             <div className="file-drop-text">
@@ -431,11 +478,11 @@ export default function UploadForm() {
                   <div className="file-icon">
                     {file.type.includes('pdf') ? (
                       <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.5,16.5V19H14V14.5H15.5V16.5M11,19H9.5V14.5H11C11.8,14.5 12.5,15.2 12.5,16V17.5C12.5,18.3 11.8,19 11,19M11,16V17.5H10.5V16H11M7,14.5H8.5V19H7V14.5Z"/>
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.5,16.5V19H14V14.5H15.5V16.5M11,19H9.5V14.5H11C11.8,14.5 12.5,15.2 12.5,16V17.5C12.5,18.3 11.8,19 11,19M11,16V17.5H10.5V16H11M7,14.5H8.5V19H7V14.5Z" />
                       </svg>
                     ) : (
                       <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>
+                        <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
                       </svg>
                     )}
                   </div>
@@ -445,14 +492,14 @@ export default function UploadForm() {
                   </div>
                   <button
                     type="button"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       removeFile(index);
                     }}
                     className="file-remove"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                      <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
                     </svg>
                   </button>
                 </div>
@@ -470,7 +517,12 @@ export default function UploadForm() {
             disabled={isSubmitting}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Cancelar
           </button>
@@ -487,7 +539,12 @@ export default function UploadForm() {
             ) : (
               <>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 Guardar Registro
               </>
