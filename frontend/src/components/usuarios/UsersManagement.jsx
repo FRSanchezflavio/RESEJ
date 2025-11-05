@@ -291,6 +291,7 @@ const UsersManagement = () => {
         <table>
           <thead>
             <tr>
+              <th></th>
               <th>ID</th>
               <th>Usuario</th>
               <th>Nombre</th>
