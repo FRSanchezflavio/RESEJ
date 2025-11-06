@@ -284,19 +284,48 @@
    RESPONSIVE
    ============================================ */
 
+/* Tablets y pantallas medianas */
 @media (max-width: 1024px) {
+  .navbar-container {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
   .navbar-title-main {
     font-size: var(--font-size-base);
+  }
+
+  .navbar-title-sub {
+    font-size: 0.625rem;
   }
 
   .user-details {
     display: none;
   }
+
+  .navbar-nav {
+    gap: 0.25rem;
+  }
+
+  .nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8125rem;
+  }
+
+  .btn-logout {
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.8125rem;
+  }
 }
 
+/* Móviles */
 @media (max-width: 768px) {
+  .navbar-container {
+    padding: var(--spacing-sm);
+  }
+
   .navbar-toggle {
     display: flex;
+    font-size: 1.5rem;
   }
 
   .navbar-nav {
@@ -316,11 +345,16 @@
     padding: var(--spacing-md);
     gap: var(--spacing-xs);
     animation: slideIn var(--transition-base) ease-out;
+    max-height: 80vh;
+    overflow-y: auto;
   }
 
   .navbar-menu-mobile .nav-link {
     width: 100%;
     justify-content: flex-start;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-base);
+    border: 1px solid var(--border-light);
   }
 
   .navbar-title-sub {
@@ -340,5 +374,64 @@
   .user-avatar {
     width: 32px;
     height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .btn-logout {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .navbar-user {
+    gap: var(--spacing-sm);
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .navbar-brand {
+    gap: var(--spacing-sm);
+  }
+
+  .navbar-logo {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
+  }
+
+  .navbar-title-main {
+    font-size: 0.875rem;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.6875rem;
+  }
+
+  .btn-logout {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+
+  .btn-logout span:last-child {
+    display: none;
+  }
+
+  .btn-logout::after {
+    content: '🚪';
+  }
+}
+
+/* Animación del menú móvil */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

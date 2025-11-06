@@ -890,15 +890,37 @@
    RESPONSIVE ULTRA MODERNO
    ============================================ */
 
+/* Pantallas extra grandes */
+@media (max-width: 1400px) {
+  .registros-grid {
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Tablets grandes */
 @media (max-width: 1200px) {
   .registros-grid {
     grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
     gap: var(--spacing-xl);
   }
+
+  .search-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
+/* Tablets */
 @media (max-width: 1024px) {
+  .registros-container {
+    padding: var(--spacing-xl) var(--spacing-lg);
+    padding-bottom: 100px;
+  }
+
   .search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .search-fields {
     grid-template-columns: 1fr;
   }
 
@@ -915,8 +937,13 @@
   .expanded-content {
     grid-template-columns: 1fr;
   }
+
+  .registro-card {
+    min-height: 350px;
+  }
 }
 
+/* Móviles grandes */
 @media (max-width: 768px) {
   .registros-container {
     padding: var(--spacing-lg) var(--spacing-md);
@@ -929,10 +956,45 @@
 
   .search-card {
     padding: var(--spacing-lg);
+    min-height: auto;
+  }
+
+  .search-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .search-fields {
+    gap: var(--spacing-md);
+  }
+
+  .form-group-registros label {
+    font-size: 0.75rem;
+  }
+
+  .form-control-registros {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+  }
+
+  .search-actions {
+    flex-direction: column;
+  }
+
+  .btn-search,
+  .btn-clear {
+    width: 100%;
+    justify-content: center;
   }
 
   .registro-card {
     padding: var(--spacing-lg);
+    min-height: 300px;
+  }
+
+  .card-header-registros {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: flex-start;
   }
 
   .card-id-badge {
@@ -941,18 +1003,56 @@
     font-size: var(--font-size-lg);
   }
 
+  .card-title-registros {
+    font-size: var(--font-size-lg);
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .info-label {
+    font-size: 0.6875rem;
+  }
+
+  .info-value {
+    font-size: 0.875rem;
+  }
+
   .card-actions {
     flex-direction: column;
+    gap: var(--spacing-sm);
   }
 
   .btn-table {
     width: 100%;
     justify-content: center;
+    padding: 0.625rem 1rem;
   }
 
   .archivo-item {
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+
+  .archivo-info {
+    gap: var(--spacing-xs);
+  }
+
+  .archivo-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .archivo-nombre {
+    font-size: 0.875rem;
+  }
+
+  .archivo-meta {
+    font-size: 0.6875rem;
   }
 
   .btn-download {
@@ -965,7 +1065,7 @@
   }
 
   .empty-icon {
-    font-size: 3rem;
+    font-size: 3.5rem;
   }
 
   .empty-title {
@@ -975,20 +1075,140 @@
   .empty-description {
     font-size: var(--font-size-base);
   }
+
+  .empty-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .empty-actions .btn-search {
+    width: 100%;
+  }
+
+  .pagination-controls {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .pagination-info {
+    order: -1;
+  }
 }
 
+/* Móviles pequeños */
 @media (max-width: 480px) {
   .registros-container {
-    padding: var(--spacing-md);
-    padding-bottom: 80px;
+    padding: var(--spacing-md) var(--spacing-sm);
+    padding-bottom: 90px;
+  }
+
+  .page-title-registros {
+    font-size: var(--font-size-xl);
   }
 
   .search-card {
     padding: var(--spacing-md);
   }
 
+  .search-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .form-control-registros {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-search,
+  .btn-clear {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
   .results-count {
     font-size: var(--font-size-sm);
     padding: var(--spacing-xs) var(--spacing-md);
+  }
+
+  .registro-card {
+    padding: var(--spacing-md);
+    min-height: 250px;
+  }
+
+  .card-id-badge {
+    min-width: 36px;
+    height: 36px;
+    font-size: var(--font-size-base);
+  }
+
+  .card-title-registros {
+    font-size: var(--font-size-base);
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+  }
+
+  .info-label {
+    font-size: 0.625rem;
+  }
+
+  .info-value {
+    font-size: 0.8125rem;
+  }
+
+  .btn-table {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+
+  .empty-state-registros {
+    padding: var(--spacing-xl);
+  }
+
+  .empty-icon {
+    font-size: 2.5rem;
+  }
+
+  .empty-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .empty-description {
+    font-size: var(--font-size-sm);
+  }
+
+  .pagination-controls {
+    padding: var(--spacing-md);
+  }
+
+  .btn-pagination {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+  .registros-container {
+    padding: var(--spacing-sm);
+    padding-bottom: 80px;
+  }
+
+  .page-title-registros {
+    font-size: var(--font-size-lg);
+  }
+
+  .search-card {
+    padding: var(--spacing-sm);
+  }
+
+  .registro-card {
+    padding: var(--spacing-sm);
+  }
+
+  .card-title-registros {
+    font-size: 0.875rem;
   }
 }

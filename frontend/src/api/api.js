@@ -10,12 +10,53 @@ const api = axios.create({
   withCredentials: false,
 });
 
-// attach token automatically
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// Interceptor para adjuntar el token automáticamente
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para manejar errores de autenticación
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // Si el error es 401 (No autorizado) o 403 (Prohibido) por token inválido
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      const errorMessage = error.response.data?.error || '';
+
+      // Si el error es específicamente por token inválido o expirado
+      if (
+        errorMessage.includes('Token') ||
+        errorMessage.includes('token') ||
+        errorMessage.includes('expirado') ||
+        errorMessage.includes('inválido')
+      ) {
+        console.warn('⚠️ Token expirado o inválido. Redirigiendo al login...');
+
+        // Limpiar el localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('rol');
+
+        // Redirigir al login (ruta raíz)
+        window.location.href = '/';
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export async function loginRequest(usuario, password) {
   return api.post('/auth/login', { usuario, password });

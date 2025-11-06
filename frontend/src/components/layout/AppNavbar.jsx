@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { usePermisos } from '../../context/usePermisos';
+import ThemeToggle from '../theme/ThemeToggle';
 import './AppNavbar.css';
 
 export default function AppNavbar() {
@@ -96,6 +97,8 @@ export default function AppNavbar() {
 
         {/* Información de Usuario y Acciones */}
         <div className="navbar-user">
+          <ThemeToggle />
+
           <div className="user-info">
             <div className="user-avatar">
               {getInitials(user.nombreCompleto)}

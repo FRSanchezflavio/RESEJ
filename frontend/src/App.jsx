@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { PermisosProvider } from './context/PermisosContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import AppNavbar from './components/layout/AppNavbar';
 import Footer from './components/layout/Footer';
@@ -23,48 +24,58 @@ function AppInner() {
 
   return (
     <Router>
-      <AppNavbar />
-      <Routes>
-        {/* Ruta raíz */}
-        <Route
-          path="/"
-          element={user ? <Navigate to="/dashboard" /> : <Login />}
-        />
+      <div className="app-shell">
+        <AppNavbar />
 
-        {/* Dashboard */}
-        <Route
-          path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/" />}
-        />
+        <main className="app-main">
+          <Routes>
+            {/* Ruta raíz */}
+            <Route
+              path="/"
+              element={user ? <Navigate to="/dashboard" /> : <Login />}
+            />
 
-        {/* Módulos */}
-        <Route
-          path="/registros"
-          element={user ? <Registros /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/cargar"
-          element={isAdmin ? <UploadForm /> : <Navigate to="/dashboard" />}
-        />
-        <Route
-          path="/usuarios"
-          element={isAdmin ? <UsersManagement /> : <Navigate to="/dashboard" />}
-        />
+            {/* Dashboard */}
+            <Route
+              path="/dashboard"
+              element={user ? <Dashboard /> : <Navigate to="/" />}
+            />
 
-        {/* Cualquier ruta no válida → redirige */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-      <Footer />
+            {/* Módulos */}
+            <Route
+              path="/registros"
+              element={user ? <Registros /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/cargar"
+              element={isAdmin ? <UploadForm /> : <Navigate to="/dashboard" />}
+            />
+            <Route
+              path="/usuarios"
+              element={
+                isAdmin ? <UsersManagement /> : <Navigate to="/dashboard" />
+              }
+            />
+
+            {/* Cualquier ruta no válida → redirige */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
     </Router>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <PermisosProvider>
-        <AppInner />
-      </PermisosProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <PermisosProvider>
+          <AppInner />
+        </PermisosProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

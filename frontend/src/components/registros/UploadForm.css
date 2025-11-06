@@ -2,7 +2,8 @@
    UPLOAD FORM - MODERN DESIGN SYSTEM
    ============================================ */
 
-:root {
+/* Usar variables globales del tema */
+.upload-form-container {
   --upload-spacing-xs: 0.5rem;
   --upload-spacing-sm: 0.75rem;
   --upload-spacing-md: 1rem;
@@ -15,31 +16,28 @@
   --upload-radius-lg: 1rem;
   --upload-radius-xl: 1.5rem;
 
-  --upload-primary: #3b82f6;
+  --upload-primary: var(--color-primary-light);
   --upload-primary-light: #60a5fa;
-  --upload-primary-dark: #2563eb;
-  --upload-success: #10b981;
-  --upload-error: #ef4444;
-  --upload-warning: #f59e0b;
+  --upload-primary-dark: var(--color-primary-dark);
+  --upload-success: var(--color-success);
+  --upload-error: var(--color-danger);
+  --upload-warning: var(--color-warning);
 
-  --upload-text-primary: #e2e8f0;
-  --upload-text-secondary: #94a3b8;
-  --upload-text-tertiary: #64748b;
+  --upload-text-primary: var(--text-primary);
+  --upload-text-secondary: var(--text-secondary);
+  --upload-text-tertiary: var(--text-tertiary);
 
-  --upload-bg-primary: rgba(30, 41, 59, 0.5);
-  --upload-bg-secondary: rgba(51, 65, 85, 0.4);
-  --upload-bg-tertiary: rgba(71, 85, 105, 0.3);
+  --upload-bg-primary: var(--bg-tertiary);
+  --upload-bg-secondary: var(--bg-secondary);
+  --upload-bg-tertiary: var(--bg-primary);
 
-  --upload-border: rgba(148, 163, 184, 0.2);
-  --upload-border-hover: rgba(148, 163, 184, 0.4);
+  --upload-border: var(--border-color);
+  --upload-border-hover: var(--border-light);
 
-  --upload-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --upload-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --upload-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --upload-shadow-glow: 0 0 30px rgba(59, 130, 246, 0.3);
+  --upload-shadow: var(--shadow-md);
+  --upload-shadow-lg: var(--shadow-lg);
+  --upload-shadow-xl: var(--shadow-xl);
+  --upload-shadow-glow: var(--shadow-glow);
 }
 
 /* ============================================
@@ -115,15 +113,17 @@
   gap: var(--upload-spacing-lg);
   margin-bottom: var(--upload-spacing-2xl);
   padding: var(--upload-spacing-xl);
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.1),
-    rgba(147, 51, 234, 0.1)
-  );
-  border: 2px solid rgba(59, 130, 246, 0.3);
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
   border-radius: var(--upload-radius-xl);
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--glass-blur);
   animation: slideInRight 0.6s ease-out;
+}
+
+/* Modo claro - fondo más visible */
+[data-theme='light'] .upload-form-header {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(59, 130, 246, 0.2);
 }
 
 .header-icon {
@@ -253,6 +253,18 @@
   transition: all 0.3s ease;
   animation: fadeInUp 0.6s ease-out;
   animation-fill-mode: both;
+}
+
+/* Modo claro - cards más visibles */
+[data-theme='light'] .form-section {
+  background: #ffffff;
+  border-color: var(--color-gray-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='light'] .form-section:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
 }
 
 .form-section:nth-child(1) {
@@ -436,6 +448,17 @@
   background: var(--upload-bg-secondary);
   position: relative;
   overflow: hidden;
+}
+
+/* Modo claro - zona de archivos más visible */
+[data-theme='light'] .file-drop-zone {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-300);
+}
+
+[data-theme='light'] .file-drop-zone:hover {
+  background: var(--color-gray-100);
+  border-color: var(--upload-primary);
 }
 
 .file-drop-zone::before {
@@ -706,9 +729,24 @@
    RESPONSIVE
    ============================================ */
 
+/* Tablets grandes */
+@media (max-width: 1024px) {
+  .upload-form-container {
+    max-width: 900px;
+    padding: var(--upload-spacing-xl);
+    padding-bottom: 120px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: var(--upload-spacing-lg);
+  }
+}
+
+/* Móviles grandes */
 @media (max-width: 768px) {
   .upload-form-container {
-    padding: var(--upload-spacing-lg);
+    padding: var(--upload-spacing-lg) var(--upload-spacing-md);
     padding-bottom: 120px;
   }
 
@@ -716,14 +754,20 @@
     flex-direction: column;
     text-align: center;
     padding: var(--upload-spacing-lg);
+    gap: var(--upload-spacing-md);
   }
 
   .upload-form-title {
     font-size: 1.5rem;
   }
 
+  .upload-form-subtitle {
+    font-size: 0.875rem;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
+    gap: var(--upload-spacing-md);
   }
 
   .form-section {
@@ -733,23 +777,46 @@
   .section-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--upload-spacing-sm);
   }
 
   .section-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+  }
+
+  .section-description {
+    font-size: 0.8125rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-label-upload {
+    font-size: 0.75rem;
+  }
+
+  .form-input-upload,
+  .form-select-upload,
+  .form-textarea-upload {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: var(--upload-spacing-sm);
   }
 
   .btn-primary-upload,
   .btn-secondary-upload {
     width: 100%;
+    justify-content: center;
   }
 
   .file-drop-zone {
     padding: var(--upload-spacing-lg);
+    min-height: 180px;
   }
 
   .file-drop-icon {
@@ -761,15 +828,68 @@
     width: 32px;
     height: 32px;
   }
+
+  .file-drop-text {
+    font-size: 1rem;
+  }
+
+  .file-drop-hint {
+    font-size: 0.8125rem;
+  }
+
+  .file-list {
+    gap: var(--upload-spacing-sm);
+  }
+
+  .file-item {
+    padding: var(--upload-spacing-sm);
+  }
+
+  .file-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .file-details {
+    gap: 0.125rem;
+  }
+
+  .file-name {
+    font-size: 0.875rem;
+  }
+
+  .file-size {
+    font-size: 0.75rem;
+  }
+
+  .btn-remove-file {
+    padding: 0.375rem;
+    font-size: 1rem;
+  }
 }
 
+/* Móviles pequeños */
 @media (max-width: 480px) {
   .upload-form-container {
+    padding: var(--upload-spacing-md) var(--upload-spacing-sm);
+    padding-bottom: 100px;
+  }
+
+  .upload-form-header {
     padding: var(--upload-spacing-md);
   }
 
   .upload-form-title {
     font-size: 1.25rem;
+  }
+
+  .upload-form-subtitle {
+    font-size: 0.8125rem;
+  }
+
+  .form-section {
+    padding: var(--upload-spacing-md);
   }
 
   .section-number {
@@ -779,6 +899,105 @@
   }
 
   .section-title {
+    font-size: 1rem;
+  }
+
+  .section-description {
+    font-size: 0.75rem;
+  }
+
+  .form-input-upload,
+  .form-select-upload,
+  .form-textarea-upload {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-primary-upload,
+  .btn-secondary-upload {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .file-drop-zone {
+    padding: var(--upload-spacing-md);
+    min-height: 160px;
+  }
+
+  .file-drop-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .file-drop-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .file-drop-text {
+    font-size: 0.875rem;
+  }
+
+  .file-drop-hint {
+    font-size: 0.75rem;
+  }
+
+  .file-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--upload-spacing-sm);
+  }
+
+  .file-info {
+    width: 100%;
+  }
+
+  .btn-remove-file {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .alert-upload {
+    padding: var(--upload-spacing-sm) var(--upload-spacing-md);
+    font-size: 0.8125rem;
+  }
+
+  .success-animation {
+    width: 64px;
+    height: 64px;
+  }
+
+  .success-title {
     font-size: 1.125rem;
+  }
+
+  .success-message {
+    font-size: 0.875rem;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+  .upload-form-container {
+    padding: var(--upload-spacing-sm);
+    padding-bottom: 90px;
+  }
+
+  .upload-form-title {
+    font-size: 1.125rem;
+  }
+
+  .section-number {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+
+  .section-title {
+    font-size: 0.9375rem;
+  }
+
+  .file-drop-zone {
+    min-height: 140px;
   }
 }

@@ -106,6 +106,42 @@
 }
 
 /* ============================================
+   TEMA CLARO
+   ============================================ */
+
+[data-theme='light'] {
+  /* Backgrounds */
+  --bg-primary: #ffffff; /* Fondo Principal Claro */
+  --bg-secondary: #f8fafc; /* Fondo Secundario Claro */
+  --bg-tertiary: #f1f5f9; /* Fondo Cards Claro */
+  --bg-light: #0f172a; /* Invertido para contraste */
+  --bg-overlay: rgba(248, 250, 252, 0.95); /* Overlay Modales Claro */
+
+  /* Texto */
+  --text-primary: #0f172a; /* Texto Principal Oscuro */
+  --text-secondary: #475569; /* Texto Secundario */
+  --text-tertiary: #64748b; /* Texto Terciario */
+  --text-dark: #f8fafc; /* Invertido */
+
+  /* Bordes y Sombras */
+  --border-color: #e2e8f0;
+  --border-light: #cbd5e1;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15),
+    0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+
+  /* Efectos Glass Morphism */
+  --glass-bg: rgba(248, 250, 252, 0.7);
+  --glass-border: rgba(30, 41, 59, 0.1);
+  --glass-blur: blur(12px);
+}
+
+/* ============================================
    RESET Y CONFIGURACIÓN BASE
    ============================================ */
 
@@ -126,11 +162,43 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--text-primary);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #1a2332 100%);
+  background: var(--bg-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  transition: background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+/* Gradiente de fondo para modo oscuro */
+body[data-theme='dark'] {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #1a2332 100%);
+}
+
+/* Fondo claro para modo claro */
+body[data-theme='light'] {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* ============================================
+   APP LAYOUT (ensure footer is always at the bottom)
+   ============================================ */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1 0 auto; /* main grows to fill available space and push footer to bottom */
+  display: block;
+  width: 100%;
+}
+
+/* ensure footer does not shrink when space is limited */
+.app-footer {
+  flex-shrink: 0;
 }
 
 /* ============================================
@@ -423,14 +491,138 @@ label {
    RESPONSIVE
    ============================================ */
 
+/* Tablets grandes */
+@media (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 900px;
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+/* Móviles grandes */
 @media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
   :root {
-    --font-size-4xl: 1.875rem;
-    --font-size-3xl: 1.5rem;
-    --font-size-2xl: 1.25rem;
+    --font-size-4xl: 2rem;
+    --font-size-3xl: 1.625rem;
+    --font-size-2xl: 1.375rem;
+    --font-size-xl: 1.125rem;
+    --spacing-2xl: 2rem;
   }
 
   .container {
     padding: 0 var(--spacing-md);
+  }
+
+  button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+  }
+
+  h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+
+  :root {
+    --font-size-4xl: 1.75rem;
+    --font-size-3xl: 1.5rem;
+    --font-size-2xl: 1.25rem;
+    --font-size-xl: 1.0625rem;
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 1.75rem;
+  }
+
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 360px) {
+  html {
+    font-size: 12px;
+  }
+
+  :root {
+    --font-size-4xl: 1.5rem;
+    --font-size-3xl: 1.25rem;
+    --font-size-2xl: 1.125rem;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Orientación landscape en móviles */
+@media (max-height: 600px) and (orientation: landscape) {
+  html {
+    font-size: 13px;
+  }
+
+  :root {
+    --spacing-xl: 1.25rem;
+    --spacing-2xl: 1.5rem;
+  }
+}
+
+/* Touch devices - mejorar áreas táctiles */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px; /* Tamaño mínimo recomendado para touch */
+  }
+
+  button {
+    padding: 0.75rem 1.25rem;
   }
 }
