@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Button, Modal, Form } from 'react-bootstrap';
+import React, { useEffect, useState, useContext } from 'react';
+import { Card, Table, Button, Modal, Form, Alert } from 'react-bootstrap';
 import { fetchUsers, createUser } from '../../api/api';
+import InviteUserModal from './InviteUserModal';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function UsersManagement() {
+  const { user } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [show, setShow] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [form, setForm] = useState({
     usuario: '',
     nombre: '',
@@ -17,7 +21,12 @@ export default function UsersManagement() {
   const [mensajeEmail, setMensajeEmail] = useState('');
 
   useEffect(() => {
+    // Debug: Mostrar información del usuario actual
+    console.log('👤 Usuario actual:', user);
+    console.log('🔑 Rol:', user?.rol);
+    console.log('✅ Es admin:', isAdmin);
     load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function load() {
@@ -35,17 +44,29 @@ export default function UsersManagement() {
 
   const handleCreate = async () => {
     try {
+      // Validar campos requeridos
+      if (!form.usuario || !form.nombre || !form.apellido || !form.password) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
+      }
+
       // Validar que el email esté presente si se quiere enviar
       if (enviarEmail && !form.email) {
-        alert('Por favor ingresa un email para enviar las credenciales');
+        alert('Por favor ingresa un email para enviar las credenciales, o desmarca la opción de envío');
         return;
       }
 
       const datosUsuario = {
-        ...form,
+        usuario: form.usuario,
+        nombre: form.nombre,
+        apellido: form.apellido,
+        password: form.password,
+        rol: form.rol,
+        ...(form.email && { email: form.email }), // Solo incluir email si existe
         enviarEmail: enviarEmail && form.email ? true : false,
       };
 
+      console.log('📤 Datos a enviar:', datosUsuario);
       const response = await createUser(datosUsuario);
 
       // Mostrar mensaje sobre el envío del email
@@ -79,21 +100,64 @@ export default function UsersManagement() {
       setMensajeEmail('');
       load();
     } catch (err) {
-      console.error('Error creando usuario:', err);
-      alert(
-        `Error al crear usuario: ${err.response?.data?.message || err.message}`
-      );
+      console.error('❌ Error creando usuario:', err);
+      console.error('📋 Respuesta del servidor:', err.response?.data);
+      console.error('📊 Status:', err.response?.status);
+      
+      const errorMsg = err.response?.data?.error 
+        || err.response?.data?.message 
+        || err.response?.data?.detalles?.[0]?.msg
+        || JSON.stringify(err.response?.data)
+        || err.message;
+      
+      alert(`Error al crear usuario: ${errorMsg}`);
     }
   };
+
+  // Verificar si el usuario es administrador
+  const isAdmin = user?.rol === 'administrador' || user?.rol === 'admin';
 
   return (
     <Card className="p-3 shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h6>👥 Gestión de Usuarios</h6>
-        <Button size="sm" onClick={() => setShow(true)}>
-          Crear Nuevo Usuario
-        </Button>
+        <div className="d-flex gap-2">
+          <Button 
+            size="sm" 
+            variant="success" 
+            onClick={() => setShowInviteModal(true)}
+            disabled={!isAdmin}
+            title={!isAdmin ? 'Solo administradores pueden invitar usuarios' : 'Invitar usuario por email'}
+          >
+            📧 Invitar Usuario
+          </Button>
+          <Button 
+            size="sm" 
+            onClick={() => setShow(true)}
+            disabled={!isAdmin}
+            title={!isAdmin ? 'Solo administradores pueden crear usuarios' : 'Crear usuario manualmente'}
+          >
+            Crear Nuevo Usuario
+          </Button>
+        </div>
       </div>
+
+      {!isAdmin && (
+        <Alert variant="danger" className="mb-3">
+          <strong>🚫 Acceso Denegado</strong>
+          <p className="mb-2 mt-2">Solo los administradores pueden gestionar usuarios.</p>
+          <div className="bg-light p-2 rounded mt-2">
+            <small>
+              <strong>Tu usuario:</strong> {user?.usuario || 'Desconocido'}<br/>
+              <strong>Tu rol:</strong> {user?.rol || 'Desconocido'}
+            </small>
+          </div>
+          <hr />
+          <small className="text-muted">
+            💡 <strong>Solución:</strong> Cierra sesión y vuelve a iniciar con el usuario <code>admin</code> y contraseña <code>Admin2025!</code>
+          </small>
+        </Alert>
+      )}
 
       <Table size="sm" striped bordered hover>
         <thead>
@@ -177,7 +241,7 @@ export default function UsersManagement() {
               />
             </Form.Group>
             <Form.Group className="mb-2">
-              <Form.Label>📧 Email</Form.Label>
+              <Form.Label>📧 Email (Opcional)</Form.Label>
               <Form.Control
                 type="email"
                 placeholder="usuario@example.com"
@@ -185,7 +249,7 @@ export default function UsersManagement() {
                 onChange={e => setForm({ ...form, email: e.target.value })}
               />
               <Form.Text className="text-muted">
-                Necesario para enviar las credenciales por correo
+                Solo se usa para enviar credenciales por correo. No se guarda en la base de datos.
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-2">
@@ -247,6 +311,13 @@ export default function UsersManagement() {
           <Button onClick={handleCreate}>Crear</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal para invitar usuario */}
+      <InviteUserModal
+        show={showInviteModal}
+        onHide={() => setShowInviteModal(false)}
+        onInvitationSent={() => load()}
+      />
     </Card>
   );
 }

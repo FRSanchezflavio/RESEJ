@@ -28,6 +28,15 @@ export default function Login() {
       <Card style={{ width: 420, padding: 20, boxShadow: "0 2px 8px rgba(0,0,0,.08)" }}>
         <h4 className="mb-3">Iniciar Sesión</h4>
         {err && <Alert variant="danger">{err}</Alert>}
+        
+        <Alert variant="info" className="py-2">
+          <small>
+            <strong>👤 Usuario administrador:</strong><br/>
+            Usuario: <code>admin</code><br/>
+            Contraseña: <code>Admin2025!</code>
+          </small>
+        </Alert>
+
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Nombre de usuario</Form.Label>

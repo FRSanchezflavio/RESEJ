@@ -13,6 +13,8 @@ const personasRoutes = require('./routes/personas.routes');
 const registrosRoutes = require('./routes/registros.routes');
 const archivosRoutes = require('./routes/archivos.routes');
 const logsRoutes = require('./routes/logs.routes');
+const invitacionesRoutes = require('./routes/invitaciones.routes');
+const invitacionesPublicRoutes = require('./routes/invitacionesPublic.routes');
 
 const app = express();
 
@@ -71,6 +73,8 @@ app.use('/api/personas', personasRoutes);
 app.use('/api/registros', registrosRoutes);
 app.use('/api/archivos', archivosRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/invitaciones', invitacionesRoutes);
+app.use('/api/public/invitaciones', invitacionesPublicRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {

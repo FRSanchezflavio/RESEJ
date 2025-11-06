@@ -8,6 +8,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import Registros from "./components/registros/Registros";
 import UploadForm from "./components/registros/UploadForm";
 import UsersManagement from "./components/usuarios/UsersManagement";
+import RegistroInvitacion from "./pages/RegistroInvitacion";
 
 function AppInner() {
   const { user } = useContext(AuthContext);
@@ -20,6 +21,9 @@ function AppInner() {
       <Routes>
         {/* Ruta raíz */}
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+
+        {/* Ruta pública de registro por invitación */}
+        <Route path="/registro/:token" element={<RegistroInvitacion />} />
 
         {/* Dashboard */}
         <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />

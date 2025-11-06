@@ -58,9 +58,10 @@ class Usuario {
    * Crear nuevo usuario
    */
   static async create(usuarioData) {
-    const { password, ...rest } = usuarioData;
+    const { password, email, ...rest } = usuarioData;
     const password_hash = await hashPassword(password);
 
+    // La tabla usuarios no tiene columna email, se filtra aquí
     const [usuario] = await db('usuarios')
       .insert({
         ...rest,
@@ -68,14 +69,15 @@ class Usuario {
       })
       .returning('*');
 
-    return usuario;
+    // Agregar el email a la respuesta si se proporcionó (para el servicio de email)
+    return email ? { ...usuario, email } : usuario;
   }
 
   /**
    * Actualizar usuario
    */
   static async update(id, usuarioData) {
-    const { password, ...rest } = usuarioData;
+    const { password, email, ...rest } = usuarioData;
     const updateData = { ...rest };
 
     // Solo actualizar password si se proporciona
@@ -88,7 +90,8 @@ class Usuario {
       .update(updateData)
       .returning('*');
 
-    return usuario;
+    // Agregar el email a la respuesta si se proporcionó
+    return email ? { ...usuario, email } : usuario;
   }
 
   /**
