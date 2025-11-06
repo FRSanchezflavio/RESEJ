@@ -20,7 +20,7 @@ const createInvitationValidators = [
   body('duracion_horas')
     .optional()
     .isInt({ min: 1, max: 720 })
-    .withMessage('La duración debe ser entre 1 y 720 horas (30 días)')
+    .withMessage('La duración debe ser entre 1 y 720 horas (30 días)'),
 ];
 
 const validateTokenValidators = [
@@ -29,14 +29,11 @@ const validateTokenValidators = [
     .notEmpty()
     .withMessage('El token es requerido')
     .isLength({ min: 32 })
-    .withMessage('Token inválido')
+    .withMessage('Token inválido'),
 ];
 
 const acceptInvitationValidators = [
-  param('token')
-    .trim()
-    .notEmpty()
-    .withMessage('El token es requerido'),
+  param('token').trim().notEmpty().withMessage('El token es requerido'),
   body('username')
     .trim()
     .notEmpty()
@@ -49,7 +46,7 @@ const acceptInvitationValidators = [
     .notEmpty()
     .withMessage('La contraseña es requerida')
     .isLength({ min: 6 })
-    .withMessage('La contraseña debe tener al menos 6 caracteres')
+    .withMessage('La contraseña debe tener al menos 6 caracteres'),
 ];
 
 class InvitacionesController {
@@ -65,16 +62,19 @@ class InvitacionesController {
       }
 
       const usuarioCreadorId = req.user.id;
-      const result = await InvitacionService.createInvitation(req.body, usuarioCreadorId);
+      const result = await InvitacionService.createInvitation(
+        req.body,
+        usuarioCreadorId
+      );
 
       res.status(201).json({
         message: 'Invitación creada exitosamente',
-        data: result
+        data: result,
       });
     } catch (error) {
       console.error('Error al crear invitación:', error);
       res.status(400).json({
-        error: error.message || 'Error al crear la invitación'
+        error: error.message || 'Error al crear la invitación',
       });
     }
   }
@@ -96,18 +96,18 @@ class InvitacionesController {
       if (!result.valid) {
         return res.status(400).json({
           valid: false,
-          error: result.error
+          error: result.error,
         });
       }
 
       res.json({
         valid: true,
-        invitacion: result.invitacion
+        invitacion: result.invitacion,
       });
     } catch (error) {
       console.error('Error al validar invitación:', error);
       res.status(500).json({
-        error: 'Error al validar la invitación'
+        error: 'Error al validar la invitación',
       });
     }
   }
@@ -132,13 +132,13 @@ class InvitacionesController {
           id: usuario.id,
           username: usuario.usuario,
           email: usuario.email,
-          rol: usuario.rol
-        }
+          rol: usuario.rol,
+        },
       });
     } catch (error) {
       console.error('Error al aceptar invitación:', error);
       res.status(400).json({
-        error: error.message || 'Error al aceptar la invitación'
+        error: error.message || 'Error al aceptar la invitación',
       });
     }
   }
@@ -150,19 +150,24 @@ class InvitacionesController {
   static async list(req, res) {
     try {
       const filters = {
-        usado: req.query.usado === 'true' ? true : req.query.usado === 'false' ? false : undefined,
-        email: req.query.email
+        usado:
+          req.query.usado === 'true'
+            ? true
+            : req.query.usado === 'false'
+            ? false
+            : undefined,
+        email: req.query.email,
       };
 
       const invitaciones = await InvitacionService.getAllInvitations(filters);
 
       res.json({
-        data: invitaciones
+        data: invitaciones,
       });
     } catch (error) {
       console.error('Error al listar invitaciones:', error);
       res.status(500).json({
-        error: 'Error al obtener las invitaciones'
+        error: 'Error al obtener las invitaciones',
       });
     }
   }
@@ -176,12 +181,12 @@ class InvitacionesController {
       const result = await InvitacionService.cleanupExpired();
 
       res.json({
-        message: `${result} invitaciones expiradas eliminadas`
+        message: `${result} invitaciones expiradas eliminadas`,
       });
     } catch (error) {
       console.error('Error al limpiar invitaciones:', error);
       res.status(500).json({
-        error: 'Error al limpiar las invitaciones'
+        error: 'Error al limpiar las invitaciones',
       });
     }
   }
@@ -191,5 +196,5 @@ module.exports = {
   InvitacionesController,
   createInvitationValidators,
   validateTokenValidators,
-  acceptInvitationValidators
+  acceptInvitationValidators,
 };

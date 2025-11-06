@@ -31,7 +31,9 @@ class InvitacionService {
 
     // Calcular fecha de expiración
     const fechaExpiracion = new Date();
-    fechaExpiracion.setHours(fechaExpiracion.getHours() + (duracion_horas || 48));
+    fechaExpiracion.setHours(
+      fechaExpiracion.getHours() + (duracion_horas || 48)
+    );
 
     // Crear invitación
     const invitacion = await InvitacionUsuario.create({
@@ -40,12 +42,14 @@ class InvitacionService {
       rol: rol || 'usuario_consulta',
       token,
       usuario_creador_id: usuarioCreadorId,
-      fecha_expiracion: fechaExpiracion
+      fecha_expiracion: fechaExpiracion,
     });
 
     return {
       invitacion,
-      url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/registro/${token}`
+      url: `${
+        process.env.FRONTEND_URL || 'http://localhost:5173'
+      }/registro/${token}`,
     };
   }
 
@@ -74,8 +78,8 @@ class InvitacionService {
       invitacion: {
         email: invitacion.email,
         nombre_completo: invitacion.nombre_completo,
-        rol: invitacion.rol
-      }
+        rol: invitacion.rol,
+      },
     };
   }
 
@@ -101,10 +105,11 @@ class InvitacionService {
     const nuevoUsuario = await Usuario.create({
       usuario: userData.username,
       password: userData.password,
-      nombre: invitacion.nombre_completo.split(' ')[0] || invitacion.nombre_completo,
+      nombre:
+        invitacion.nombre_completo.split(' ')[0] || invitacion.nombre_completo,
       apellido: invitacion.nombre_completo.split(' ').slice(1).join(' ') || '',
       rol: invitacion.rol,
-      activo: true
+      activo: true,
     });
 
     // Marcar invitación como usada

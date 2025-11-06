@@ -7,16 +7,16 @@ import api from '../api/api';
 const RegistroInvitacion = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  
+
   const [validating, setValidating] = useState(true);
   const [invitacionValida, setInvitacionValida] = useState(false);
   const [invitacionData, setInvitacionData] = useState(null);
   const [error, setError] = useState(null);
-  
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
   const [registroExitoso, setRegistroExitoso] = useState(false);
@@ -38,19 +38,19 @@ const RegistroInvitacion = () => {
         setValidating(false);
       }
     };
-    
+
     validateToken();
   }, [token]);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError(null);
 
@@ -69,11 +69,11 @@ const RegistroInvitacion = () => {
     try {
       await api.post(`/public/invitaciones/${token}/aceptar`, {
         username: formData.username,
-        password: formData.password
+        password: formData.password,
       });
-      
+
       setRegistroExitoso(true);
-      
+
       setTimeout(() => {
         navigate('/login');
       }, 3000);
@@ -87,7 +87,10 @@ const RegistroInvitacion = () => {
 
   if (validating) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '100vh' }}
+      >
         <div className="text-center">
           <Spinner animation="border" variant="primary" />
           <p className="mt-3">Validando invitación...</p>
@@ -98,7 +101,10 @@ const RegistroInvitacion = () => {
 
   if (registroExitoso) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '100vh' }}
+      >
         <Card style={{ maxWidth: '500px', width: '100%' }} className="shadow">
           <Card.Body className="text-center p-5">
             <FaCheckCircle size={60} className="text-success mb-3" />
@@ -106,10 +112,13 @@ const RegistroInvitacion = () => {
             <p className="text-muted">
               Tu cuenta ha sido creada correctamente.
             </p>
-            <p className="text-muted">
-              Redirigiendo al inicio de sesión...
-            </p>
-            <Spinner animation="border" size="sm" variant="primary" className="mt-3" />
+            <p className="text-muted">Redirigiendo al inicio de sesión...</p>
+            <Spinner
+              animation="border"
+              size="sm"
+              variant="primary"
+              className="mt-3"
+            />
           </Card.Body>
         </Card>
       </Container>
@@ -118,14 +127,21 @@ const RegistroInvitacion = () => {
 
   if (!invitacionValida || error) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      <Container
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: '100vh' }}
+      >
         <Card style={{ maxWidth: '500px', width: '100%' }} className="shadow">
           <Card.Body className="p-5">
             <Alert variant="danger">
               <Alert.Heading>Invitación Inválida</Alert.Heading>
               <p className="mb-0">{error}</p>
             </Alert>
-            <Button variant="primary" onClick={() => navigate('/login')} className="w-100 mt-3">
+            <Button
+              variant="primary"
+              onClick={() => navigate('/login')}
+              className="w-100 mt-3"
+            >
               Ir al Inicio de Sesión
             </Button>
           </Card.Body>
@@ -135,7 +151,10 @@ const RegistroInvitacion = () => {
   }
 
   return (
-    <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+    <Container
+      className="d-flex justify-content-center align-items-center"
+      style={{ minHeight: '100vh' }}
+    >
       <Card style={{ maxWidth: '500px', width: '100%' }} className="shadow">
         <Card.Body className="p-5">
           <div className="text-center mb-4">
@@ -146,13 +165,20 @@ const RegistroInvitacion = () => {
 
           {invitacionData && (
             <Alert variant="info" className="mb-4">
-              <div><strong>Email:</strong> {invitacionData.email}</div>
-              <div><strong>Nombre:</strong> {invitacionData.nombre_completo}</div>
-              <div><strong>Rol:</strong> {
-                invitacionData.rol === 'usuario_consulta' ? 'Usuario de Consulta' :
-                invitacionData.rol === 'usuario_registro' ? 'Usuario de Registro' :
-                'Administrador'
-              }</div>
+              <div>
+                <strong>Email:</strong> {invitacionData.email}
+              </div>
+              <div>
+                <strong>Nombre:</strong> {invitacionData.nombre_completo}
+              </div>
+              <div>
+                <strong>Rol:</strong>{' '}
+                {invitacionData.rol === 'usuario_consulta'
+                  ? 'Usuario de Consulta'
+                  : invitacionData.rol === 'usuario_registro'
+                  ? 'Usuario de Registro'
+                  : 'Administrador'}
+              </div>
             </Alert>
           )}
 
@@ -199,9 +225,7 @@ const RegistroInvitacion = () => {
                 required
                 minLength={6}
               />
-              <Form.Text className="text-muted">
-                Mínimo 6 caracteres
-              </Form.Text>
+              <Form.Text className="text-muted">Mínimo 6 caracteres</Form.Text>
             </Form.Group>
 
             <Form.Group className="mb-4">

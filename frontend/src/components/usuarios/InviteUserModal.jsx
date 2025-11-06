@@ -8,22 +8,22 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
     email: '',
     nombre_completo: '',
     rol: 'usuario_consulta',
-    duracion_horas: 48
+    duracion_horas: 48,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [invitationUrl, setInvitationUrl] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -55,7 +55,7 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
       email: '',
       nombre_completo: '',
       rol: 'usuario_consulta',
-      duracion_horas: 48
+      duracion_horas: 48,
     });
     setError(null);
     setInvitationUrl(null);
@@ -126,7 +126,9 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
                 onChange={handleChange}
                 required
               >
-                <option value="usuario_consulta">Usuario de Consulta (Solo lectura)</option>
+                <option value="usuario_consulta">
+                  Usuario de Consulta (Solo lectura)
+                </option>
                 <option value="usuario_registro">Usuario de Registro</option>
                 <option value="admin">Administrador</option>
               </Form.Select>
@@ -159,7 +161,11 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
             </Form.Group>
 
             <div className="d-flex justify-content-end gap-2">
-              <Button variant="secondary" onClick={handleClose} disabled={loading}>
+              <Button
+                variant="secondary"
+                onClick={handleClose}
+                disabled={loading}
+              >
                 Cancelar
               </Button>
               <Button variant="primary" type="submit" disabled={loading}>
@@ -177,12 +183,12 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
               <small className="text-muted d-block mb-2">
                 Envía este enlace a <strong>{formData.email}</strong>
               </small>
-              
+
               <InputGroup>
                 <Form.Control
                   readOnly
                   value={invitationUrl}
-                  onClick={(e) => e.target.select()}
+                  onClick={e => e.target.select()}
                   style={{ fontSize: '0.9rem', fontFamily: 'monospace' }}
                   className="bg-light"
                 />
@@ -204,7 +210,7 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
                   )}
                 </Button>
               </InputGroup>
-              
+
               <small className="text-muted d-block mt-2">
                 <FaClock className="me-1" />
                 Expira en {formData.duracion_horas} horas
@@ -215,7 +221,9 @@ const InviteUserModal = ({ show, onHide, onInvitationSent }) => {
               <small>
                 <strong>⚠️ Importante:</strong>
                 <ul className="mb-0 mt-1 ps-3">
-                  <li>El enlace es de <strong>un solo uso</strong></li>
+                  <li>
+                    El enlace es de <strong>un solo uso</strong>
+                  </li>
                   <li>El usuario debe registrarse antes de que expire</li>
                 </ul>
               </small>

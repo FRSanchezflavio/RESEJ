@@ -41,7 +41,7 @@ class InvitacionUsuario {
       .update({
         usado: true,
         usuario_creado_id: usuarioCreadoId,
-        fecha_uso: knex.fn.now()
+        fecha_uso: knex.fn.now(),
       })
       .returning('*');
     return invitacion;
@@ -57,7 +57,11 @@ class InvitacionUsuario {
         'usuarios.nombre as nombre_creador',
         'usuarios.apellido as apellido_creador'
       )
-      .leftJoin('usuarios', 'invitaciones_usuarios.usuario_creador_id', 'usuarios.id')
+      .leftJoin(
+        'usuarios',
+        'invitaciones_usuarios.usuario_creador_id',
+        'usuarios.id'
+      )
       .orderBy('fecha_creacion', 'desc');
 
     if (filters.usado !== undefined) {
@@ -65,7 +69,11 @@ class InvitacionUsuario {
     }
 
     if (filters.email) {
-      query = query.where('invitaciones_usuarios.email', 'ilike', `%${filters.email}%`);
+      query = query.where(
+        'invitaciones_usuarios.email',
+        'ilike',
+        `%${filters.email}%`
+      );
     }
 
     return await query;

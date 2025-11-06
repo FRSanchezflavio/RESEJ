@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   InvitacionesController,
-  createInvitationValidators
+  createInvitationValidators,
 } = require('../controllers/invitacionesController');
 const { authenticateToken } = require('../middleware/auth');
 

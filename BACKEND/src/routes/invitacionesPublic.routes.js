@@ -3,13 +3,21 @@ const router = express.Router();
 const {
   InvitacionesController,
   validateTokenValidators,
-  acceptInvitationValidators
+  acceptInvitationValidators,
 } = require('../controllers/invitacionesController');
 
 // Validar token de invitación (público)
-router.get('/:token/validar', validateTokenValidators, InvitacionesController.validate);
+router.get(
+  '/:token/validar',
+  validateTokenValidators,
+  InvitacionesController.validate
+);
 
 // Aceptar invitación y crear usuario (público)
-router.post('/:token/aceptar', acceptInvitationValidators, InvitacionesController.accept);
+router.post(
+  '/:token/aceptar',
+  acceptInvitationValidators,
+  InvitacionesController.accept
+);
 
 module.exports = router;
