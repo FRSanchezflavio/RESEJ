@@ -30,12 +30,10 @@ async function actualizarRolUsuario(nombreUsuario, nuevoRol) {
     }
 
     // Actualizar el rol del usuario
-    await db('usuarios')
-      .where('usuario', nombreUsuario)
-      .update({
-        rol: nuevoRol,
-        rol_id: rol.id,
-      });
+    await db('usuarios').where('usuario', nombreUsuario).update({
+      rol: nuevoRol,
+      rol_id: rol.id,
+    });
 
     console.log(`✅ Usuario "${nombreUsuario}" actualizado exitosamente`);
     console.log(`   Nuevo rol: ${nuevoRol} (ID: ${rol.id})`);
@@ -60,10 +58,14 @@ async function actualizarRolUsuario(nombreUsuario, nuevoRol) {
 const [, , nombreUsuario, nuevoRol] = process.argv;
 
 if (!nombreUsuario || !nuevoRol) {
-  console.log('Uso: node scripts/actualizar-rol-usuario.js <nombre_usuario> <rol>');
+  console.log(
+    'Uso: node scripts/actualizar-rol-usuario.js <nombre_usuario> <rol>'
+  );
   console.log('');
   console.log('Ejemplo:');
-  console.log('  node scripts/actualizar-rol-usuario.js DEVELOPER1 administrador');
+  console.log(
+    '  node scripts/actualizar-rol-usuario.js DEVELOPER1 administrador'
+  );
   console.log('');
   console.log('Roles disponibles: administrador, usuario_consulta');
   process.exit(1);
