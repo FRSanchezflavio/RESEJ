@@ -437,7 +437,10 @@
   }
 
   .stats-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas incluso en móviles grandes */
+    grid-template-columns: repeat(
+      3,
+      1fr
+    ); /* 3 columnas incluso en móviles grandes */
     gap: var(--spacing-sm);
   }
 
