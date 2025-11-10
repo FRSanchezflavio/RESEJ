@@ -98,6 +98,14 @@
   gap: var(--users-spacing-sm);
 }
 
+/* Modo claro - título más visible */
+[data-theme='light'] .header h2 {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--users-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .header-actions {
   display: flex;
   gap: 10px;

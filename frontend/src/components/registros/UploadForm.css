@@ -160,6 +160,14 @@
   background-clip: text;
 }
 
+/* Modo claro - título más visible */
+[data-theme='light'] .upload-form-title {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--upload-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .upload-form-subtitle {
   font-size: 1rem;
   color: var(--upload-text-secondary);

@@ -89,13 +89,10 @@
    ============================================ */
 
 .stats-grid {
-  /* Mostrar las tarjetas en una sola fila; permitir scroll horizontal en pantallas pequeñas */
-  display: flex;
-  flex-wrap: nowrap; /* mantener en una línea */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-2xl);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .stat-card-dashboard {
@@ -110,12 +107,6 @@
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
-}
-
-/* Forzar tamaño mínimo para que las tarjetas no se compriman en una sola fila */
-.stat-card-dashboard {
-  min-width: 240px;
-  flex: 0 0 auto; /* evitar que las tarjetas crezcan/reduzcan para mantenerse en línea */
 }
 
 .stat-card-dashboard::before {
@@ -405,11 +396,8 @@
   }
 
   .stats-grid {
+    grid-template-columns: repeat(3, 1fr); /* mantener 3 columnas */
     gap: var(--spacing-md);
-  }
-
-  .stat-card-dashboard {
-    min-width: 220px;
   }
 
   .quick-actions-grid {
@@ -449,12 +437,13 @@
   }
 
   .stats-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas incluso en móviles grandes */
     gap: var(--spacing-sm);
   }
 
   .stat-card-dashboard {
-    min-width: 200px;
     padding: var(--spacing-lg);
+    gap: var(--spacing-sm);
   }
 
   .stat-icon-dashboard {
@@ -551,11 +540,11 @@
   }
 
   .stats-grid {
+    grid-template-columns: 1fr; /* 1 columna en móviles pequeños */
     gap: var(--spacing-xs);
   }
 
   .stat-card-dashboard {
-    min-width: 180px;
     padding: var(--spacing-md);
     gap: var(--spacing-md);
   }
@@ -602,7 +591,7 @@
     font-size: var(--font-size-lg);
   }
 
-  .stat-card-dashboard {
-    min-width: 160px;
+  .stats-grid {
+    grid-template-columns: 1fr; /* 1 columna en móviles muy pequeños */
   }
 }
