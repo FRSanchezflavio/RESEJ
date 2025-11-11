@@ -118,6 +118,13 @@ export default function Registros() {
         numero_causa: editData.numero_causa,
         juzgado: editData.juzgado,
         observaciones: editData.observaciones,
+        // Nuevos campos agregados
+        estado_secuestro: editData.estado_secuestro,
+        lugar_deposito: editData.lugar_deposito,
+        caratula: editData.caratula,
+        victima: editData.victima,
+        imputado_causante: editData.imputado_causante,
+        denunciante: editData.denunciante,
       };
 
       await api.put(`/registros/${registroId}`, camposPermitidos);
@@ -204,6 +211,10 @@ export default function Registros() {
                 <option value="cadena_custodia">🔗 Cadena de Custodia</option>
                 <option value="detalle_secuestro">📝 Detalle</option>
                 <option value="of_a_cargo">👮 Oficial a Cargo</option>
+                <option value="caratula">📑 Carátula</option>
+                <option value="victima">🧑 Víctima</option>
+                <option value="imputado">⚠️ Imputado/Causante</option>
+                <option value="denunciante">📢 Denunciante</option>
               </select>
             </div>
 
@@ -441,6 +452,45 @@ function RegistroCard({
                   {registro.observaciones || registro.tramite || '-'}
                 </div>
               </div>
+
+              {/* Nuevos campos agregados */}
+              <div className="detail-group">
+                <div className="detail-label">✅ Estado del Secuestro</div>
+                <div className="detail-value">
+                  {registro.estado_secuestro || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">📍 Lugar de Depósito</div>
+                <div className="detail-value">
+                  {registro.lugar_deposito || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group" style={{ gridColumn: '1 / -1' }}>
+                <div className="detail-label">📑 Carátula</div>
+                <div className="detail-value">{registro.caratula || '-'}</div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">🧑 Víctima</div>
+                <div className="detail-value">{registro.victima || '-'}</div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">⚠️ Imputado/Causante</div>
+                <div className="detail-value">
+                  {registro.imputado_causante || '-'}
+                </div>
+              </div>
+
+              <div className="detail-group">
+                <div className="detail-label">📢 Denunciante</div>
+                <div className="detail-value">
+                  {registro.denunciante || '-'}
+                </div>
+              </div>
             </div>
           ) : (
             /* Formulario de edición */
@@ -562,6 +612,81 @@ function RegistroCard({
                   rows="2"
                   value={editData.tramite || editData.observaciones || ''}
                   onChange={e => onEditChange('tramite', e.target.value)}
+                />
+              </div>
+
+              {/* Nuevos campos editables */}
+              <div className="detail-group">
+                <label className="detail-label">✅ Estado del Secuestro</label>
+                <select
+                  className="form-input-registros"
+                  value={editData.estado_secuestro || ''}
+                  onChange={e =>
+                    onEditChange('estado_secuestro', e.target.value)
+                  }
+                >
+                  <option value="">Seleccione un estado...</option>
+                  <option value="Remitido">Remitido</option>
+                  <option value="En depósito">En depósito</option>
+                  <option value="Entregado">Entregado</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📍 Lugar de Depósito</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.lugar_deposito || ''}
+                  onChange={e => onEditChange('lugar_deposito', e.target.value)}
+                  placeholder="Ubicación del depósito"
+                />
+              </div>
+
+              <div className="detail-group" style={{ gridColumn: '1 / -1' }}>
+                <label className="detail-label">📑 Carátula</label>
+                <textarea
+                  className="form-input-registros"
+                  rows="2"
+                  value={editData.caratula || ''}
+                  onChange={e => onEditChange('caratula', e.target.value)}
+                  placeholder="Carátula de la causa judicial"
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">🧑 Víctima</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.victima || ''}
+                  onChange={e => onEditChange('victima', e.target.value)}
+                  placeholder="Nombre de la víctima"
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">⚠️ Imputado/Causante</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.imputado_causante || ''}
+                  onChange={e =>
+                    onEditChange('imputado_causante', e.target.value)
+                  }
+                  placeholder="Nombre del imputado o causante"
+                />
+              </div>
+
+              <div className="detail-group">
+                <label className="detail-label">📢 Denunciante</label>
+                <input
+                  type="text"
+                  className="form-input-registros"
+                  value={editData.denunciante || ''}
+                  onChange={e => onEditChange('denunciante', e.target.value)}
+                  placeholder="Nombre del denunciante"
                 />
               </div>
             </div>

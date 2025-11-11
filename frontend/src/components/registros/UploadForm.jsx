@@ -16,12 +16,49 @@ export default function UploadForm() {
     nro_libro_secuestro: '',
     of_a_cargo: '',
     observaciones: '',
+    // Nuevos campos
+    estado_secuestro: '',
+    lugar_deposito: '',
+    caratula: '',
+    victima: '',
+    imputado_causante: '',
+    denunciante: '',
   });
+  const [objetosSecuestrados, setObjetosSecuestrados] = useState([
+    { id: 1, detalle: '', estado: '' },
+  ]);
   const [files, setFiles] = useState([]);
   const [msg, setMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showCaratulaDetails, setShowCaratulaDetails] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Funciones para manejar objetos secuestrados
+  const agregarObjeto = () => {
+    const nuevoId =
+      objetosSecuestrados.length > 0
+        ? Math.max(...objetosSecuestrados.map(obj => obj.id)) + 1
+        : 1;
+    setObjetosSecuestrados([
+      ...objetosSecuestrados,
+      { id: nuevoId, detalle: '', estado: '' },
+    ]);
+  };
+
+  const eliminarObjeto = id => {
+    if (objetosSecuestrados.length > 1) {
+      setObjetosSecuestrados(objetosSecuestrados.filter(obj => obj.id !== id));
+    }
+  };
+
+  const actualizarObjeto = (id, campo, valor) => {
+    setObjetosSecuestrados(
+      objetosSecuestrados.map(obj =>
+        obj.id === id ? { ...obj, [campo]: valor } : obj
+      )
+    );
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -38,9 +75,20 @@ export default function UploadForm() {
       ? new Date(form.fecha_carga).toISOString().split('T')[0]
       : '';
 
+    // Construir el detalle completo con todos los objetos
+    const detalleCompleto = objetosSecuestrados
+      .map(
+        (obj, index) =>
+          `Objeto ${index + 1}: ${obj.detalle} - Estado: ${
+            obj.estado || 'Sin especificar'
+          }`
+      )
+      .join('\n');
+
     // Agregar todos los campos
     Object.entries({
       ...form,
+      detalle_secuestro: detalleCompleto,
       fecha_ingreso: fechaIngresoISO,
       fecha_carga: fechaCargaISO,
       persona_id: 1, // temporal
@@ -73,8 +121,16 @@ export default function UploadForm() {
         nro_libro_secuestro: '',
         of_a_cargo: '',
         observaciones: '',
+        estado_secuestro: '',
+        lugar_deposito: '',
+        caratula: '',
+        victima: '',
+        imputado_causante: '',
+        denunciante: '',
       });
       setFiles([]);
+      setObjetosSecuestrados([{ id: 1, detalle: '', estado: '' }]);
+      setShowCaratulaDetails(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
       console.error('Error detallado:', err.response?.data || err.message);
@@ -315,18 +371,67 @@ export default function UploadForm() {
 
           <div className="form-field full-width">
             <label className="form-label">
-              <span className="label-text">Detalle del secuestro</span>
+              <span className="label-text">Objetos Secuestrados</span>
               <span className="label-required">*</span>
             </label>
-            <textarea
-              name="detalle_secuestro"
-              value={form.detalle_secuestro}
-              onChange={handleChange}
-              className="form-textarea"
-              rows={4}
-              placeholder="Describa detalladamente el secuestro realizado..."
-              required
-            />
+
+            <div className="objetos-secuestrados-container">
+              {objetosSecuestrados.map((objeto, index) => (
+                <div key={objeto.id} className="objeto-secuestrado-item">
+                  <div className="objeto-numero">Objeto {index + 1}</div>
+
+                  <div className="objeto-inputs">
+                    <div className="objeto-detalle">
+                      <input
+                        type="text"
+                        value={objeto.detalle}
+                        onChange={e =>
+                          actualizarObjeto(objeto.id, 'detalle', e.target.value)
+                        }
+                        className="form-input"
+                        placeholder="Descripción del objeto secuestrado..."
+                        required={index === 0}
+                      />
+                    </div>
+
+                    <div className="objeto-estado">
+                      <select
+                        value={objeto.estado}
+                        onChange={e =>
+                          actualizarObjeto(objeto.id, 'estado', e.target.value)
+                        }
+                        className="form-select"
+                      >
+                        <option value="">Estado...</option>
+                        <option value="Remitido">Remitido</option>
+                        <option value="En depósito">En depósito</option>
+                        <option value="Entregado">Entregado</option>
+                        <option value="Otros">Otros</option>
+                      </select>
+                    </div>
+
+                    {objetosSecuestrados.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => eliminarObjeto(objeto.id)}
+                        className="btn-eliminar-objeto"
+                        title="Eliminar objeto"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={agregarObjeto}
+                className="btn-agregar-objeto"
+              >
+                + Agregar otro objeto
+              </button>
+            </div>
           </div>
         </div>
 
@@ -430,12 +535,220 @@ export default function UploadForm() {
               placeholder="Agregue cualquier observación adicional..."
             />
           </div>
+
+          {/* Nuevos campos: Estado y Depósito */}
+          <div className="form-grid">
+            <div className="form-field">
+              <label className="form-label">
+                <span className="label-text">Estado del secuestro</span>
+              </label>
+              <div className="input-wrapper">
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <select
+                  name="estado_secuestro"
+                  value={form.estado_secuestro}
+                  onChange={handleChange}
+                  className="form-input form-select"
+                >
+                  <option value="">Seleccione un estado...</option>
+                  <option value="Remitido">Remitido</option>
+                  <option value="En depósito">En depósito</option>
+                  <option value="Entregado">Entregado</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label">
+                <span className="label-text">Lugar de depósito</span>
+              </label>
+              <div className="input-wrapper">
+                <svg
+                  className="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  name="lugar_deposito"
+                  value={form.lugar_deposito}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Ubicación del depósito"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección: Información de la Causa */}
+        <div className="form-section">
+          <div className="section-header">
+            <span className="section-number">04</span>
+            <h2 className="section-title">Información de la Causa</h2>
+          </div>
+
+          <div className="form-field full-width">
+            <label className="form-label">
+              <span className="label-text">Carátula</span>
+            </label>
+            <textarea
+              name="caratula"
+              value={form.caratula}
+              onChange={handleChange}
+              className="form-textarea"
+              rows={2}
+              placeholder="Carátula de la causa judicial"
+            />
+          </div>
+
+          {/* Toggle para mostrar/ocultar detalles adicionales */}
+          <div className="form-field full-width">
+            <button
+              type="button"
+              onClick={() => setShowCaratulaDetails(!showCaratulaDetails)}
+              className="toggle-details-btn"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={showCaratulaDetails ? 'M19 9l-7 7-7-7' : 'M9 5l7 7-7 7'}
+                />
+              </svg>
+              <span>
+                {showCaratulaDetails ? 'Ocultar' : 'Mostrar'} detalles de la
+                causa
+              </span>
+            </button>
+          </div>
+
+          {showCaratulaDetails && (
+            <div className="caratula-details">
+              <div className="form-grid">
+                <div className="form-field">
+                  <label className="form-label">
+                    <span className="label-text">Víctima</span>
+                  </label>
+                  <div className="input-wrapper">
+                    <svg
+                      className="input-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      name="victima"
+                      value={form.victima}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Nombre de la víctima"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="form-label">
+                    <span className="label-text">Imputado / Causante</span>
+                  </label>
+                  <div className="input-wrapper">
+                    <svg
+                      className="input-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      name="imputado_causante"
+                      value={form.imputado_causante}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Nombre del imputado o causante"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="form-label">
+                    <span className="label-text">Denunciante</span>
+                  </label>
+                  <div className="input-wrapper">
+                    <svg
+                      className="input-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      name="denunciante"
+                      value={form.denunciante}
+                      onChange={handleChange}
+                      className="form-input"
+                      placeholder="Nombre del denunciante"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sección: Archivos Adjuntos */}
         <div className="form-section">
           <div className="section-header">
-            <span className="section-number">04</span>
+            <span className="section-number">05</span>
             <h2 className="section-title">Archivos Adjuntos</h2>
           </div>
 

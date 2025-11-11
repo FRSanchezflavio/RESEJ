@@ -120,7 +120,13 @@ class Registro {
             .orWhere('r.numero_causa', 'ilike', `%${termino}%`)
             .orWhere('r.detalle_secuestro', 'ilike', `%${termino}%`)
             .orWhere('r.cadena_custodia', 'ilike', `%${termino}%`)
-            .orWhere('r.of_a_cargo', 'ilike', `%${termino}%`);
+            .orWhere('r.of_a_cargo', 'ilike', `%${termino}%`)
+            .orWhere('r.estado_secuestro', 'ilike', `%${termino}%`)
+            .orWhere('r.lugar_deposito', 'ilike', `%${termino}%`)
+            .orWhere('r.caratula', 'ilike', `%${termino}%`)
+            .orWhere('r.victima', 'ilike', `%${termino}%`)
+            .orWhere('r.imputado_causante', 'ilike', `%${termino}%`)
+            .orWhere('r.denunciante', 'ilike', `%${termino}%`);
         } else if (criterio === 'persona') {
           this.where('p.nombre', 'ilike', `%${termino}%`).orWhere(
             'p.apellido',
@@ -143,6 +149,14 @@ class Registro {
           this.where('r.detalle_secuestro', 'ilike', `%${termino}%`);
         } else if (criterio === 'oficial') {
           this.where('r.of_a_cargo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'caratula') {
+          this.where('r.caratula', 'ilike', `%${termino}%`);
+        } else if (criterio === 'victima') {
+          this.where('r.victima', 'ilike', `%${termino}%`);
+        } else if (criterio === 'imputado') {
+          this.where('r.imputado_causante', 'ilike', `%${termino}%`);
+        } else if (criterio === 'denunciante') {
+          this.where('r.denunciante', 'ilike', `%${termino}%`);
         }
       });
     }

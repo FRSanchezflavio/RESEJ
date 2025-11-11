@@ -108,8 +108,9 @@ const createRegistroValidators = [
     .withMessage('ID de persona inválido'),
   // fecha_ingreso: aceptar AAAA-MM-DD y convertir a Date
   body('fecha_ingreso')
-    .notEmpty().withMessage('La fecha de ingreso es requerida')
-    .custom((value) => {
+    .notEmpty()
+    .withMessage('La fecha de ingreso es requerida')
+    .custom(value => {
       const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
       if (!isoRegex.test(value)) {
         throw new Error('Formato de fecha inválido (use AAAA-MM-DD)');
@@ -131,6 +132,34 @@ const createRegistroValidators = [
     .optional()
     .isIn(['abierta', 'cerrada', 'en_proceso'])
     .withMessage('Estado de causa inválido'),
+
+  // Nuevos campos agregados
+  body('estado_secuestro')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Estado del secuestro no puede exceder 100 caracteres'),
+  body('lugar_deposito')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Lugar de depósito no puede exceder 200 caracteres'),
+  body('caratula').optional().trim(),
+  body('victima')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Víctima no puede exceder 200 caracteres'),
+  body('imputado_causante')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Imputado/Causante no puede exceder 200 caracteres'),
+  body('denunciante')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Denunciante no puede exceder 200 caracteres'),
 ];
 
 /**
