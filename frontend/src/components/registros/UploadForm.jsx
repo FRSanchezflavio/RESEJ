@@ -332,7 +332,7 @@ export default function UploadForm() {
               </div>
             </div>
 
-            <div className="form-field">
+            <div className="form-field ">
               <label className="form-label">
                 <span className="label-text">Sección que interviene</span>
                 <span className="label-required">*</span>
@@ -359,11 +359,18 @@ export default function UploadForm() {
                   required
                 >
                   <option value="">Seleccione una sección...</option>
-                  <option value="Criminalística">Criminalística</option>
-                  <option value="Robos y Hurtos">Robos y Hurtos</option>
-                  <option value="Narcotráfico">Narcotráfico</option>
-                  <option value="Delitos Complejos">Delitos Complejos</option>
-                  <option value="Otros">Otros</option>
+                  <option value="Delitos Generales y Especiales">
+                    Delitos Generales y Especiales
+                  </option>
+                  <option value="Cibercrimen">Cibercrimen</option>
+                  <option value="Of. Central">Of. Central</option>
+                  <option value="Análisis Informática Forense">
+                    Análisis Informática Forense
+                  </option>
+                  <option value="Explotación de Prensa">
+                    Explotación de Prensa
+                  </option>
+                  <option value="Análisis Delictual">Análisis Delictual</option>
                 </select>
               </div>
             </div>
@@ -417,7 +424,8 @@ export default function UploadForm() {
                         className="btn-eliminar-objeto"
                         title="Eliminar objeto"
                       >
-                        ✕
+                        <span>✕</span>
+                        <span>Eliminar objeto</span>
                       </button>
                     )}
                   </div>

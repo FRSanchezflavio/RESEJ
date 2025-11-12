@@ -380,10 +380,42 @@ function RegistroCard({
           <div className="info-content">
             <div className="info-label">Detalle del Secuestro</div>
             <div className="info-value">
-              {isExpanded
-                ? registro.detalle_secuestro || '-'
-                : (registro.detalle_secuestro || '-').substring(0, 100) +
-                  (registro.detalle_secuestro?.length > 100 ? '...' : '')}
+              {isExpanded ? (
+                <div className="objetos-list">
+                  {(registro.detalle_secuestro || '-')
+                    .split('\n')
+                    .map((linea, idx) => {
+                      // Parsear cada línea con formato "Objeto N: detalle - Estado: estado"
+                      if (linea.trim().startsWith('Objeto')) {
+                        return (
+                          <div key={idx} className="objeto-item-display">
+                            {linea}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })
+                    .filter(Boolean).length > 0 ? (
+                    (registro.detalle_secuestro || '-')
+                      .split('\n')
+                      .map((linea, idx) => {
+                        if (linea.trim().startsWith('Objeto')) {
+                          return (
+                            <div key={idx} className="objeto-item-display">
+                              {linea}
+                            </div>
+                          );
+                        }
+                        return null;
+                      })
+                  ) : (
+                    <span>{registro.detalle_secuestro || '-'}</span>
+                  )}
+                </div>
+              ) : (
+                (registro.detalle_secuestro || '-').substring(0, 100) +
+                (registro.detalle_secuestro?.length > 100 ? '...' : '')
+              )}
             </div>
           </div>
         </div>
@@ -527,14 +559,27 @@ function RegistroCard({
 
               <div className="detail-group">
                 <label className="detail-label">🏛️ Sección</label>
-                <input
-                  type="text"
+                <select
                   className="form-input-registros"
                   value={editData.seccion_que_interviene || ''}
                   onChange={e =>
                     onEditChange('seccion_que_interviene', e.target.value)
                   }
-                />
+                >
+                  <option value="">Seleccione una sección...</option>
+                  <option value="Delitos Generales y Especiales">
+                    Delitos Generales y Especiales
+                  </option>
+                  <option value="Cibercrimen">Cibercrimen</option>
+                  <option value="Oficina Central(s5)">Oficina Central </option>
+                  <option value="Análisis Informática Forense">
+                    Análisis Informática Forense
+                  </option>
+                  <option value="Explotación de Prensa y Reunión de informacion">
+                    Explotación de Prensa
+                  </option>
+                  <option value="Análisis Delictual">Análisis Delictual</option>
+                </select>
               </div>
 
               <div className="detail-group" style={{ gridColumn: '1 / -1' }}>
