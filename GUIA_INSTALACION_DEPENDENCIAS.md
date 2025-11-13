@@ -29,10 +29,12 @@ Antes de comenzar, asegúrese de cumplir con los [Requisitos del Sistema](./REQU
 Puede obtener el sistema de dos formas:
 
 **A) Descarga directa:**
+
 - Solicite el paquete comprimido `RESEJ-v1.0.0.zip` al equipo de desarrollo
 - Verifique que el archivo tenga aproximadamente 50-100 MB
 
 **B) Desde repositorio Git:**
+
 ```bash
 git clone https://github.com/FRSanchezflavio/RESEJ.git
 cd RESEJ
@@ -41,6 +43,7 @@ cd RESEJ
 ### 3. Preparar Credenciales
 
 Tendrá que configurar:
+
 - ✅ Usuario y contraseña de PostgreSQL
 - ✅ Credenciales de administrador del sistema
 - ✅ Configuración de email (opcional)
@@ -179,6 +182,7 @@ npm run build
 ### Paso 9: Iniciar el Sistema
 
 **Opción 1: Modo Desarrollo (para pruebas)**
+
 ```bash
 # Desde la raíz del proyecto
 npm install
@@ -186,6 +190,7 @@ npm start
 ```
 
 **Opción 2: Modo Producción**
+
 ```bash
 # Terminal 1 - Backend
 cd BACKEND
@@ -244,10 +249,12 @@ En cada estación de trabajo de las dependencias:
 3. Iniciar sesión con las credenciales proporcionadas
 
 **Configurar IP estática en el servidor:**
+
 - Panel de Control → Red → Adaptador de red → Propiedades IPv4
 - Asignar IP fija (ej: 192.168.1.100)
 
 **Abrir puertos en el firewall del servidor:**
+
 ```bash
 # Windows Firewall
 netsh advfirewall firewall add rule name="RESEJ Backend" dir=in action=allow protocol=TCP localport=3001
@@ -265,6 +272,7 @@ netsh advfirewall firewall add rule name="RESEJ Frontend" dir=in action=allow pr
 Repetir los pasos 1-9 de la Opción A en cada computadora de la dependencia.
 
 **Diferencias clave:**
+
 - No es necesario configurar acceso remoto
 - Usar `localhost` en todas las configuraciones
 - Cada dependencia tiene su propia base de datos independiente
@@ -393,7 +401,7 @@ psql -U resej_user -d resej_db
 
 ```sql
 -- Insertar administrador (la contraseña será hasheada automáticamente al iniciar sesión)
-INSERT INTO usuarios (username, password, rol, activo) 
+INSERT INTO usuarios (username, password, rol, activo)
 VALUES ('admin', '$2b$10$...', 'admin', true);
 ```
 
@@ -403,7 +411,7 @@ Editar en la interfaz web o directamente en la base de datos:
 
 ```sql
 -- Configurar información de la comisaría
-UPDATE configuracion SET 
+UPDATE configuracion SET
   dependencia_nombre = 'Comisaría Primera',
   dependencia_codigo = 'COM01',
   ubicacion = 'Dirección de la comisaría',
@@ -480,6 +488,7 @@ http://[IP-DEL-SERVIDOR]:3000
 ### Error: "Cannot connect to database"
 
 **Solución:**
+
 ```bash
 # 1. Verificar que PostgreSQL esté corriendo
 # Windows:
@@ -494,6 +503,7 @@ psql -U resej_user -d resej_db -h localhost
 ### Error: "Port 3001 already in use"
 
 **Solución:**
+
 ```bash
 # Windows - Encontrar y terminar proceso
 netstat -ano | findstr :3001
@@ -506,6 +516,7 @@ PORT=3002
 ### Error: "npm command not found"
 
 **Solución:**
+
 1. Instalar Node.js desde https://nodejs.org/
 2. Reiniciar la terminal
 3. Verificar: `node --version`
@@ -513,6 +524,7 @@ PORT=3002
 ### Frontend no carga
 
 **Solución:**
+
 ```bash
 # 1. Verificar que el backend esté corriendo
 curl http://localhost:3001/api/health
@@ -527,6 +539,7 @@ npm run build
 ### No se pueden subir archivos
 
 **Solución:**
+
 ```bash
 # 1. Verificar permisos de la carpeta uploads
 # Windows: Click derecho → Propiedades → Seguridad
@@ -553,11 +566,13 @@ MAX_FILE_SIZE=10485760
 Se recomienda capacitar al personal en:
 
 1. **Nivel Básico (2 horas)**
+
    - Login y navegación
    - Crear registros
    - Buscar y consultar
 
 2. **Nivel Intermedio (4 horas)**
+
    - Gestión de archivos
    - Reportes
    - Gestión de usuarios
@@ -588,14 +603,14 @@ Completar antes de poner en producción:
 
 ## 📋 Registro de Instalación
 
-**Dependencia:** _______________________________________________  
-**Fecha de Instalación:** _______________________________________________  
-**Instalado por:** _______________________________________________  
+**Dependencia:** **********************\_\_\_**********************  
+**Fecha de Instalación:** **********************\_\_\_**********************  
+**Instalado por:** **********************\_\_\_**********************  
 **Versión del Sistema:** 1.0.0  
 **Tipo de Instalación:** [ ] Servidor Central [ ] Local [ ] Electron  
-**IP del Servidor:** _______________________________________________  
-**Usuarios Creados:** _______________________________________________  
-**Observaciones:** _______________________________________________  
+**IP del Servidor:** **********************\_\_\_**********************  
+**Usuarios Creados:** **********************\_\_\_**********************  
+**Observaciones:** **********************\_\_\_**********************
 
 ---
 

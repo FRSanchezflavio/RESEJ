@@ -104,45 +104,53 @@ Ver: `GUIA_INSTALACION_DEPENDENCIAS.md` → Opción C
 
 ## 📖 Documentación Incluida
 
-| Archivo | Descripción |
-|---------|-------------|
-| `REQUISITOS_SISTEMA.md` | Requisitos de hardware y software |
+| Archivo                            | Descripción                                 |
+| ---------------------------------- | ------------------------------------------- |
+| `REQUISITOS_SISTEMA.md`            | Requisitos de hardware y software           |
 | `GUIA_INSTALACION_DEPENDENCIAS.md` | Guía completa con 3 opciones de instalación |
-| `INSTALACION.md` | Documentación técnica general |
-| `INICIO_RAPIDO.md` | Guía de inicio rápido |
-| `CONFIGURACION_PRODUCCION.md` | Configuración para producción |
+| `INSTALACION.md`                   | Documentación técnica general               |
+| `INICIO_RAPIDO.md`                 | Guía de inicio rápido                       |
+| `CONFIGURACION_PRODUCCION.md`      | Configuración para producción               |
 
 ---
 
 ## 🛠️ Scripts Útiles
 
 ### Iniciar el Sistema
+
 ```bash
 iniciar-sistema.bat
 ```
+
 - Inicia Backend y Frontend
 - Abre automáticamente en el navegador
 - Backend: `http://localhost:3001`
 - Frontend: `http://localhost:5173`
 
 ### Detener el Sistema
+
 ```bash
 detener-sistema.bat
 ```
+
 - Detiene todos los procesos de Node.js
 
 ### Crear Respaldo
+
 ```bash
 backup-db.bat
 ```
+
 - Crea un respaldo completo de la base de datos
 - Guarda en `C:\RESEJ-Backups\`
 - Incluye fecha y hora en el nombre del archivo
 
 ### Restaurar Respaldo
+
 ```bash
 restaurar-db.bat
 ```
+
 - Restaura la base de datos desde un respaldo
 - ⚠️ **ADVERTENCIA:** Reemplaza todos los datos actuales
 
@@ -174,6 +182,7 @@ PORT=3001
 ```
 
 **Generar JWT_SECRET seguro:**
+
 ```bash
 # En Node.js:
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
@@ -186,12 +195,14 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ### En Red Local
 
 1. Obtener la IP del servidor:
+
    ```bash
    ipconfig
    # Buscar "Dirección IPv4"
    ```
 
 2. Configurar firewall:
+
    ```bash
    # Ejecutar como Administrador
    netsh advfirewall firewall add rule name="RESEJ Backend" dir=in action=allow protocol=TCP localport=3001
@@ -199,6 +210,7 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
    ```
 
 3. Editar `frontend\.env`:
+
    ```env
    VITE_API_URL=http://192.168.1.XXX:3001/api
    ```
@@ -246,6 +258,7 @@ node verificar-sistema.js
 ### Error: "node is not recognized"
 
 **Solución:** Node.js no está instalado o no está en el PATH.
+
 1. Instalar Node.js desde https://nodejs.org/
 2. Reiniciar la terminal
 3. Verificar: `node --version`
@@ -253,6 +266,7 @@ node verificar-sistema.js
 ### Error: "Cannot connect to database"
 
 **Solución:** Verificar PostgreSQL.
+
 1. Abrir "Servicios" de Windows
 2. Buscar servicio de PostgreSQL
 3. Asegurarse de que esté "Iniciado"
@@ -261,6 +275,7 @@ node verificar-sistema.js
 ### Error: "Port 3001 already in use"
 
 **Solución:** Cambiar el puerto o detener el proceso.
+
 ```bash
 # Opción 1: Cambiar puerto en BACKEND\.env
 PORT=3002
@@ -273,6 +288,7 @@ taskkill /PID [número] /F
 ### Frontend no carga
 
 **Solución:**
+
 ```bash
 cd frontend
 npm run build
@@ -292,6 +308,7 @@ npm run dev
 ### Antes de Contactar Soporte
 
 Tenga a mano:
+
 1. Versión del sistema (1.0.0)
 2. Sistema operativo
 3. Capturas de pantalla del error
@@ -300,6 +317,7 @@ Tenga a mano:
 ### Logs del Sistema
 
 Ubicación de logs:
+
 ```
 BACKEND\logs\
 ├── combined.log    → Todos los logs
@@ -320,11 +338,11 @@ BACKEND\logs\
 
 ### Roles de Usuario
 
-| Rol | Permisos |
-|-----|----------|
-| **Admin** | Acceso total, gestión de usuarios |
-| **Operador** | Crear y editar registros |
-| **Consulta** | Solo visualización |
+| Rol          | Permisos                          |
+| ------------ | --------------------------------- |
+| **Admin**    | Acceso total, gestión de usuarios |
+| **Operador** | Crear y editar registros          |
+| **Consulta** | Solo visualización                |
 
 ---
 
@@ -366,7 +384,7 @@ BACKEND\logs\
 **Versión:** 1.0.0  
 **Desarrolladores:** Flavio Sanchez & Lucas Jonas Diaz  
 **Organización:** Policía de Tucumán  
-**Licencia:** Uso interno policial  
+**Licencia:** Uso interno policial
 
 ---
 

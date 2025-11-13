@@ -5,25 +5,28 @@
 **Nombre del Sistema:** RE.SE.J - Sistema de Registro de Secuestros Judiciales  
 **Versión:** 1.0.0  
 **Desarrolladores:** Flavio Sanchez & Lucas Jonas Diaz  
-**Organización:** Policía de Tucumán  
+**Organización:** Policía de Tucumán
 
 ---
 
 ## 💻 Requisitos de Hardware
 
 ### Servidor (Mínimo)
+
 - **Procesador:** Intel Core i3 o equivalente (2.0 GHz o superior)
 - **Memoria RAM:** 4 GB mínimo (8 GB recomendado)
 - **Disco Duro:** 20 GB de espacio libre (50 GB recomendado)
 - **Red:** Tarjeta de red 100 Mbps
 
 ### Servidor (Recomendado)
+
 - **Procesador:** Intel Core i5 o superior (3.0 GHz o superior)
 - **Memoria RAM:** 16 GB o más
 - **Disco Duro:** 100 GB SSD
 - **Red:** Tarjeta de red 1 Gbps
 
 ### Estaciones de Trabajo (Clientes)
+
 - **Procesador:** Intel Core i3 o equivalente
 - **Memoria RAM:** 4 GB mínimo
 - **Disco Duro:** 10 GB de espacio libre
@@ -37,6 +40,7 @@
 ### Sistema Operativo (Servidor)
 
 **Opciones soportadas:**
+
 - ✅ Windows 10/11 Pro o Enterprise (64 bits)
 - ✅ Windows Server 2016/2019/2022
 - ✅ Ubuntu 20.04 LTS o superior
@@ -45,6 +49,7 @@
 ### Sistema Operativo (Clientes)
 
 **Navegadores Web soportados:**
+
 - ✅ Google Chrome 100 o superior (Recomendado)
 - ✅ Mozilla Firefox 100 o superior
 - ✅ Microsoft Edge 100 o superior
@@ -56,6 +61,7 @@
 ## 🔧 Software Requerido en el Servidor
 
 ### 1. Node.js
+
 - **Versión:** 18.x o superior
 - **Descarga:** https://nodejs.org/
 - **Verificar instalación:**
@@ -65,6 +71,7 @@
   ```
 
 ### 2. PostgreSQL
+
 - **Versión:** 13.x o superior (Recomendado: 15.x)
 - **Descarga:** https://www.postgresql.org/download/
 - **Verificar instalación:**
@@ -73,6 +80,7 @@
   ```
 
 ### 3. Git (Opcional - para actualizaciones)
+
 - **Versión:** 2.30 o superior
 - **Descarga:** https://git-scm.com/downloads
 
@@ -81,6 +89,7 @@
 ## 📦 Dependencias del Sistema
 
 ### Backend (Node.js)
+
 ```json
 {
   "express": "^5.1.0",
@@ -99,6 +108,7 @@
 ```
 
 ### Frontend (React + Vite)
+
 ```json
 {
   "react": "^19.1.1",
@@ -115,18 +125,22 @@
 ## 🌐 Requisitos de Red
 
 ### Configuración de Red Local
+
 - **Puerto Backend:** 3001 (configurable)
 - **Puerto Frontend:** 5173 (desarrollo) / 3000 (producción)
 - **Puerto PostgreSQL:** 5432
 - **Protocolo:** HTTP/HTTPS
 
 ### Firewall
+
 **Puertos a habilitar:**
+
 - Puerto 3001 (API Backend)
 - Puerto 3000 o 80/443 (Frontend Web)
 - Puerto 5432 (PostgreSQL - solo si es acceso remoto)
 
 ### Conectividad
+
 - Red local (LAN) para instalación centralizada
 - Internet (opcional) para actualizaciones y notificaciones por email
 
@@ -135,15 +149,18 @@
 ## 🔒 Requisitos de Seguridad
 
 ### Certificados SSL/TLS (Recomendado para producción)
+
 - Certificado SSL válido para HTTPS
 - Configuración de variables de entorno seguras
 
 ### Base de Datos
+
 - Usuario dedicado con permisos limitados
 - Contraseñas seguras (mínimo 12 caracteres)
 - Respaldo de base de datos configurado
 
 ### Autenticación
+
 - Sistema de tokens JWT
 - Gestión de roles y permisos
 - Rate limiting para prevenir ataques
@@ -153,17 +170,20 @@
 ## 💾 Requisitos de Almacenamiento
 
 ### Base de Datos PostgreSQL
+
 - **Espacio inicial:** 500 MB
-- **Crecimiento estimado:** 
+- **Crecimiento estimado:**
   - 10 MB por cada 1000 registros
   - Archivos adjuntos: variable según uso
 
 ### Archivos Adjuntos
+
 - **Ubicación:** `/uploads` (configurable)
 - **Espacio recomendado:** 10 GB inicial
 - **Tipos permitidos:** PDF, imágenes (JPG, PNG), documentos
 
 ### Logs del Sistema
+
 - **Ubicación:** `/BACKEND/logs`
 - **Espacio recomendado:** 1 GB
 - **Rotación:** Configurada automáticamente
@@ -186,15 +206,18 @@ work_mem = 4MB
 ## 📱 Requisitos para Acceso Móvil
 
 ### Navegadores Móviles
+
 - ✅ Chrome Mobile (Android)
 - ✅ Safari Mobile (iOS)
 - ✅ Edge Mobile
 
 ### Sistema Operativo Móvil
+
 - Android 8.0 o superior
 - iOS 13.0 o superior
 
 ### Conectividad
+
 - WiFi o datos móviles con conexión a la red de la dependencia
 
 ---
@@ -202,9 +225,11 @@ work_mem = 4MB
 ## ⚙️ Modo Electron (Aplicación de Escritorio)
 
 ### Sistema Operativo
+
 - Windows 10/11 (64 bits)
 
 ### Requisitos Adicionales
+
 - 200 MB adicionales de espacio en disco
 - Permisos de administrador para instalación
 
@@ -228,6 +253,7 @@ Antes de instalar, verificar que se cuenta con:
 ## 📞 Soporte Técnico
 
 Para consultas sobre requisitos del sistema:
+
 - **Email:** soporte@resej.gob.ar
 - **Teléfono:** [Número de contacto]
 - **Horario:** Lunes a Viernes, 8:00 - 16:00
