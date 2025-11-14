@@ -1,51 +1,80 @@
 import React, { useContext } from "react";
-import { Container, Card, Row, Col, Button } from "react-bootstrap";
+import { Container, Button } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
+import { usePermisos } from "../../context/usePermisos";
 import { useNavigate } from "react-router-dom";
-import { Share2 } from "lucide-react";
+import "./Dashboard.css";
 
 export default function Dashboard() {
   const { user } = useContext(AuthContext);
+  const { permisos } = usePermisos();
   const navigate = useNavigate();
 
   const isAdmin = user?.rol === "administrador";
+  const puedeCargar = permisos.puede_crear || isAdmin;
 
   return (
-    <Container style={{ paddingTop: 20 }}>
-      <Row>
-        <Col>
-          <Card className="mb-3 p-3">
-            <h5>Accesos r√°pidos</h5>
-            <div className="d-flex gap-2 mt-3 flex-wrap">
-              <Button variant="outline-dark" onClick={() => navigate("/registros")}>
-                Ì¥ç Buscar Registros
+    <div className="dashboard-container">
+      {/* Header con gradiente */}
+      <div className="dashboard-header">
+        <h2>üëã Bienvenido, {user?.nombre || user?.usuario}</h2>
+        <p className="user-info">
+          <span className="user-role">{user?.rol}</span>
+        </p>
+      </div>
+
+      {/* Acciones r√°pidas */}
+      <div className="quick-actions">
+        <h5>üöÄ Accesos R√°pidos</h5>
+        <div className="action-cards">
+          {/* Buscar Registros */}
+          <div className="action-card search" onClick={() => navigate("/registros")}>
+            <div className="action-card-icon">üîç</div>
+            <h6 className="action-card-title">Buscar Registros</h6>
+            <p className="action-card-desc">
+              Consulta y descarga informaci√≥n de secuestros registrados
+            </p>
+            <Button variant="outline-primary">
+              Ir a B√∫squeda
+            </Button>
+          </div>
+
+          {/* Cargar Registros */}
+          <div 
+            className={`action-card upload ${!puedeCargar ? 'disabled' : ''}`}
+            onClick={() => puedeCargar && navigate("/cargar")}
+          >
+            <div className="action-card-icon">üì§</div>
+            <h6 className="action-card-title">Cargar Registros</h6>
+            <p className="action-card-desc">
+              {puedeCargar 
+                ? "Carga nuevos casos de secuestros al sistema"
+                : "No tiene permisos para cargar registros"
+              }
+            </p>
+            <Button 
+              variant={puedeCargar ? "success" : "secondary"} 
+              disabled={!puedeCargar}
+            >
+              {puedeCargar ? "Cargar Nuevo" : "Sin Acceso"}
+            </Button>
+          </div>
+
+          {/* Gestionar Usuarios - Solo Admin */}
+          {isAdmin && (
+            <div className="action-card users" onClick={() => navigate("/usuarios")}>
+              <div className="action-card-icon">üë•</div>
+              <h6 className="action-card-title">Gestionar Usuarios</h6>
+              <p className="action-card-desc">
+                Administra usuarios y permisos del sistema
+              </p>
+              <Button variant="warning">
+                Administrar
               </Button>
-              <Button 
-                variant="outline-primary" 
-                onClick={() => navigate("/enlaces")}
-                className="d-flex align-items-center gap-2"
-              >
-                <Share2 size={18} /> Enlaces Compartidos
-              </Button>
-              {isAdmin ? (
-                <>
-                  <Button variant="dark" onClick={() => navigate("/cargar")}>
-                    Ì≥Ñ Cargar Registros
-                  </Button>
-                  <Button variant="outline-dark" onClick={() => navigate("/usuarios")}>
-                    Ì±• Gestionar Usuarios
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="secondary" disabled>Ì≥Ñ Cargar Registros</Button>
-                  <Button variant="secondary" disabled>Ì±• Gestionar Usuarios</Button>
-                </>
-              )}
             </div>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
