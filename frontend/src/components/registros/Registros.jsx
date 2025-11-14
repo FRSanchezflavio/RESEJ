@@ -78,14 +78,33 @@ export default function Registros() {
       );
       if (!res.ok) throw new Error("Error al descargar archivo");
       const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = archivo.nombre_original;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      
+      // Detectar iOS/Safari para usar método alternativo
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      
+      if (isIOS) {
+        // En iOS, usar FileReader para convertir blob a data URL
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const a = document.createElement("a");
+          a.href = reader.result;
+          a.download = archivo.nombre_original;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        };
+        reader.readAsDataURL(blob);
+      } else {
+        // Método estándar para otros navegadores
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = archivo.nombre_original;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      }
     } catch (err) {
       console.error(err);
       alert("Error al descargar archivo");
