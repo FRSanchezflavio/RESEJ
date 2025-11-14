@@ -15,8 +15,19 @@ class AuthService {
    */
   static async login(usuario, password, ipAddress) {
     try {
-      // Buscar usuario
-      const user = await Usuario.findByUsername(usuario);
+      // Buscar usuario con sus permisos de rol
+      const user = await db('usuarios')
+        .select(
+          'usuarios.*',
+          'roles.nombre as rol_nombre',
+          'roles.puede_crear',
+          'roles.puede_editar',
+          'roles.puede_eliminar',
+          'roles.puede_consultar'
+        )
+        .leftJoin('roles', 'usuarios.rol_id', 'roles.id')
+        .where('usuarios.usuario', usuario)
+        .first();
 
       if (!user) {
         logger.warn(
@@ -41,12 +52,23 @@ class AuthService {
         throw new Error('Credenciales inválidas');
       }
 
-      // Generar tokens
+      // Crear objeto de permisos
+      const permisos = {
+        puede_crear: user.puede_crear || false,
+        puede_editar: user.puede_editar || false,
+        puede_eliminar: user.puede_eliminar || false,
+        puede_consultar: user.puede_consultar || false,
+        rol: user.rol_nombre || 'sin_rol',
+      };
+
+      // Generar tokens con permisos incluidos
       const payload = {
         userId: user.id,
         usuario: user.usuario,
-        rol: user.rol,
+        rol: user.rol_nombre || user.rol, // Usar rol_nombre de la tabla roles
+        rolNombre: user.rol_nombre,
         nombreCompleto: `${user.nombre} ${user.apellido}`,
+        permisos: permisos,
       };
 
       const accessToken = generateAccessToken(payload);
@@ -68,16 +90,25 @@ class AuthService {
         usuario_id: user.id,
         accion: 'LOGIN',
         recurso_tipo: 'autenticacion',
-        detalles: JSON.stringify({ usuario: user.usuario }),
+        detalles: JSON.stringify({
+          usuario: user.usuario,
+          rol: user.rol_nombre,
+        }),
         ip_address: ipAddress,
       });
 
-      logger.info(`Login exitoso: ${usuario} desde ${ipAddress}`);
+      logger.info(
+        `Login exitoso: ${usuario} (${user.rol_nombre}) desde ${ipAddress}`
+      );
 
       return {
         accessToken,
         refreshToken,
-        usuario: formatUsuario(user),
+        usuario: {
+          ...formatUsuario(user),
+          rol_nombre: user.rol_nombre,
+        },
+        permisos: permisos,
       };
     } catch (error) {
       logger.error(`Error en login: ${error.message}`);
@@ -109,19 +140,41 @@ class AuthService {
         throw new Error('Refresh token expirado');
       }
 
-      // Obtener usuario
-      const user = await Usuario.findById(decoded.userId);
+      // Obtener usuario con sus permisos de rol
+      const user = await db('usuarios')
+        .select(
+          'usuarios.*',
+          'roles.nombre as rol_nombre',
+          'roles.puede_crear',
+          'roles.puede_editar',
+          'roles.puede_eliminar',
+          'roles.puede_consultar'
+        )
+        .leftJoin('roles', 'usuarios.rol_id', 'roles.id')
+        .where('usuarios.id', decoded.userId)
+        .first();
 
       if (!user || !user.activo) {
         throw new Error('Usuario no encontrado o inactivo');
       }
 
-      // Generar nuevo access token
+      // Crear objeto de permisos
+      const permisos = {
+        puede_crear: user.puede_crear || false,
+        puede_editar: user.puede_editar || false,
+        puede_eliminar: user.puede_eliminar || false,
+        puede_consultar: user.puede_consultar || false,
+        rol: user.rol_nombre || 'sin_rol',
+      };
+
+      // Generar nuevo access token con permisos
       const payload = {
         userId: user.id,
         usuario: user.usuario,
         rol: user.rol,
+        rolNombre: user.rol_nombre,
         nombreCompleto: `${user.nombre} ${user.apellido}`,
+        permisos: permisos,
       };
 
       const newAccessToken = generateAccessToken(payload);
@@ -130,7 +183,11 @@ class AuthService {
 
       return {
         accessToken: newAccessToken,
-        usuario: formatUsuario(user),
+        usuario: {
+          ...formatUsuario(user),
+          rol_nombre: user.rol_nombre,
+        },
+        permisos: permisos,
       };
     } catch (error) {
       logger.error(`Error al refrescar token: ${error.message}`);
@@ -197,6 +254,32 @@ class AuthService {
       return { deleted };
     } catch (error) {
       logger.error(`Error al limpiar tokens expirados: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Validar contraseña del usuario
+   */
+  static async validatePassword(userId, password) {
+    try {
+      const user = await Usuario.findById(userId);
+
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const passwordMatch = await comparePassword(password, user.password_hash);
+
+      logger.info(
+        `Validación de contraseña para usuario: ${user.usuario} - ${
+          passwordMatch ? 'exitosa' : 'fallida'
+        }`
+      );
+
+      return passwordMatch;
+    } catch (error) {
+      logger.error(`Error al validar contraseña: ${error.message}`);
       throw error;
     }
   }

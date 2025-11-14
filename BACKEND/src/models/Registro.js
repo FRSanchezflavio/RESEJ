@@ -79,25 +79,57 @@ class Registro {
       .orderBy('r.fecha_carga', 'desc');
 
     if (termino) {
-      if (criterio === 'todos' || criterio === 'persona') {
-        query = query.where(function () {
+      query = query.where(function () {
+        if (criterio === 'todos') {
+          // Búsqueda en todos los campos
           this.where('p.nombre', 'ilike', `%${termino}%`)
             .orWhere('p.apellido', 'ilike', `%${termino}%`)
-            .orWhere('p.dni', 'ilike', `%${termino}%`);
-        });
-      }
-
-      if (criterio === 'todos' || criterio === 'legajo') {
-        query = query.orWhere('r.numero_legajo', 'ilike', `%${termino}%`);
-      }
-
-      if (criterio === 'todos' || criterio === 'ufi') {
-        query = query.orWhere('r.ufi', 'ilike', `%${termino}%`);
-      }
-
-      if (criterio === 'todos' || criterio === 'protocolo') {
-        query = query.orWhere('r.numero_protocolo', 'ilike', `%${termino}%`);
-      }
+            .orWhere('p.dni', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_legajo', 'ilike', `%${termino}%`)
+            .orWhere('r.ufi', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_protocolo', 'ilike', `%${termino}%`)
+            .orWhere('r.numero_causa', 'ilike', `%${termino}%`)
+            .orWhere('r.detalle_secuestro', 'ilike', `%${termino}%`)
+            .orWhere('r.cadena_custodia', 'ilike', `%${termino}%`)
+            .orWhere('r.of_a_cargo', 'ilike', `%${termino}%`)
+            .orWhere('r.estado_secuestro', 'ilike', `%${termino}%`)
+            .orWhere('r.lugar_deposito', 'ilike', `%${termino}%`)
+            .orWhere('r.caratula', 'ilike', `%${termino}%`)
+            .orWhere('r.victima', 'ilike', `%${termino}%`)
+            .orWhere('r.imputado_causante', 'ilike', `%${termino}%`)
+            .orWhere('r.denunciante', 'ilike', `%${termino}%`);
+        } else if (criterio === 'persona') {
+          this.where('p.nombre', 'ilike', `%${termino}%`).orWhere(
+            'p.apellido',
+            'ilike',
+            `%${termino}%`
+          );
+        } else if (criterio === 'dni') {
+          this.where('p.dni', 'ilike', `%${termino}%`);
+        } else if (criterio === 'legajo') {
+          this.where('r.numero_legajo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'causa') {
+          this.where('r.numero_causa', 'ilike', `%${termino}%`);
+        } else if (criterio === 'ufi') {
+          this.where('r.ufi', 'ilike', `%${termino}%`);
+        } else if (criterio === 'protocolo') {
+          this.where('r.numero_protocolo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'cadena_custodia') {
+          this.where('r.cadena_custodia', 'ilike', `%${termino}%`);
+        } else if (criterio === 'detalle') {
+          this.where('r.detalle_secuestro', 'ilike', `%${termino}%`);
+        } else if (criterio === 'oficial') {
+          this.where('r.of_a_cargo', 'ilike', `%${termino}%`);
+        } else if (criterio === 'caratula') {
+          this.where('r.caratula', 'ilike', `%${termino}%`);
+        } else if (criterio === 'victima') {
+          this.where('r.victima', 'ilike', `%${termino}%`);
+        } else if (criterio === 'imputado') {
+          this.where('r.imputado_causante', 'ilike', `%${termino}%`);
+        } else if (criterio === 'denunciante') {
+          this.where('r.denunciante', 'ilike', `%${termino}%`);
+        }
+      });
     }
 
     if (estado_causa) query = query.where('r.estado_causa', estado_causa);

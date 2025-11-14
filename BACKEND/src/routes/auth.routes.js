@@ -26,4 +26,11 @@ router.post('/logout', authController.logout);
 // GET /api/auth/me - Obtener datos del usuario autenticado
 router.get('/me', authenticateToken, authController.me);
 
+// POST /api/auth/validate-password - Validar contraseña del usuario actual
+router.post(
+  '/validate-password',
+  authenticateToken,
+  authController.validatePassword
+);
+
 module.exports = router;

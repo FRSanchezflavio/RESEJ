@@ -2,79 +2,48 @@ const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuariosController');
 const { authenticateToken } = require('../middleware/auth');
-const { requireAdmin } = require('../middleware/authorize');
-const auditLogger = require('../middleware/auditLogger');
-const {
-  createUsuarioValidators,
-  idParamValidator,
-  handleValidationErrors,
-} = require('../utils/validators');
+const { verificarPermiso } = require('../middleware/permisos');
 
-// Todas las rutas requieren autenticación y rol de administrador
-router.use(authenticateToken, requireAdmin);
-
-// GET /api/usuarios - Listar todos los usuarios
-router.get('/', usuariosController.getAll);
-
-// GET /api/usuarios/:id - Obtener usuario por ID
+// Rutas de usuarios
+router.get('/roles', authenticateToken, usuariosController.obtenerRoles);
 router.get(
-  '/:id',
-  idParamValidator,
-  handleValidationErrors,
-  usuariosController.getById
+  '/',
+  authenticateToken,
+  verificarPermiso('consultar'),
+  usuariosController.obtenerUsuarios
 );
-
-// POST /api/usuarios - Crear nuevo usuario
 router.post(
   '/',
-  createUsuarioValidators,
-  handleValidationErrors,
-  auditLogger('CREAR_USUARIO', 'usuario'),
-  usuariosController.create
+  authenticateToken,
+  verificarPermiso('crear'),
+  usuariosController.crearUsuario
 );
-
-// PUT /api/usuarios/:id - Actualizar usuario
 router.put(
   '/:id',
-  idParamValidator,
-  handleValidationErrors,
-  auditLogger('ACTUALIZAR_USUARIO', 'usuario'),
-  usuariosController.update
+  authenticateToken,
+  verificarPermiso('editar'),
+  usuariosController.actualizarUsuario
+);
+router.delete(
+  '/:id',
+  authenticateToken,
+  verificarPermiso('eliminar'),
+  usuariosController.eliminarUsuario
 );
 
-// PATCH /api/usuarios/:id/deactivate - Desactivar usuario
-router.patch(
-  '/:id/deactivate',
-  idParamValidator,
-  handleValidationErrors,
-  auditLogger('DESACTIVAR_USUARIO', 'usuario'),
-  usuariosController.deactivate
-);
-
-// PATCH /api/usuarios/:id/activate - Activar usuario
-router.patch(
-  '/:id/activate',
-  idParamValidator,
-  handleValidationErrors,
-  auditLogger('ACTIVAR_USUARIO', 'usuario'),
-  usuariosController.activate
-);
-
-// POST /api/usuarios/:id/reset-password - Resetear contraseña
+// Rutas para tokens de acceso temporal
 router.post(
-  '/:id/reset-password',
-  idParamValidator,
-  handleValidationErrors,
-  auditLogger('RESETEAR_PASSWORD', 'usuario'),
-  usuariosController.resetPassword
+  '/generar-enlace-acceso',
+  authenticateToken,
+  verificarPermiso('crear'),
+  usuariosController.generarEnlaceAcceso
 );
-
-// GET /api/usuarios/:id/historial-accesos - Ver historial de accesos
+router.post('/validar-token-acceso', usuariosController.validarTokenAcceso);
 router.get(
-  '/:id/historial-accesos',
-  idParamValidator,
-  handleValidationErrors,
-  usuariosController.getAccessHistory
+  '/tokens-activos',
+  authenticateToken,
+  verificarPermiso('crear'),
+  usuariosController.listarTokensActivos
 );
 
 module.exports = router;

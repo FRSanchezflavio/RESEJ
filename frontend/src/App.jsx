@@ -6,8 +6,12 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
+import { PermisosProvider } from './context/PermisosContext';
+import { usePermisos } from './context/usePermisos';
+import { ThemeProvider } from './context/ThemeContext';
 
 import AppNavbar from './components/layout/AppNavbar';
+import Footer from './components/layout/Footer';
 import Login from './components/auth/Login';
 import Dashboard from './components/dashboard/Dashboard';
 import Registros from './components/registros/Registros';
@@ -19,62 +23,79 @@ import Diagnostico from './pages/Diagnostico';
 
 function AppInner() {
   const { user } = useContext(AuthContext);
+  const { permisos } = usePermisos();
 
   const isAdmin = user?.rol === 'administrador';
+  const puedeCargar = permisos.puede_crear || isAdmin;
 
   return (
     <Router>
-      <AppNavbar />
-      <Routes>
-        {/* Ruta raíz */}
-        <Route
-          path="/"
-          element={user ? <Navigate to="/dashboard" /> : <Login />}
-        />
+      <div className="app-shell">
+        <AppNavbar />
 
-        {/* Dashboard */}
-        <Route
-          path="/dashboard"
-          element={user ? <Dashboard /> : <Navigate to="/" />}
-        />
+        <main className="app-main">
+          <Routes>
+            {/* Ruta raíz */}
+            <Route
+              path="/"
+              element={user ? <Navigate to="/dashboard" /> : <Login />}
+            />
 
-        {/* Módulos */}
-        <Route
-          path="/registros"
-          element={user ? <Registros /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/cargar"
-          element={isAdmin ? <UploadForm /> : <Navigate to="/dashboard" />}
-        />
-        <Route
-          path="/usuarios"
-          element={isAdmin ? <UsersManagement /> : <Navigate to="/dashboard" />}
-        />
+            {/* Dashboard */}
+            <Route
+              path="/dashboard"
+              element={user ? <Dashboard /> : <Navigate to="/" />}
+            />
 
-        {/* Enlaces Compartidos */}
-        <Route
-          path="/enlaces"
-          element={user ? <EnlacesCompartidos /> : <Navigate to="/" />}
-        />
+            {/* Módulos */}
+            <Route
+              path="/registros"
+              element={user ? <Registros /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/cargar"
+              element={
+                puedeCargar ? <UploadForm /> : <Navigate to="/dashboard" />
+              }
+            />
+            <Route
+              path="/usuarios"
+              element={
+                isAdmin ? <UsersManagement /> : <Navigate to="/dashboard" />
+              }
+            />
 
-        {/* Diagnóstico */}
-        <Route path="/diagnostico" element={<Diagnostico />} />
+            {/* Enlaces Compartidos */}
+            <Route
+              path="/enlaces"
+              element={user ? <EnlacesCompartidos /> : <Navigate to="/" />}
+            />
 
-        {/* Vista pública de enlace (sin autenticación) */}
-        <Route path="/enlace/:token" element={<VistaEnlacePublico />} />
+            {/* Diagnóstico */}
+            <Route path="/diagnostico" element={<Diagnostico />} />
 
-        {/* Cualquier ruta no válida → redirige */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+            {/* Vista pública de enlace (sin autenticación) */}
+            <Route path="/enlace/:token" element={<VistaEnlacePublico />} />
+
+            {/* Cualquier ruta no válida → redirige */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
     </Router>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppInner />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <PermisosProvider>
+          <AppInner />
+        </PermisosProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
