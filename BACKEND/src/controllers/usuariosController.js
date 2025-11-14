@@ -101,7 +101,8 @@ const crearUsuario = async (req, res) => {
     console.log('✅ Username y email disponibles');
 
     // Verificar que el rol existe
-    const rolIdFinal = rol_id || 2; // Por defecto rol de consulta
+    // Por defecto asignar rol de Administrador (ID 1) con TODOS los permisos
+    const rolIdFinal = rol_id || 1;
     console.log('\n🔍 Verificando rol con ID:', rolIdFinal);
     const rolExiste = await db('roles').where('id', rolIdFinal).first();
 

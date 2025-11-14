@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { PermisosProvider } from './context/PermisosContext';
+import { usePermisos } from './context/usePermisos';
 import { ThemeProvider } from './context/ThemeContext';
 
 import AppNavbar from './components/layout/AppNavbar';
@@ -19,8 +20,10 @@ import UsersManagement from './components/usuarios/UsersManagement';
 
 function AppInner() {
   const { user } = useContext(AuthContext);
+  const { permisos } = usePermisos();
 
   const isAdmin = user?.rol === 'administrador';
+  const puedeCargar = permisos.puede_crear || isAdmin;
 
   return (
     <Router>
@@ -48,7 +51,9 @@ function AppInner() {
             />
             <Route
               path="/cargar"
-              element={isAdmin ? <UploadForm /> : <Navigate to="/dashboard" />}
+              element={
+                puedeCargar ? <UploadForm /> : <Navigate to="/dashboard" />
+              }
             />
             <Route
               path="/usuarios"
