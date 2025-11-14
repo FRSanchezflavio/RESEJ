@@ -1,106 +1,142 @@
-const db = require('../config/database');
-
 /**
  * Middleware para verificar permisos específicos del usuario
- * @param {string} permiso - Nombre del permiso a verificar ('puede_crear', 'puede_editar', 'puede_eliminar', 'puede_consultar')
+ * Se utiliza en las rutas que requieren permisos específicos (crear, editar, eliminar, consultar)
  */
-const verificarPermiso = (permiso) => {
-  return async (req, res, next) => {
-    try {
-      const userId = req.user?.userId || req.user?.id;
 
-      if (!userId) {
+/**
+ * Verifica si el usuario tiene un permiso específico
+ * @param {string} permiso - Tipo de permiso: 'crear', 'editar', 'eliminar', 'consultar'
+ * @returns {Function} Middleware de Express
+ */
+function verificarPermiso(permiso) {
+  return (req, res, next) => {
+    try {
+      // El middleware authenticateToken ya debe haber agregado req.user
+      if (!req.user) {
+        console.log('❌ Usuario no autenticado en verificarPermiso');
         return res.status(401).json({
           success: false,
-          message: 'Usuario no autenticado'
+          error: 'No autenticado',
         });
       }
 
-      // Obtener permisos del usuario desde la base de datos
-      const usuario = await db('usuarios')
-        .select(
-          'usuarios.*',
-          'roles.puede_crear',
-          'roles.puede_editar',
-          'roles.puede_eliminar',
-          'roles.puede_consultar'
-        )
-        .leftJoin('roles', 'usuarios.rol_id', 'roles.id')
-        .where('usuarios.id', userId)
-        .first();
+      // Los permisos vienen en req.user.permisos del JWT
+      const permisos = req.user.permisos || {};
+      const campo = `puede_${permiso}`;
 
-      if (!usuario) {
-        return res.status(404).json({
-          success: false,
-          message: 'Usuario no encontrado'
-        });
-      }
+      console.log(`🔍 Verificando permiso: ${permiso}`);
+      console.log(`👤 Usuario: ${req.user.usuario} (${req.user.rol})`);
+      console.log(`🔑 Permisos:`, permisos);
 
-      // Verificar el permiso específico
-      if (!usuario[permiso]) {
+      // Verificar si tiene el permiso específico
+      if (!permisos[campo]) {
+        console.log(`❌ Permiso denegado: ${permiso}`);
+        console.log(`   Usuario ${req.user.usuario} no tiene permiso para ${permiso}`);
         return res.status(403).json({
           success: false,
-          message: `No tiene permiso para realizar esta acción (${permiso})`
+          error: `No tiene permiso para ${permiso}`,
+          mensaje: `Su rol (${req.user.rol}) no permite esta acción`,
         });
       }
 
-      // Agregar permisos al request para uso posterior
-      req.permisos = {
-        puede_crear: usuario.puede_crear,
-        puede_editar: usuario.puede_editar,
-        puede_eliminar: usuario.puede_eliminar,
-        puede_consultar: usuario.puede_consultar
-      };
-
+      console.log(`✅ Permiso concedido: ${permiso} para ${req.user.usuario}`);
       next();
     } catch (error) {
-      console.error('Error al verificar permiso:', error);
-      res.status(500).json({
+      console.error('❌ Error en verificarPermiso:', error);
+      return res.status(500).json({
         success: false,
-        message: 'Error al verificar permisos'
+        error: 'Error al verificar permisos',
       });
     }
   };
-};
+}
 
 /**
- * Middleware para verificar si el usuario es administrador
+ * Verifica si el usuario es administrador
+ * Middleware simplificado para rutas que solo admins pueden acceder
+ * @returns {Function} Middleware de Express
  */
-const esAdministrador = async (req, res, next) => {
+function soloAdministrador(req, res, next) {
   try {
-    const userId = req.user?.userId || req.user?.id;
-
-    if (!userId) {
+    if (!req.user) {
+      console.log('❌ Usuario no autenticado en soloAdministrador');
       return res.status(401).json({
         success: false,
-        message: 'Usuario no autenticado'
+        error: 'No autenticado',
       });
     }
 
-    const usuario = await db('usuarios')
-      .select('usuarios.*', 'roles.nombre as rol_nombre')
-      .leftJoin('roles', 'usuarios.rol_id', 'roles.id')
-      .where('usuarios.id', userId)
-      .first();
+    const esAdmin = req.user.rol === 'administrador' || req.user.rolNombre === 'administrador';
 
-    if (!usuario || usuario.rol_nombre !== 'administrador') {
+    console.log(`🔍 Verificando si es administrador: ${req.user.usuario}`);
+    console.log(`   Rol: ${req.user.rol || req.user.rolNombre}`);
+
+    if (!esAdmin) {
+      console.log(`❌ Acceso denegado: no es administrador`);
       return res.status(403).json({
         success: false,
-        message: 'Acceso denegado: requiere privilegios de administrador'
+        error: 'Acceso denegado',
+        mensaje: 'Esta acción solo está disponible para administradores',
       });
     }
 
+    console.log(`✅ Acceso concedido: usuario es administrador`);
     next();
   } catch (error) {
-    console.error('Error al verificar administrador:', error);
-    res.status(500).json({
+    console.error('❌ Error en soloAdministrador:', error);
+    return res.status(500).json({
       success: false,
-      message: 'Error al verificar permisos'
+      error: 'Error al verificar permisos de administrador',
     });
   }
-};
+}
+
+/**
+ * Verifica que el usuario tenga al menos uno de los permisos especificados
+ * @param {Array<string>} permisosRequeridos - Array de permisos, ej: ['crear', 'editar']
+ * @returns {Function} Middleware de Express
+ */
+function verificarAlgunoDeEsosPermisos(permisosRequeridos) {
+  return (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          error: 'No autenticado',
+        });
+      }
+
+      const permisos = req.user.permisos || {};
+      
+      // Verificar si tiene al menos uno de los permisos
+      const tienePermiso = permisosRequeridos.some(permiso => {
+        const campo = `puede_${permiso}`;
+        return permisos[campo] === true;
+      });
+
+      if (!tienePermiso) {
+        console.log(`❌ Permiso denegado: necesita uno de ${permisosRequeridos.join(', ')}`);
+        return res.status(403).json({
+          success: false,
+          error: 'No tiene los permisos necesarios',
+          mensaje: `Requiere uno de los siguientes permisos: ${permisosRequeridos.join(', ')}`,
+        });
+      }
+
+      console.log(`✅ Permiso concedido para ${req.user.usuario}`);
+      next();
+    } catch (error) {
+      console.error('❌ Error en verificarAlgunoDeEsosPermisos:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error al verificar permisos',
+      });
+    }
+  };
+}
 
 module.exports = {
   verificarPermiso,
-  esAdministrador
+  soloAdministrador,
+  verificarAlgunoDeEsosPermisos,
 };

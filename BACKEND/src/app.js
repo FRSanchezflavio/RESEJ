@@ -13,7 +13,7 @@ const personasRoutes = require('./routes/personas.routes');
 const registrosRoutes = require('./routes/registros.routes');
 const archivosRoutes = require('./routes/archivos.routes');
 const logsRoutes = require('./routes/logs.routes');
-const enlacesRoutes = require('./routes/enlacesCompartidos.routes');
+// const enlacesRoutes = require('./routes/enlacesCompartidos.routes'); // TODO: Crear este archivo
 
 const app = express();
 
@@ -83,7 +83,7 @@ app.use('/api/personas', personasRoutes);
 app.use('/api/registros', registrosRoutes);
 app.use('/api/archivos', archivosRoutes);
 app.use('/api/logs', logsRoutes);
-app.use('/api/enlaces-compartidos', enlacesRoutes);
+// app.use('/api/enlaces-compartidos', enlacesRoutes); // TODO: Implementar enlaces compartidos
 
 // Ruta raíz
 app.get('/', (req, res) => {

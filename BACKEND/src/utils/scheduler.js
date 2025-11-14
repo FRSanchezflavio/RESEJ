@@ -1,96 +1,75 @@
 const cron = require('node-cron');
-const db = require('../config/database');
+const logger = require('./logger');
+const { limpiarTokensExpirados } = require('../middleware/tokenAcceso');
 
 /**
- * Limpia tokens de acceso temporal expirados
+ * Inicializa todas las tareas programadas del sistema
+ * Estas tareas se ejecutan automáticamente en segundo plano
  */
-const limpiarTokensExpirados = async () => {
-  try {
-    console.log('🧹 Ejecutando limpieza de tokens expirados...');
-    
-    const resultado = await db('tokens_acceso_temporal')
-      .where('fecha_expiracion', '<', new Date())
-      .del();
-    
-    if (resultado > 0) {
-      console.log(`✅ Se eliminaron ${resultado} tokens expirados`);
+function iniciarTareasProgramadas() {
+  logger.info('📅 Iniciando tareas programadas...');
+
+  // Tarea 1: Limpieza de tokens temporales expirados
+  // Se ejecuta cada hora
+  cron.schedule('0 * * * *', async () => {
+    try {
+      logger.info('🧹 Ejecutando limpieza de tokens temporales expirados...');
+      const eliminados = await limpiarTokensExpirados();
+      if (eliminados > 0) {
+        logger.info(`✅ Tokens temporales eliminados: ${eliminados}`);
+      }
+    } catch (error) {
+      logger.error('❌ Error en limpieza de tokens temporales:', error);
     }
-  } catch (error) {
-    console.error('❌ Error al limpiar tokens expirados:', error);
-  }
-};
-
-/**
- * Limpia sesiones antiguas (refresh tokens)
- */
-const limpiarSesionesAntiguas = async () => {
-  try {
-    console.log('🧹 Ejecutando limpieza de sesiones antiguas...');
-    
-    // Eliminar refresh tokens expirados (más de 30 días)
-    const fechaLimite = new Date();
-    fechaLimite.setDate(fechaLimite.getDate() - 30);
-    
-    const resultado = await db('refresh_tokens')
-      .where('created_at', '<', fechaLimite)
-      .del();
-    
-    if (resultado > 0) {
-      console.log(`✅ Se eliminaron ${resultado} sesiones antiguas`);
-    }
-  } catch (error) {
-    console.error('❌ Error al limpiar sesiones antiguas:', error);
-  }
-};
-
-/**
- * Limpia archivos huérfanos (sin registro asociado)
- */
-const limpiarArchivosHuerfanos = async () => {
-  try {
-    console.log('🧹 Ejecutando limpieza de archivos huérfanos...');
-    
-    const resultado = await db('archivos_adjuntos')
-      .whereNotExists(function() {
-        this.select('*')
-          .from('registros_secuestros')
-          .whereRaw('registros_secuestros.id = archivos_adjuntos.registro_id');
-      })
-      .del();
-    
-    if (resultado > 0) {
-      console.log(`✅ Se eliminaron ${resultado} archivos huérfanos`);
-    }
-  } catch (error) {
-    console.error('❌ Error al limpiar archivos huérfanos:', error);
-  }
-};
-
-/**
- * Inicia todas las tareas programadas
- */
-const iniciarTareasProgramadas = () => {
-  console.log('📅 Iniciando tareas programadas...');
-  
-  // Ejecutar limpieza de tokens cada día a las 2:00 AM
-  cron.schedule('0 2 * * *', () => {
-    console.log('⏰ Ejecutando tareas programadas diarias');
-    limpiarTokensExpirados();
-    limpiarSesionesAntiguas();
   });
-  
-  // Ejecutar limpieza de archivos huérfanos cada domingo a las 3:00 AM
-  cron.schedule('0 3 * * 0', () => {
-    console.log('⏰ Ejecutando limpieza semanal');
-    limpiarArchivosHuerfanos();
+
+  // Tarea 2: Limpieza de refresh tokens expirados
+  // Se ejecuta todos los días a las 2:00 AM
+  cron.schedule('0 2 * * *', async () => {
+    try {
+      logger.info('🧹 Ejecutando limpieza de refresh tokens expirados...');
+      const db = require('../config/database');
+      const eliminados = await db('refresh_tokens')
+        .where('expires_at', '<', new Date())
+        .del();
+      
+      if (eliminados > 0) {
+        logger.info(`✅ Refresh tokens eliminados: ${eliminados}`);
+      }
+    } catch (error) {
+      logger.error('❌ Error en limpieza de refresh tokens:', error);
+    }
   });
-  
-  console.log('✅ Tareas programadas iniciadas correctamente');
-};
+
+  // Tarea 3: Limpieza de logs antiguos (opcional)
+  // Se ejecuta el primer día de cada mes a las 3:00 AM
+  cron.schedule('0 3 1 * *', async () => {
+    try {
+      logger.info('🧹 Ejecutando limpieza de logs antiguos...');
+      const db = require('../config/database');
+      
+      // Mantener solo logs de los últimos 6 meses
+      const seisosesAntes = new Date();
+      seisosesAntes.setMonth(seisosesAntes.getMonth() - 6);
+      
+      const eliminados = await db('logs_auditoria')
+        .where('timestamp', '<', seisosesAntes)
+        .del();
+      
+      if (eliminados > 0) {
+        logger.info(`✅ Logs antiguos eliminados: ${eliminados}`);
+      }
+    } catch (error) {
+      logger.error('❌ Error en limpieza de logs antiguos:', error);
+    }
+  });
+
+  logger.info('✅ Tareas programadas iniciadas correctamente');
+  logger.info('   - Limpieza de tokens temporales: cada hora');
+  logger.info('   - Limpieza de refresh tokens: diaria a las 2:00 AM');
+  logger.info('   - Limpieza de logs antiguos: mensual el día 1 a las 3:00 AM');
+}
 
 module.exports = {
   iniciarTareasProgramadas,
-  limpiarTokensExpirados,
-  limpiarSesionesAntiguas,
-  limpiarArchivosHuerfanos
 };
