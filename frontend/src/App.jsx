@@ -17,9 +17,9 @@ import Dashboard from './components/dashboard/Dashboard';
 import Registros from './components/registros/Registros';
 import UploadForm from './components/registros/UploadForm';
 import UsersManagement from './components/usuarios/UsersManagement';
-import EnlacesCompartidos from './pages/EnlacesCompartidos';
-import VistaEnlacePublico from './pages/VistaEnlacePublico';
-import Diagnostico from './pages/Diagnostico';
+// import EnlacesCompartidos from './pages/EnlacesCompartidos'; // TODO: Implementar
+// import VistaEnlacePublico from './pages/VistaEnlacePublico'; // TODO: Implementar
+// import Diagnostico from './pages/Diagnostico'; // TODO: Implementar
 
 function AppInner() {
   const { user } = useContext(AuthContext);
@@ -65,17 +65,17 @@ function AppInner() {
               }
             />
 
-            {/* Enlaces Compartidos */}
-            <Route
+            {/* Enlaces Compartidos - TODO: Implementar */}
+            {/* <Route
               path="/enlaces"
               element={user ? <EnlacesCompartidos /> : <Navigate to="/" />}
-            />
+            /> */}
 
-            {/* Diagnóstico */}
-            <Route path="/diagnostico" element={<Diagnostico />} />
+            {/* Diagnóstico - TODO: Implementar */}
+            {/* <Route path="/diagnostico" element={<Diagnostico />} /> */}
 
-            {/* Vista pública de enlace (sin autenticación) */}
-            <Route path="/enlace/:token" element={<VistaEnlacePublico />} />
+            {/* Vista pública de enlace - TODO: Implementar */}
+            {/* <Route path="/enlace/:token" element={<VistaEnlacePublico />} /> */}
 
             {/* Cualquier ruta no válida → redirige */}
             <Route path="*" element={<Navigate to="/" />} />
