@@ -816,15 +816,40 @@ function ArchivosAdjuntos({ registroId }) {
         },
       });
 
-      // Crear un enlace temporal para descargar el archivo
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', archivo.nombre_original || 'archivo');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      // Detectar si es iOS/Safari
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isSafari = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      );
+
+      if (isIOS || isSafari) {
+        // Método compatible con iOS/Safari
+        const blob = new Blob([response.data], {
+          type:
+            response.headers['content-type'] ||
+            archivo.tipo_mime ||
+            'application/octet-stream',
+        });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const link = document.createElement('a');
+          link.href = reader.result;
+          link.download = archivo.nombre_original || 'archivo';
+          link.click();
+        };
+        reader.readAsDataURL(blob);
+      } else {
+        // Método estándar para otros navegadores
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', archivo.nombre_original || 'archivo');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }
     } catch (error) {
       console.error('Error al descargar archivo:', error);
       alert('Error al descargar el archivo. Por favor intente nuevamente.');

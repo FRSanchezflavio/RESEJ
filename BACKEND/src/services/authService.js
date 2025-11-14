@@ -65,7 +65,7 @@ class AuthService {
       const payload = {
         userId: user.id,
         usuario: user.usuario,
-        rol: user.rol,
+        rol: user.rol_nombre || user.rol || 'sin_rol', // Usar rol_nombre de la relación con la tabla roles
         rolNombre: user.rol_nombre,
         nombreCompleto: `${user.nombre} ${user.apellido}`,
         permisos: permisos,
@@ -171,7 +171,7 @@ class AuthService {
       const payload = {
         userId: user.id,
         usuario: user.usuario,
-        rol: user.rol,
+        rol: user.rol_nombre || user.rol || 'sin_rol', // Usar rol_nombre de la relación con la tabla roles
         rolNombre: user.rol_nombre,
         nombreCompleto: `${user.nombre} ${user.apellido}`,
         permisos: permisos,
