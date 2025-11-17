@@ -4,10 +4,7 @@ setlocal
 set ROOT_DIR=%~dp0
 set BACKEND_SCRIPT=%ROOT_DIR%iniciar-backend.bat
 set FRONTEND_SCRIPT=%ROOT_DIR%iniciar-frontend.bat
-set FRONTEND_BASE=http://localhost:5173
-set FRONTEND_URL=%FRONTEND_BASE%
-set MAX_RETRIES=20
-set RETRY_DELAY=3
+set FRONTEND_URL=http://localhost:5173
 
 if not exist "%BACKEND_SCRIPT%" (
     echo No se encontro iniciar-backend.bat en %ROOT_DIR%.
@@ -29,32 +26,51 @@ echo   Se abriran dos ventanas de terminal separadas.
 echo ==================================================
 
 start "RESEJ Backend" cmd /k call "%BACKEND_SCRIPT%"
+echo Backend iniciado, esperando 3 segundos...
+timeout /t 3 /nobreak >nul
+
 start "RESEJ Frontend" cmd /k call "%FRONTEND_SCRIPT%"
 
-echo Esperando a que el frontend quede listo en %FRONTEND_BASE% ...
-echo (Esto puede tomar 30-60 segundos mientras Vite compila...)
-set /a RETRY_COUNT=0
+echo.
+echo ==================================================
+echo IMPORTANTE: Vite necesita tiempo para compilar
+echo.
+echo El navegador se abrira en 20 segundos.
+echo Por favor NO cierres esta ventana.
+echo.
+echo Contador:
+echo ==================================================
 
-:WAIT_FOR_FRONTEND
-echo Intento %RETRY_COUNT%/%MAX_RETRIES% - Verificando si Vite responde...
-curl -s -o nul -w "%%{http_code}" %FRONTEND_BASE% 2>nul | findstr "200" >nul
-if %errorlevel%==0 (
-    echo Frontend detectado y listo!
-    goto OPEN_BROWSER
+REM Contador visual
+for /L %%i in (20,-1,1) do (
+    echo   Abriendo navegador en %%i segundos...
+    timeout /t 1 /nobreak >nul
 )
 
-set /a RETRY_COUNT+=1
-if %RETRY_COUNT% GEQ %MAX_RETRIES% (
-    echo Tiempo de espera agotado. Abriendo navegador de todas formas...
-    goto OPEN_BROWSER
-)
-timeout /t %RETRY_DELAY% /nobreak >nul
-goto WAIT_FOR_FRONTEND
+echo.
+echo Listo! Abriendo navegador ahora...
 
 :OPEN_BROWSER
 echo.
-echo Abriendo la app en el navegador predeterminado (%FRONTEND_URL%)
+echo Abriendo %FRONTEND_URL% en el navegador...
+echo.
 start "" "%FRONTEND_URL%"
+
+echo.
+echo ==================================================
+echo APLICACION INICIADA
+echo ==================================================
+echo.
+echo - Backend corriendo en: http://localhost:3000
+echo - Frontend corriendo en: http://localhost:5173
+echo.
+echo Si aun ves error 404 en el navegador:
+echo   Espera 5-10 segundos mas y presiona F5
+echo.
+echo Para detener los servicios:
+echo   Cierra las 2 ventanas de terminal que se abrieron
+echo ==================================================
+echo.
 
 echo Ambos procesos se estan ejecutando en ventanas separadas.
 echo Cierra esas ventanas para detener los servicios.

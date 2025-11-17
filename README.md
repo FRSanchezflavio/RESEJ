@@ -16,7 +16,17 @@ Puedes arrancar ambos servicios con un doble clic gracias a los scripts `.bat` u
 
 ### Todo en uno
 
-Si quieres abrir backend y frontend al mismo tiempo, usa `iniciar-app-completa.bat`. Este script verifica que existan los otros dos `.bat`, abre dos ventanas nuevas (una para `node server.js` y otra para Vite) y espera de forma inteligente a que el frontend responda (sondea `http://localhost:5173/` hasta por ~1 min). En cuanto detecta que Vite está listo, abre automáticamente `http://localhost:5173` en tu navegador predeterminado para que inicies sesión y navegues a Registros. Cierra cualquiera de las ventanas para detener el servicio correspondiente.
+Si quieres abrir backend y frontend al mismo tiempo, usa `iniciar-app-completa.bat`. Este script:
+
+1. Abre dos ventanas de terminal (backend con Node.js y frontend con Vite)
+2. Espera 20 segundos con contador visible para que Vite compile la aplicación
+3. Abre automáticamente tu navegador en `http://localhost:5173`
+
+**El contador de 20 segundos es necesario** porque Vite necesita compilar todo el código React antes de servir la aplicación. NO cierres la ventana durante la espera.
+
+Si al abrir el navegador aún ves error 404, espera 5-10 segundos más y presiona F5.
+
+Cierra las dos ventanas de terminal que se abrieron para detener los servicios.
 
 ### Crear accesos directos (opcional)
 
