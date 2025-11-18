@@ -1,5 +1,98 @@
 {
+  "name": "resej-electron",
+  "version": "1.0.0",
+  "description": "RE.SE.J - Sistema de Registro de Secuestros Judiciales - Policía de Tucumán",
+  "main": "electron-main.js",
+  "scripts": {
+    "electron": "electron .",
+    "electron:dev": "set NODE_ENV=development && electron .",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "echo Backend no requiere compilación",
+    "build:all": "npm run build:frontend && npm run build:backend",
+    "pack": "npm run build:all && electron-builder --dir",
+    "dist": "npm run build:all && electron-builder",
+    "dist:win": "npm run build:all && electron-builder --win",
+    "postinstall": "cd BACKEND && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "resej",
+    "policia",
+    "tucuman",
+    "electron"
+  ],
+  "author": "Flavio Sanchez & Lucas Jonas Diaz",
+  "license": "UNLICENSED",
   "dependencies": {
-    "knex": "^3.1.0"
+    "dotenv": "^17.2.3",
+    "knex": "^3.1.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "electron": "^39.2.1",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.policia.resej",
+    "productName": "RESEJ",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron-main.js",
+      "electron-preload.js",
+      "frontend/dist/**/*",
+      "!**/*.md",
+      "!**/*.log"
+    ],
+    "extraResources": [
+      {
+        "from": "BACKEND",
+        "to": "BACKEND",
+        "filter": [
+          "**/*",
+          "!.git/**/*",
+          "!logs/**/*",
+          "!uploads/**/*",
+          "!test/**/*",
+          "!tests/**/*"
+        ]
+      },
+      {
+        "from": "frontend/dist",
+        "to": "frontend/dist"
+      },
+      {
+        "from": "BACKEND/.env.example",
+        "to": "BACKEND/.env.example"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RE.SE.J",
+      "license": "BACKEND/LICENCIA.md"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    }
   }
 }

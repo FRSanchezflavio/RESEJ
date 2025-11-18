@@ -9,4 +9,11 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    emptyOutDir: true,
+  },
+  base: './', // Importante para que funcione en Electron
 });
+

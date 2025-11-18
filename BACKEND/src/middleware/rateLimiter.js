@@ -26,7 +26,7 @@ const generalLimiter = rateLimit({
 // Rate limiter estricto para login (prevenir fuerza bruta)
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 intentos de login
+  max: process.env.NODE_ENV === 'production' ? 5 : 50, // 50 intentos en desarrollo, 5 en producción
   skipSuccessfulRequests: true, // No contar intentos exitosos
   message: createErrorResponse(
     'Demasiados intentos de inicio de sesión. Por favor intente más tarde',

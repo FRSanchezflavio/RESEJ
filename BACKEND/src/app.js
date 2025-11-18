@@ -23,8 +23,11 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir requests sin origin (como Postman, mobile apps, etc.)
+    // Permitir requests sin origin (como Postman, mobile apps, Electron, etc.)
     if (!origin) return callback(null, true);
+    
+    // Permitir file:// protocol de Electron
+    if (origin.startsWith('file://')) return callback(null, true);
 
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
