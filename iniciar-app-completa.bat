@@ -33,6 +33,7 @@ start "RESEJ Frontend" cmd /k call "%FRONTEND_SCRIPT%"
 
 echo.
 echo ==================================================
+<<<<<<< HEAD
 echo ESPERANDO A QUE VITE COMPILE LA APLICACION...
 echo ==================================================
 echo.
@@ -43,18 +44,41 @@ echo.
 REM Esperar 30 segundos con contador regresivo
 for /L %%i in (30,-1,1) do (
     echo   Tiempo restante: %%i segundos...
+=======
+echo IMPORTANTE: Vite necesita tiempo para compilar
+echo.
+echo El navegador se abrira en 20 segundos.
+echo Por favor NO cierres esta ventana.
+echo.
+echo Contador:
+echo ==================================================
+
+REM Contador visual
+for /L %%i in (20,-1,1) do (
+    echo   Abriendo navegador en %%i segundos...
+>>>>>>> cd57601e476db50c4d478d69812fb000de7d8741
     timeout /t 1 /nobreak >nul
 )
 
 echo.
+<<<<<<< HEAD
 echo *** Abriendo navegador ahora ***
 echo.
 
 :OPEN_BROWSER
+=======
+echo Listo! Abriendo navegador ahora...
+
+:OPEN_BROWSER
+echo.
+echo Abriendo %FRONTEND_URL% en el navegador...
+echo.
+>>>>>>> cd57601e476db50c4d478d69812fb000de7d8741
 start "" "%FRONTEND_URL%"
 
 echo.
 echo ==================================================
+<<<<<<< HEAD
 echo APLICACION INICIADA CORRECTAMENTE
 echo ==================================================
 echo.
@@ -67,6 +91,19 @@ echo - Las 2 ventanas de terminal deben permanecer abiertas
 echo.
 echo Para detener la aplicacion:
 echo   Cierra las 2 ventanas de terminal (Backend y Frontend)
+=======
+echo APLICACION INICIADA
+echo ==================================================
+echo.
+echo - Backend corriendo en: http://localhost:3000
+echo - Frontend corriendo en: http://localhost:5173
+echo.
+echo Si aun ves error 404 en el navegador:
+echo   Espera 5-10 segundos mas y presiona F5
+echo.
+echo Para detener los servicios:
+echo   Cierra las 2 ventanas de terminal que se abrieron
+>>>>>>> cd57601e476db50c4d478d69812fb000de7d8741
 echo ==================================================
 echo.
 
