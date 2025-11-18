@@ -39,6 +39,7 @@ Puedes arrancar ambos servicios con un doble clic gracias a los scripts `.bat` u
 ### Todo en uno
 
 Si quieres abrir backend y frontend al mismo tiempo, usa `iniciar-app-completa.bat`. Este script:
+
 1. Abre dos ventanas de terminal (backend con Node.js y frontend con Vite)
 2. Espera 30 segundos con contador visible para que Vite compile la aplicación
 3. Abre automáticamente tu navegador en `http://localhost:5173`
